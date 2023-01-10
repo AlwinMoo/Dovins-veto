@@ -3,7 +3,7 @@
 
 #include "AEEngine.h"
 
-
+#include "../Source/TestScene.h"
 
 // ---------------------------------------------------------------------------
 // main
@@ -30,7 +30,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// reset the system modules
 	AESysReset();
 
-
+	test_scene::TestScene* mainScene = new test_scene::TestScene();
 
 	// Game Loop
 	while (gGameRunning)
@@ -42,10 +42,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEInputUpdate();
 
 		// Your own update logic goes here
-
+		
 
 		// Your own rendering logic goes here
-
+		mainScene->update();
 
 		// Informing the system about the loop's end
 		AESysFrameEnd();
