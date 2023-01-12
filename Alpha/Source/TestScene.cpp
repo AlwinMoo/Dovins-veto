@@ -1,9 +1,10 @@
 #include "TestScene.h"
-
+#include <iostream>
 namespace test_scene
 {
 	TestScene::TestScene()
 	{
+		AEGfxTextureLoad("PlanetTexture.png");
 	}
 	TestScene::~TestScene()
 	{
@@ -32,7 +33,18 @@ namespace test_scene
 	void TestScene::update()
 	{
 		GameObj::GameObject* specific_go;
-
 		specific_go = FetchGO(GameObj::GameObject::GO_NONE);
+		//std::cout << "Cursor pos: " << x << ", " << y << std::endl;
+		
+	}
+	void TestScene::Render()
+	{
+		s32 cursorX, cursorY;
+		s8 text[]  = "TEST";
+		AEInputGetCursorPosition(&cursorX, &cursorY);
+		f32 fcursorX, fcursorY;
+		//fcursorX = cursorX/AE
+		//AEGfxSetBackgroundColor(0.3f, 0.3f, 0.3f);
+		AEGfxPrint(m_fontId, text, 0.5f, 0.f, 10.f, 1.f, 0.f, 0.f);
 	}
 }
