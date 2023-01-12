@@ -32,6 +32,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	
 	test_scene::TestScene* mainScene = new test_scene::TestScene();
+	mainScene->Init();
 	s8 defaultFont = AEGfxCreateFont("./Assets/Roboto-Regular.ttf", 0);
 	mainScene->m_fontId = defaultFont;
 	// Game Loop
@@ -47,7 +48,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		
 
 		// Your own rendering logic goes here
-		mainScene->update();
+		mainScene->Update();
 		mainScene->Render();
 		// Informing the system about the loop's end
 		AESysFrameEnd();

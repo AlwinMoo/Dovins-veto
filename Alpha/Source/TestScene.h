@@ -14,10 +14,11 @@ namespace test_scene
 
 		int object_count;
 
-		std::vector<GameObj::GameObject*> go_list;
-		GameObj::GameObject* FetchGO(GameObj::GameObject::GAMEOBJECT_TYPE value);
+		std::vector<GameObject*> go_list;
+		GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value);
 
-		void update();
+		void Init();
+		void Update();
 		void Render();
 	};
 }

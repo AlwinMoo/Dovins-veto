@@ -396,3 +396,13 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+*.tlog
+*.recipe
+*.recipe
+*.ilk
+*.log
+*.lastbuildstate
+*.idb
+*.pdb
+Alpha/.vs/Alpha/v17/.suo
+*.db

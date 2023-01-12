@@ -97,23 +97,19 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\GameObject.cpp" />
-    <ClCompile Include="..\Source\GameScene.cpp" />
-    <ClCompile Include="..\Source\MainMenuScene.cpp" />
-    <ClCompile Include="..\Source\SceneManager.cpp" />
+    <ClCompile Include="..\Source\Rendering.cpp" />
     <ClCompile Include="..\Source\TestScene.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Rendering.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\GameObject.h" />
     <ClInclude Include="..\Source\GameScene.hpp" />
     <ClInclude Include="..\Source\MainMenuScene.hpp" />
+    <ClInclude Include="..\Source\Rendering.hpp" />
     <ClInclude Include="..\Source\SceneBase.hpp" />
     <ClInclude Include="..\Source\SceneManager.hpp" />
     <ClInclude Include="..\Source\TestScene.h" />
     <ClInclude Include="Mesh.hpp" />
-    <ClInclude Include="Rendering.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

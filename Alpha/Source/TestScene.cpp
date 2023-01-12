@@ -4,17 +4,16 @@ namespace test_scene
 {
 	TestScene::TestScene()
 	{
-		AEGfxTextureLoad("PlanetTexture.png");
 	}
 	TestScene::~TestScene()
 	{
 	}
 
-	GameObj::GameObject* TestScene::FetchGO(GameObj::GameObject::GAMEOBJECT_TYPE value)
+	GameObject* TestScene::FetchGO(GameObject::GAMEOBJECT_TYPE value)
 	{
 		for (auto it : go_list)
 		{
-			GameObj::GameObject* go = (GameObj::GameObject*)it;
+			GameObject* go = (GameObject*)it;
 			if (!go->active)
 			{
 				go->active = true;
@@ -22,7 +21,7 @@ namespace test_scene
 				return go;
 			}
 		}
-		GameObj::GameObject* go{ new GameObj::GameObject(value) };
+		GameObject* go{ new GameObject(value) };
 		go_list.push_back(go);
 
 		//CODE TO INITIALISE GO SPECIFIC VARIABLES
@@ -30,21 +29,56 @@ namespace test_scene
 		return FetchGO(value);
 
 	}
-	void TestScene::update()
+
+	void TestScene::Init()
 	{
-		GameObj::GameObject* specific_go;
-		specific_go = FetchGO(GameObj::GameObject::GO_NONE);
-		//std::cout << "Cursor pos: " << x << ", " << y << std::endl;
-		
+		srand(time(NULL));
 	}
+
+	void TestScene::Update()
+	{
+		// Player Input
+		s32 mouseX, mouseY;
+		AEInputGetCursorPosition(&mouseX, &mouseY);
+		if (AEInputCheckTriggered(AEVK_LBUTTON))
+		{
+			GameObject* test = FetchGO(GameObject::GO_PLANET);
+			test->position.x = mouseX;
+			test->position.y = mouseY;
+			test->rotation = rand() % 360;
+			test->scale.x = 100;
+			test->scale.y = 100;
+		}
+
+
+		// GameObject Update
+		for (GameObject* gameObj : go_list)
+		{
+			if (gameObj->active)
+			{
+				if (gameObj->type == GameObject::GO_PLANET)
+					gameObj->Update();
+			}
+		}
+	}
+
 	void TestScene::Render()
 	{
 		s32 cursorX, cursorY;
 		s8 text[]  = "TEST";
 		AEInputGetCursorPosition(&cursorX, &cursorY);
 		f32 fcursorX, fcursorY;
-		//fcursorX = cursorX/AE
-		//AEGfxSetBackgroundColor(0.3f, 0.3f, 0.3f);
-		AEGfxPrint(m_fontId, text, 0.5f, 0.f, 10.f, 1.f, 0.f, 0.f);
+
+		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+
+		//Gameobjects Render
+		for (GameObject* gameObj : go_list)
+		{
+			if (gameObj->active)
+			{
+				if(gameObj->type == GameObject::GO_PLANET)
+					gameObj->Render();
+			}
+		}
 	}
 }
