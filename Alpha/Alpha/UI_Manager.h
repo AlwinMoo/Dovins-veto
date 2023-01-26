@@ -9,7 +9,7 @@ namespace UI
 	};
 	class UI_Manager
 	{
-		std::array<
+		//std::array<
 	};
 }
 #endif
