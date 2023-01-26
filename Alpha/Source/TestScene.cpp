@@ -33,6 +33,8 @@ namespace test_scene
 	void TestScene::Init()
 	{
 		srand(time(NULL));
+
+		test_map = new game_map(10, 10, 800, 600);
 	}
 
 	void TestScene::Update()
@@ -43,11 +45,11 @@ namespace test_scene
 		if (AEInputCheckTriggered(AEVK_LBUTTON))
 		{
 			GameObject* test = FetchGO(GameObject::GO_PLANET);
-			test->position.x = mouseX;
-			test->position.y = mouseY;
+			test->position.x = static_cast<int>(mouseX / test_map->get_tile_size()) * test_map->get_tile_size();
+			test->position.y = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size();
 			test->rotation = rand() % 360;
-			test->scale.x = 100;
-			test->scale.y = 100;
+			test->scale.x = test_map->get_tile_size();
+			test->scale.y = test->scale.x;
 		}
 
 
