@@ -1,6 +1,12 @@
-#pragma once
 #include "Bevantest.h"
 #include "AEEngine.h"
+#include <iostream>
+#include <iomanip>
+#include "UI_Manager.h"
+f32 winSizeX, winSizeY;
+s8 m_fontId;
+
+static UI::UI_Manager uiManager;
 
 AEGfxTexture* pTex;
 AEGfxVertexList* pMesh;
@@ -11,10 +17,14 @@ s32 x, y;
 void Bevantest_Load()
 {
 	pTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
+	m_fontId = AEGfxCreateFont("Assets/Roboto-Regular.ttf", 16);
 }
 
 void Bevantest_Initialize()
 {
+	winSizeX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
+	winSizeY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+
 	pos_x = 400;
 	pos_y = 300;
 	click_pos_x = 400;
@@ -35,10 +45,27 @@ void Bevantest_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 1.0f);
 
 	pMesh = AEGfxMeshEnd();
+
+	
 }
 
 void Bevantest_Update()
 {
+	// IMPORTANT SNIPPET:
+		/***********************************************************************/
+	s32 cursorX, cursorY;
+	AEInputGetCursorPosition(&cursorX, &cursorY);
+	f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
+	//std::cout << winX << ", " <<  winY << std::endl;
+	f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
+	std::cout << std::setprecision(2) << std::setw(5) << cursorXN << ", " << std::setw(5) << cursorYN << std::endl;
+	/************************************************************************/
+	s8 const* testStr = "TEST TEXT";
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);
+
+	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+
 	if (AEInputCheckTriggered(AEVK_RBUTTON))
 	{
 		AEInputGetCursorPosition(&click_pos_x, &click_pos_y);
