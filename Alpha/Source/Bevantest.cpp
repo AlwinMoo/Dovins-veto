@@ -2,12 +2,46 @@
 #include "Bevantest.h"
 #include "AEEngine.h"
 
+#include <vector>
+#include "Map/Map.h"
+#include "GameObject.h"
+#include <iostream>
+
 AEGfxTexture* pTex;
 AEGfxVertexList* pMesh;
 s32 click_pos_x;
 s32 click_pos_y;
 s32 pos_x, pos_y;
 s32 x, y;
+
+namespace
+{
+	std::vector<GameObject*> go_list;
+	game_map* test_map;
+	int object_count;
+
+	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
+	{
+		for (auto it : go_list)
+		{
+			GameObject* go = (GameObject*)it;
+			if (!go->active)
+			{
+				go->active = true;
+				++object_count;
+				return go;
+			}
+		}
+		GameObject* go{ new GameObject(value) };
+		go_list.push_back(go);
+
+		//CODE TO INITIALISE GO SPECIFIC VARIABLES
+
+		return FetchGO(value);
+
+	}
+}
+
 void Bevantest_Load()
 {
 	pTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
@@ -35,10 +69,54 @@ void Bevantest_Initialize()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 1.0f);
 
 	pMesh = AEGfxMeshEnd();
+
+	test_map = new game_map(10, 10, 1600, 900, true); // automatically destroyed in deconstructor
+
+	for (int i = 0; i < test_map->map_size; ++i)
+	{
+		GameObject* test = FetchGO(GameObject::GO_PLANET);
+		test->position = test_map->get_worldpos(i);
+		test->scale.x = test_map->get_tile_size();
+		test->scale.y = test->scale.x;
+	}
 }
 
 void Bevantest_Update()
 {
+
+	// Player Input
+	s32 mouseX, mouseY;
+	AEInputGetCursorPosition(&mouseX, &mouseY);
+	if (AEInputCheckTriggered(AEVK_LBUTTON))
+	{
+		/*GameObject* test = FetchGO(GameObject::GO_PLANET);
+		test->position.x = test_map->get_world_x(static_cast<int>(mouseX / test_map->get_tile_size()));
+		test->position.y = test_map->get_world_y(static_cast<int>(mouseY / test_map->get_tile_size()));
+		test->rotation = rand() % 360;
+		test->scale.x = test_map->get_tile_size();
+		test->scale.y = test->scale.x;*/
+
+		if (test_map->get_index(static_cast<int>(mouseX / test_map->get_tile_size()), static_cast<int>(mouseY / test_map->get_tile_size())) < test_map->map_size && test_map->get_index(static_cast<int>(mouseX / test_map->get_tile_size()), static_cast<int>(mouseY / test_map->get_tile_size())) >= 0)
+		{
+			std::cout << "Legal: " << test_map->get_index(static_cast<int>(mouseX / test_map->get_tile_size()), static_cast<int>(mouseY / test_map->get_tile_size())) << std::endl;
+		}
+		else
+		{
+			std::cout << "Illegal" << std::endl;
+		}
+	}
+
+
+	// GameObject Update
+	for (GameObject* gameObj : go_list)
+	{
+		if (gameObj->active)
+		{
+			if (gameObj->type == GameObject::GO_PLANET)
+				gameObj->Update();
+		}
+	}
+
 	if (AEInputCheckTriggered(AEVK_RBUTTON))
 	{
 		AEInputGetCursorPosition(&click_pos_x, &click_pos_y);
@@ -101,6 +179,16 @@ void Bevantest_Draw()
 {
 	//Draw mesh
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+
+	//Gameobjects Render
+	for (GameObject* gameObj : go_list)
+	{
+		if (gameObj->active)
+		{
+			if (gameObj->type == GameObject::GO_PLANET)
+				gameObj->Render();
+		}
+	}
 }
 
 void Bevantest_Free()
