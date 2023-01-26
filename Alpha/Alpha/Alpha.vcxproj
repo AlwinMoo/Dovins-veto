@@ -104,11 +104,11 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\Desktop\Dovins-veto-main\Alpha\Alpha\GameStateManager.h" />
     <ClInclude Include="..\Source\Bevantest.h" />
     <ClInclude Include="..\Source\GameObject.h" />
     <ClInclude Include="..\Source\GameScene.hpp" />
     <ClInclude Include="..\Source\GameStateList.h" />
+    <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\MainMenuScene.hpp" />
     <ClInclude Include="..\Source\Rendering.hpp" />
     <ClInclude Include="..\Source\SceneBase.hpp" />

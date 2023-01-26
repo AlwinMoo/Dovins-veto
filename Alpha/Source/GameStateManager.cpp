@@ -24,13 +24,13 @@ void GSM_Update()
 		fpFree = Bevantest_Free;
 		fpUnload = Bevantest_Unload;
 		break;
-	case GS_LEVEL2:
-		fpLoad = Level2_Load;
-		fpInitialize = Level2_Initialize;
-		fpUpdate = Level2_Update;
-		fpDraw = Level2_Draw;
-		fpFree = Level2_Free;
-		fpUnload = Level2_Unload;
+	//case GS_LEVEL2:
+	//	fpLoad = Level2_Load;
+	//	fpInitialize = Level2_Initialize;
+	//	fpUpdate = Level2_Update;
+	//	fpDraw = Level2_Draw;
+	//	fpFree = Level2_Free;
+	//	fpUnload = Level2_Unload;
 		break;
 	case GS_RESTART:
 		break;

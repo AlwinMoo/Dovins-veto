@@ -59,13 +59,13 @@
     <ClInclude Include="..\Source\Rendering.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Desktop\Dovins-veto-main\Alpha\Alpha\GameStateManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\GameStateList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Bevantest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\GameStateManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
