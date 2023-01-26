@@ -5,6 +5,8 @@
 #include <vector>
 #include "Map/Map.h"
 #include "GameObject.h"
+#include "GameStateManager.h"
+#include "GameStateList.h"
 #include <iostream>
 
 AEGfxTexture* pTex;
@@ -27,6 +29,11 @@ namespace
 			GameObject* go = (GameObject*)it;
 			if (!go->active)
 			{
+				switch (go->type)
+				{
+				default:
+					go->tex = pTex;
+				}
 				go->active = true;
 				++object_count;
 				return go;
@@ -123,6 +130,11 @@ void Bevantest_Update()
 		//click_check(click_pos_x, click_pos_y);
 		//click_check(pos_x, pos_y);
 	}
+	if (AEInputCheckTriggered(AEVK_LBUTTON))
+	{
+		next = GS_LEVEL2;
+	}
+
 	// Your own update logic goes here
 	if (pos_x < click_pos_x)
 	{

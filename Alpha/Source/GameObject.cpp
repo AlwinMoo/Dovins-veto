@@ -9,9 +9,9 @@ void GameObject::Update()
 void GameObject::Render()
 {
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetTintColor(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetTintColor(color.r, color.g, color.b, 1.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1.0f);
+	AEGfxSetTransparency(alpha);
 	AEGfxTextureSet(tex, 0, 0);
 
 	AEMtx33 scale = { 0 };
@@ -35,8 +35,12 @@ void GameObject::Render()
 GameObject::GameObject(GAMEOBJECT_TYPE default_type) :
 	type(default_type), active(false), rotation(0)
 {
-	tex = AEGfxTextureLoad("Assets/PlanetTexture.png");
+	tex = nullptr;
 	mesh = render::GenerateQuad();
+	alpha = 1.0f;
+	color.r = 1.0f;
+	color.g = 1.0f;
+	color.b = 1.0f;
 	position = { 0, 0 };
 	scale = { 1, 1 };
 
@@ -46,4 +50,11 @@ GameObject::~GameObject()
 {
 	AEGfxMeshFree(mesh);
 	AEGfxTextureUnload(tex);
+}
+
+void Color::Set(float r, float g, float b)
+{
+	this->r = r;
+	this->g = g;
+	this->b = b;
 }

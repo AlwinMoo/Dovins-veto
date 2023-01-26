@@ -1,8 +1,12 @@
-﻿  TestScene.cpp
-C:\Users\alien\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\TestScene.cpp(35,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\alien\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\TestScene.cpp(72,7): warning C4101: 'fcursorX': unreferenced local variable
-C:\Users\alien\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\TestScene.cpp(72,17): warning C4101: 'fcursorY': unreferenced local variable
-  Alpha.vcxproj -> C:\Users\alien\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\bin\Debug-x64\Alpha.exe
-  3 File(s) copied
+﻿  GameStateManager.cpp
+  TestScene.cpp
+C:\Users\Alvin\Desktop\GitHub\Dovins-veto\Alpha\Source\TestScene.cpp(17,6): warning C4065: switch statement contains 'default' but no 'case' labels
+C:\Users\Alvin\Desktop\GitHub\Dovins-veto\Alpha\Source\TestScene.cpp(40,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Alvin\Desktop\GitHub\Dovins-veto\Alpha\Source\TestScene.cpp(56,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Alvin\Desktop\GitHub\Dovins-veto\Alpha\Source\TestScene.cpp(57,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Main.cpp
+  Generating Code...
+  Alpha.vcxproj -> C:\Users\Alvin\Desktop\GitHub\Dovins-veto\Alpha\bin\Debug-x64\Alpha.exe
+  5 File(s) copied
   1 File(s) copied
   1 File(s) copied
