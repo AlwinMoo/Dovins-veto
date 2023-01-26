@@ -8,7 +8,7 @@ namespace test_scene
 	{
 	private:
 	public:
-		s32 m_fontId;
+		s8 m_fontId;
 		TestScene();
 		~TestScene();
 
