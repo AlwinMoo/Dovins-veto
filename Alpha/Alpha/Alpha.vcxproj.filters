@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -31,6 +31,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI_Manager.cpp">
+    <ClCompile Include="..\Source\GameStateManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Bevantest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -63,6 +67,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI_Manager.h">
+    <ClInclude Include="..\..\..\..\..\Desktop\Dovins-veto-main\Alpha\Alpha\GameStateManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\GameStateList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Bevantest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
