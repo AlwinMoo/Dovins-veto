@@ -17,8 +17,9 @@ class game_map
 	 * @param world_width float max world width
 	 * @param world_height float max world height
 	*/
-	game_map(unsigned int width_size, unsigned int height_size, float world_width, float world_height);
-
+	game_map(unsigned int width_size, unsigned int height_size, float world_width, float world_height, bool use_offset);
+	
+	unsigned int map_size;
 	char* map_arr; //1D char map array
 
 	unsigned int width; //grid total width
@@ -27,13 +28,17 @@ class game_map
 	float world_width; //grid max world width
 	float world_height; //grid max world height
 
+	bool use_offset;
+	float world_offset;
+	int tile_offset;
+
 	/*!
 	 * @brief converts from 1D array index to 2D array x-axis
 	 * @param index 1D array index
 	 * @param size integer max width of map
 	 * @return integer x-axis in 2D array
 	*/
-	int get_x(int index, int width);
+	int get_x(int index);
 
 	/*!
 	 * @brief converts from 1D array index to 2D array y-axis
@@ -41,7 +46,7 @@ class game_map
 	 * @param size
 	 * @return integer y-axis in 2D array
 	*/
-	int get_y(int index, int height);
+	int get_y(int index);
 
 	/*!
 	 * @brief converts from 2D grid coordinates to 1D array index
@@ -50,7 +55,7 @@ class game_map
 	 * @param width width of grid
 	 * @return integer index of 1D array
 	*/
-	int get_index(int x, int y, int width);
+	int get_index(int x, int y);
 
 	/*!
 	 * @brief Calculates the world position using 1D array index

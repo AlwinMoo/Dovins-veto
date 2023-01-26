@@ -1,86 +1,99 @@
 #include "TestScene.h"
 #include <iostream>
-namespace test_scene
+
+namespace
 {
-	TestScene::TestScene()
-	{
-	}
-	TestScene::~TestScene()
-	{
-	}
+		std::vector<GameObject*> go_list;
+		game_map* test_map;
+		int object_count;
 
-	GameObject* TestScene::FetchGO(GameObject::GAMEOBJECT_TYPE value)
-	{
-		for (auto it : go_list)
+		GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
 		{
-			GameObject* go = (GameObject*)it;
-			if (!go->active)
+			for (auto it : go_list)
 			{
-				go->active = true;
-				++object_count;
-				return go;
+				GameObject* go = (GameObject*)it;
+				if (!go->active)
+				{
+					go->active = true;
+					++object_count;
+					return go;
+				}
 			}
+			GameObject* go{ new GameObject(value) };
+			go_list.push_back(go);
+
+			//CODE TO INITIALISE GO SPECIFIC VARIABLES
+
+			return FetchGO(value);
+
 		}
-		GameObject* go{ new GameObject(value) };
-		go_list.push_back(go);
+}
 
-		//CODE TO INITIALISE GO SPECIFIC VARIABLES
+void TestScene_Load()
+{
 
-		return FetchGO(value);
+}
 
-	}
+void TestScene_Initialize()
+{
+	srand(time(NULL));
 
-	void TestScene::Init()
+	test_map = new game_map(10, 10, 1600, 900, true);
+}
+
+void TestScene_Update()
+{
+	// Player Input
+	s32 mouseX, mouseY;
+	AEInputGetCursorPosition(&mouseX, &mouseY);
+	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
-		srand(time(NULL));
-
-		test_map = new game_map(10, 10, 800, 600);
+		GameObject* test = FetchGO(GameObject::GO_PLANET);
+		test->position.x = static_cast<int>(mouseX / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
+		test->position.y = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
+		test->rotation = rand() % 360;
+		test->scale.x = test_map->get_tile_size();
+		test->scale.y = test->scale.x;
 	}
 
-	void TestScene::Update()
+
+	// GameObject Update
+	for (GameObject* gameObj : go_list)
 	{
-		// Player Input
-		s32 mouseX, mouseY;
-		AEInputGetCursorPosition(&mouseX, &mouseY);
-		if (AEInputCheckTriggered(AEVK_LBUTTON))
+		if (gameObj->active)
 		{
-			GameObject* test = FetchGO(GameObject::GO_PLANET);
-			test->position.x = static_cast<int>(mouseX / test_map->get_tile_size()) * test_map->get_tile_size();
-			test->position.y = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size();
-			test->rotation = rand() % 360;
-			test->scale.x = test_map->get_tile_size();
-			test->scale.y = test->scale.x;
-		}
-
-
-		// GameObject Update
-		for (GameObject* gameObj : go_list)
-		{
-			if (gameObj->active)
-			{
-				if (gameObj->type == GameObject::GO_PLANET)
-					gameObj->Update();
-			}
+			if (gameObj->type == GameObject::GO_PLANET)
+				gameObj->Update();
 		}
 	}
+}
 
-	void TestScene::Render()
+void TestScene_Draw()
+{
+	s32 cursorX, cursorY;
+	s8 text[] = "TEST";
+	AEInputGetCursorPosition(&cursorX, &cursorY);
+	f32 fcursorX, fcursorY;
+
+	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+
+	//Gameobjects Render
+	for (GameObject* gameObj : go_list)
 	{
-		s32 cursorX, cursorY;
-		s8 text[]  = "TEST";
-		AEInputGetCursorPosition(&cursorX, &cursorY);
-		f32 fcursorX, fcursorY;
-
-		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
-
-		//Gameobjects Render
-		for (GameObject* gameObj : go_list)
+		if (gameObj->active)
 		{
-			if (gameObj->active)
-			{
-				if(gameObj->type == GameObject::GO_PLANET)
-					gameObj->Render();
-			}
+			if (gameObj->type == GameObject::GO_PLANET)
+				gameObj->Render();
 		}
 	}
+}
+
+void TestScene_Free()
+{
+	
+}
+
+void TestScene_Unload()
+{
+
 }
