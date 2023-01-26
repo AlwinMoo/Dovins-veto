@@ -21,14 +21,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Initialization of your own variables go here
 	GSM_Initialize(GS_LEVEL1);
 	// Using custom window procedure
-	AESysInit(hInstance, nCmdShow, 800, 600, 1, 60, true, NULL);
+	//AESysInit(hInstance, nCmdShow, 800, 600, 1, 60, true, NULL);
+	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, true, NULL);
 
 	// Changing the window title
 	AESysSetWindowTitle("My New Demo!");
+	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
 	// reset the system modules
 	AESysReset();
-
 	
 	//test_scene::TestScene* mainScene = new test_scene::TestScene();
 	//mainScene->Init();
