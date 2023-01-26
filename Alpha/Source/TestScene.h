@@ -2,11 +2,14 @@
 #define TEST_SCENE_H
 #include "GameObject.h"
 #include "AEEngine.h"
+#include "Map/Map.h"
+
 namespace test_scene
 {
 	class TestScene
 	{
 	private:
+		game_map *test_map;
 	public:
 		s8 m_fontId;
 		TestScene();

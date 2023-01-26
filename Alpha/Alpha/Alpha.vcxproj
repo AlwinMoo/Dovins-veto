@@ -21,13 +21,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -99,6 +99,8 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="..\Source\Bevantest.cpp" />
     <ClCompile Include="..\Source\GameObject.cpp" />
     <ClCompile Include="..\Source\GameStateManager.cpp" />
+    <ClCompile Include="..\Source\Map\Map.cpp" />
+    <ClCompile Include="..\Source\Pathfinding\pathfinder.cpp" />
     <ClCompile Include="..\Source\Rendering.cpp" />
     <ClCompile Include="..\Source\TestScene.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -112,6 +114,8 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClInclude Include="..\Source\GameStateList.h" />
     <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\MainMenuScene.hpp" />
+    <ClInclude Include="..\Source\Map\Map.h" />
+    <ClInclude Include="..\Source\Pathfinding\pathfinder.h" />
     <ClInclude Include="..\Source\Rendering.hpp" />
     <ClInclude Include="..\Source\SceneBase.hpp" />
     <ClInclude Include="..\Source\SceneManager.hpp" />
