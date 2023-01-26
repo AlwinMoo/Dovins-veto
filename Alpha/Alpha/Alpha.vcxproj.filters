@@ -25,10 +25,10 @@
     <ClCompile Include="..\Source\TestScene.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="TextArea.cpp">
+    <ClCompile Include="..\Source\TextArea.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="UI_Manager.cpp">
+    <ClCompile Include="..\Source\UI_Manager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -72,10 +72,10 @@
     <ClInclude Include="..\Source\TestScene.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="TextArea.h">
+    <ClInclude Include="..\Source\TextArea.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="UI_Manager.h">
+    <ClInclude Include="..\Source\UI_Manager.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

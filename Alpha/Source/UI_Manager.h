@@ -16,6 +16,7 @@ namespace UI
 	};
 	class UI_Manager
 	{
+	public:
 		s8 m_fontID;
 		std::array<AEGfxTexture*, NUM_TEX> m_textures;
 		std::array<AEGfxVertexList*, NUM_MESH> m_mesh;
