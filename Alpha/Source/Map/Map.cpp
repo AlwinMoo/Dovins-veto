@@ -1,49 +1,63 @@
 #include "Map.h"
+#include <cmath>
 
 //CP_Image level_sprites[NUM_TYPES_TILE];
 //CP_Image fog;
 
-game_map::game_map(unsigned int width_size, unsigned int height_size, float world_width, float world_height)
+game_map::game_map(unsigned int width_size, unsigned int height_size, float world_width, float world_height, bool use_offset)
 {
 	this->width = width_size;
 	this->height = height_size;
-	this->map_arr = new char[width_size * height_size + 1];
-	this->map_arr[(width_size * height_size)] = '\0';
+	this->map_size = width_size * height_size;
+	this->map_arr = new char[static_cast<size_t>(width_size) * height_size]{};
 	this->world_width = world_width;
 	this->world_height = world_height;
+	this->use_offset = use_offset;
+
+	if (use_offset)
+	{
+		this->world_offset = (world_width * 0.5) - (std::floor(width * 0.5) * this->get_tile_size()) + (this->get_tile_size() * 0.5);
+		tile_offset = world_offset / this->get_tile_size();
+	}
+	else
+	{
+		this->world_offset = 0;
+		tile_offset = 0;
+	}
 }
 
-int game_map::get_index(int x, int y, int width)
+int game_map::get_index(int x, int y)
 {
+	x -= tile_offset;
 	return x * width + y;
 }
 
 AEVec2 game_map::get_worldpos(int index)
 {
 	AEVec2 rtn{};
-	AEVec2Set(&rtn, get_x(index, this->width) * (this->world_width / this->width), get_y(index, this->height) * (this->world_height / this->height));
+	AEVec2Set(&rtn, get_x(index) * this->get_tile_size() + world_offset, get_y(index) * this->get_tile_size() + (this->get_tile_size() * 0.5));
 	
 	return rtn;
 }
 
 float game_map::get_world_x(int x)
 {
-	return x * (this->world_width / this->width);
+	return x * this->get_tile_size() + (this->get_tile_size() * 0.5) + world_offset;
 }
 
 float game_map::get_world_y(int y)
 {
-	return y * (this->world_height / this->height);
+	return y * this->get_tile_size() + (this->get_tile_size() * 0.5);
 }
 
-int game_map::get_y(int index, int height)
+int game_map::get_y(int index)
 {
-	return index % height;    // where "/" is an integer division;
+	return index / this->width;    // where "/" is an integer division;
 }
 
-int game_map::get_x(int index, int width)
+int game_map::get_x(int index)
 {
-	return index / width;    // % is the "modulo operator", the remainder of i / width;
+	return (index % this->width);    // % is the "modulo operator", the remainder of i / width;
 }
 
 float game_map::get_tile_size()

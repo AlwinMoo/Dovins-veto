@@ -4,6 +4,15 @@
 #include <vector>
 #include <AEEngine.h>
 
+struct Color
+{
+	float r;
+	float g;
+	float b;
+
+	void Set(float r, float g, float b);
+};
+
 class GameObject
 {
 public:
@@ -11,11 +20,14 @@ public:
 	{
 		GO_NONE = 0,
 		GO_PLANET,
+		GO_HOVER_STRUCTURE,
 		GO_TOTAL,
 	};
 
 	GAMEOBJECT_TYPE type;
 	bool active;
+	float alpha;
+	Color color;
 
 	AEVec2 position;
 	AEVec2 scale;
