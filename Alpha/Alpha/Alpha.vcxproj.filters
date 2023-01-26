@@ -35,6 +35,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Bevantest.cpp">
+    <ClCompile Include="..\Source\Pathfinding\pathfinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Map\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -70,6 +74,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\GameStateManager.h">
+    <ClInclude Include="..\Source\Pathfinding\pathfinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Map\Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
