@@ -50,6 +50,19 @@ float game_map::get_world_y(int y)
 	return y * this->get_tile_size() + (this->get_tile_size() * 0.5);
 }
 
+bool game_map::is_in_grid(AEVec2 coord)
+{
+	return (this->get_index(static_cast<int>(coord.x / this->get_tile_size()), static_cast<int>(coord.y / this->get_tile_size())) < this->map_size&& this->get_index(static_cast<int>(coord.x / this->get_tile_size()), static_cast<int>(coord.y / this->get_tile_size())) >= 0);
+}
+
+AEVec2 game_map::snap_coordinates(AEVec2 coord)
+{
+	AEVec2 rtn{};
+	AEVec2Set(&rtn, std::floor(coord.x / get_tile_size()) * get_tile_size() + (get_tile_size() * 0.5), std::floor(coord.y / get_tile_size()) * get_tile_size() + (get_tile_size() * 0.5));
+
+	return rtn;
+}
+
 int game_map::get_y(int index)
 {
 	return index / this->width;    // where "/" is an integer division;

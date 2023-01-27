@@ -81,6 +81,10 @@ class game_map
 	*/
 	float get_world_y(int y);
 
+	bool is_in_grid(AEVec2 coord);
+
+	AEVec2 snap_coordinates(AEVec2);
+
 	float get_tile_size();
 
 };

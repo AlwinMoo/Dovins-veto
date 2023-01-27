@@ -39,7 +39,7 @@ void TestScene_Initialize()
 {
 	srand(time(NULL));
 
-	test_map = new game_map(10, 10, 1600, 900, true);
+	test_map = new game_map(10, 10, AEGetWindowWidth(), AEGetWindowHeight(), true);
 	hoverStructure = FetchGO(GameObject::GO_HOVER_STRUCTURE);
 	hoverStructure->alpha = 0.5f;
 	hoverStructure->rotation = rand() % 360;
@@ -53,25 +53,26 @@ void TestScene_Update()
 	// Player Input
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
-	float mouseXGrid = static_cast<int>(mouseX / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
-	float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
+	AEVec2 mouse_pos{};
+	AEVec2Set(&mouse_pos, mouseX, mouseY);
+	mouse_pos = test_map->snap_coordinates(mouse_pos);
+	//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
 
 	if (AEInputCheckTriggered(AEVK_LBUTTON) && validPlacement)
 	{
 		GameObject* test = FetchGO(GameObject::GO_PLANET);
-		test->position.x = mouseXGrid;
-		test->position.y = mouseYGrid;
+		test->position = mouse_pos;
+		//test->position.y = mouseYGrid;
 		test->rotation = hoverStructure->rotation;
 		hoverStructure->rotation = rand() % 360;
 		test->scale.x = test_map->get_tile_size();
 		test->scale.y = test->scale.x;
 	}
 
-	if (hoverStructure->position.x != mouseXGrid
-		|| hoverStructure->position.y != mouseYGrid)
+	if (hoverStructure->position.x != mouse_pos.x
+		|| hoverStructure->position.y != mouse_pos.y)
 	{
-		hoverStructure->position.x = mouseXGrid;
-		hoverStructure->position.y = mouseYGrid;
+		hoverStructure->position = mouse_pos;
 	}
 
 	// GameObject Update
