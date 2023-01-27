@@ -103,9 +103,9 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="..\Source\Pathfinding\pathfinder.cpp" />
     <ClCompile Include="..\Source\Rendering.cpp" />
     <ClCompile Include="..\Source\TestScene.cpp" />
+    <ClCompile Include="..\Source\TextArea.cpp" />
+    <ClCompile Include="..\Source\UI_Manager.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="TextArea.cpp" />
-    <ClCompile Include="UI_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h" />
@@ -120,9 +120,9 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClInclude Include="..\Source\SceneBase.hpp" />
     <ClInclude Include="..\Source\SceneManager.hpp" />
     <ClInclude Include="..\Source\TestScene.h" />
+    <ClInclude Include="..\Source\TextArea.h" />
+    <ClInclude Include="..\Source\UI_Manager.h" />
     <ClInclude Include="Mesh.hpp" />
-    <ClInclude Include="TextArea.h" />
-    <ClInclude Include="UI_Manager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

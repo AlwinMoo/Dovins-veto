@@ -1,12 +1,30 @@
-﻿  GameStateManager.cpp
+﻿  Bevantest.cpp
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Bevantest.cpp(42,5): warning C4065: switch statement contains 'default' but no 'case' labels
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Bevantest.cpp(92,20): warning C4018: '<': signed/unsigned mismatch
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Bevantest.cpp(130,135): warning C4018: '<': signed/unsigned mismatch
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Bevantest.cpp(200,30): warning C4244: 'argument': conversion from 's32' to 'f32', possible loss of data
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Bevantest.cpp(200,27): warning C4244: 'argument': conversion from 's32' to 'f32', possible loss of data
+  GameObject.cpp
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\GameObject.cpp(21,22): warning C4244: 'argument': conversion from 'double' to 'f32', possible loss of data
+  GameStateManager.cpp
+  Map.cpp
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Map\Map.cpp(19,96): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Map\Map.cpp(20,30): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Map\Map.cpp(38,108): warning C4244: 'argument': conversion from 'double' to 'f32', possible loss of data
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Map\Map.cpp(45,67): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Map\Map.cpp(50,35): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  pathfinder.cpp
+  Rendering.cpp
   TestScene.cpp
-C:\Users\Alvin\Desktop\GitHub\Dovins-veto\Alpha\Source\TestScene.cpp(17,6): warning C4065: switch statement contains 'default' but no 'case' labels
-C:\Users\Alvin\Desktop\GitHub\Dovins-veto\Alpha\Source\TestScene.cpp(40,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\Alvin\Desktop\GitHub\Dovins-veto\Alpha\Source\TestScene.cpp(56,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Alvin\Desktop\GitHub\Dovins-veto\Alpha\Source\TestScene.cpp(57,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\TestScene.cpp(17,6): warning C4065: switch statement contains 'default' but no 'case' labels
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\TestScene.cpp(40,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\TestScene.cpp(56,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\TestScene.cpp(57,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  TextArea.cpp
+  UI_Manager.cpp
   Main.cpp
   Generating Code...
-  Alpha.vcxproj -> C:\Users\Alvin\Desktop\GitHub\Dovins-veto\Alpha\bin\Debug-x64\Alpha.exe
+  Alpha.vcxproj -> D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\bin\Debug-x64\Alpha.exe
   5 File(s) copied
   1 File(s) copied
   1 File(s) copied
