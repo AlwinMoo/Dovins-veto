@@ -40,7 +40,6 @@ void TestScene_Load()
 	planetTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
 	grassTex = AEGfxTextureLoad("Assets/GrassTile.png");
 
-	// UI MANAGER
 	
 }
 
@@ -49,8 +48,15 @@ void CALLBACKTEST() {
 }
 
 void TestScene_Initialize()
-{
-	meshTest = render::GenerateQuad();
+{	
+	// UI MANAGER
+	{
+		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
+		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+		//auto meshTest = render::GenerateQuad();
+		uiManager = new UI::UI_Manager();
+		uiManager->SetWinDim(screenWidthX, screenHeightY);
+	}
 	srand(time(NULL));
 
 	test_map = new game_map(10, 10, AEGetWindowWidth(), AEGetWindowHeight(), true);
@@ -72,16 +78,13 @@ void TestScene_Initialize()
 	validPlacement = false;
 
 	// UI MANAGER
-#ifdef UI_TEST
 	{
-		uiManager.Load();
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		const AEVec2 buttonPos{ screenWidthX / 4, screenWidthY / 4 };
 		const AEVec2 buttonSize{ 50.f, 50.f };
-		uiManager.CreateButton(buttonPos, buttonSize, UI::WHITE_BUTTON, UI::FONT_ROBOTO, CALLBACKTEST);
+		uiManager->CreateButton(buttonPos, buttonSize, UI::WHITE_BUTTON, CALLBACKTEST);
 	}
-#endif
 }
 
 void TestScene_Update()
@@ -93,6 +96,11 @@ void TestScene_Update()
 	AEVec2Set(&mouse_pos, mouseX, mouseY);
 	mouse_pos = test_map->snap_coordinates(mouse_pos);
 	//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
+	{
+		AEVec2 invert_mouse = mouse_pos;
+		invert_mouse.y = uiManager->m_winDim.y -mouse_pos.y;
+		uiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+	}
 
 	// Place Structure
 	if (AEInputCheckTriggered(AEVK_LBUTTON) && validPlacement)
@@ -162,13 +170,14 @@ void TestScene_Update()
 		hoverStructure->color.Set(1.0f, 1.0f, 1.0f);
 		validPlacement = true;
 	}
+
 }
 
 void TestScene_Draw()
 {
-	//s32 cursorX, cursorY;
+	s32 cursorX, cursorY;
 	//s8 text[] = "TEST";
-	//AEInputGetCursorPosition(&cursorX, &cursorY);
+	AEInputGetCursorPosition(&cursorX, &cursorY);
 	//f32 fcursorX, fcursorY;
 	//
 	//AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
@@ -201,33 +210,41 @@ void TestScene_Draw()
 	if(hoverStructure->active)
 		hoverStructure->Render();
 
-	// UI TEST
-	// AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	// AEGfxSetTintColor(1.f, 1.f, 1.f, 1.0f);
-	// AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	// AEGfxSetTransparency(1.f);
-	// AEGfxTextureSet(texTest, 0, 0);
+	f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
+	f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 
-	// AEMtx33 scale = { 0 };
-	// AEMtx33Scale(&scale, 1.f, 1.f);
+	{
+	 // THE WHERE'S MY CURSOR TEST?
+	 AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	 AEGfxSetTintColor(1.f, 1.f, 1.f, 1.0f);
+	 AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	 AEGfxSetTransparency(1.f);
+	 AEGfxTextureSet(texTest, 0, 0);
 
-	// AEMtx33 rotate = { 0 };
-	// AEMtx33Rot(&rotate, 0.f);
+	 AEMtx33 scale = { 0 };
+	 AEMtx33Scale(&scale, 50.f, 50.f);
 
-	// AEMtx33 translate = { 0 };
-	// AEMtx33Trans(&translate, AEGetWindowWidth() / 2.f, AEGetWindowHeight() / 2.f);
+	 AEMtx33 rotate = { 0 };
+	 AEMtx33Rot(&rotate, 0.f);
 
-	// AEMtx33 transform = { 0 };
-	// AEMtx33Concat(&transform, &rotate, &scale);
-	// AEMtx33Concat(&transform, &translate, &transform);
+	 AEMtx33 translate = { 0 };
+	 //std::cout << cursorX << ", " << cursorY << std::endl;
+	 AEMtx33Trans(&translate, cursorX - screenWidthX /2, -cursorY + screenWidthY/2 - 50);
 
-	// AEGfxSetTransform(transform.m);
-	// //AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+	 AEMtx33 transform = { 0 };
+	 AEMtx33Concat(&transform, &rotate, &scale);
+	 AEMtx33Concat(&transform, &translate, &transform);
+
+	 AEGfxSetTransform(transform.m);
+	 AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
+	// Render UI
+	uiManager->Draw();
+	}
 }
 
 void TestScene_Free()
 {
-	uiManager.Unload();
+	delete uiManager;
 }
 
 void TestScene_Unload()

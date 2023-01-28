@@ -1,21 +1,35 @@
 #include "UI_Manager.h"
 #include "Rendering.hpp"
+#include <iostream>
+extern s8 g_fontID;
 namespace UI
 {
-	void UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_FONT fontID, void(*callback)())
+	void UI_Manager::ConvertToWS(Button* newButton)
+	{
+		newButton->wsPos.x = newButton->pos.x - m_winDim.x / 2.f;
+		newButton->wsPos.y = newButton->pos.y - m_winDim.y / 2.f;
+
+		newButton->wsMin.x = newButton->min.x - m_winDim.x / 2.f;
+		newButton->wsMax.x = newButton->max.x - m_winDim.x / 2.f;
+		newButton->wsMin.y = newButton->min.y + m_winDim.y / 2.f;
+		newButton->wsMax.y = newButton->max.y + m_winDim.y / 2.f;
+	}
+	void UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, void(*callback)())
 	{
 		Button* newButton = new Button();
-		newButton->font = fontID;
 		newButton->scale = size;
 		newButton->callback = callback;
 		newButton->pos = pos;
+
 		newButton->min.x = pos.x - size.x / 2.f;
 		newButton->max.x = pos.x + size.x / 2.f;
 		newButton->min.y = pos.y - size.y / 2.f;
 		newButton->max.y = pos.y + size.y / 2.f;
+		ConvertToWS(newButton);
 		switch (type) {
 		case WHITE_BUTTON:
-			
+			newButton->texID = TEX_BUTTON;
+			newButton->meshID = MESH_BOX;
 			break;
 		default:
 			break;
@@ -24,12 +38,17 @@ namespace UI
 	}
 	void UI_Manager::Load()
 	{
-		m_fonts.at(FONT_ROBOTO) = AEGfxCreateFont("Assets/Roboto-Regular.ttf", 16);
+		m_fontID = g_fontID;
 		m_textures.at(TEX_BUTTON) = AEGfxTextureLoad("Assets/SquareButton.png");
 		m_mesh.at(MESH_BOX) = render::GenerateQuad();
 	}
 	void UI_Manager::Unload()
 	{
+	}
+	void UI_Manager::SetWinDim(f32 x, f32 y)
+	{
+		m_winDim.x = x;
+		m_winDim.y = y;
 	}
 	void UI_Manager::Update(AEVec2 mousePos, bool lClick)
 	{
@@ -37,6 +56,10 @@ namespace UI
 		if (!lClick)
 			return;
 		for (Button* curr : m_buttons) {
+			std::cout << "MOUSEPOS = " << mousePos.x << ", " << mousePos.y << '\n';
+			std::cout << "CURRMIN  = " << curr->min.x << ", " << curr->min.y << '\n';
+			std::cout << "CURRMAX  = " << curr->max.x << ", " << curr->max.y << '\n';
+			std::cout << std::endl;
 			if (mousePos.x > curr->max.x || mousePos.x < curr->min.x || mousePos.y > curr->max.y || mousePos.y < curr->min.y)
 				continue;
 			// clicked assumed. edit if hover implemented
@@ -62,7 +85,7 @@ namespace UI
 
 			AEMtx33 translate = { 0 };
 			//AEMtx33Trans(&translate, AEGetWindowWidth() / 2.f, AEGetWindowHeight() / 2.f);
-			AEMtx33Trans(&translate, curr->pos.x, curr->pos.y);
+			AEMtx33Trans(&translate, curr->wsPos.x, curr->wsPos.y);
 
 			AEMtx33 transform = { 0 };
 			AEMtx33Concat(&transform, &rotate, &scale);
@@ -74,9 +97,12 @@ namespace UI
 	}
 	UI_Manager::UI_Manager()
 	{
+		Load();
+		m_buttons = {};
 	}
 
 	UI_Manager::~UI_Manager()
 	{
+		Unload();
 	}
 }

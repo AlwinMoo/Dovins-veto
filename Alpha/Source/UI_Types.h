@@ -15,9 +15,5 @@ namespace UI
 		TEX_BUTTON,
 		NUM_TEX
 	};
-	enum UI_FONT {
-		FONT_ROBOTO,
-		NUM_FONTS
-	};
 }
 #endif

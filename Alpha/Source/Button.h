@@ -7,11 +7,16 @@ namespace UI
 {
 	struct Button
 	{
-		UI_FONT fontID;
 		UI_TEX texID;
 		UI_MESH meshID;
+		
 		AEVec2 pos;
+		// world space pos
+		AEVec2 wsPos;
+
 		AEVec2 min, max;
+		// World space boundaries
+		AEVec2 wsMin, wsMax;
 		AEVec2 scale;
 		s8 font;
 		TextArea textArea;

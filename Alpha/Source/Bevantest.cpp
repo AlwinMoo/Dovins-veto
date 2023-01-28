@@ -57,7 +57,6 @@ namespace
 void Bevantest_Load()
 {
 	pTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
-	m_fontId = AEGfxCreateFont("Assets/Roboto-Regular.ttf", 16);
 }
 
 void Bevantest_Initialize()
@@ -99,18 +98,18 @@ void Bevantest_Initialize()
 
 void Bevantest_Update()
 {
-	// IMPORTANT SNIPPET:
-		/***********************************************************************/
-	s32 cursorX, cursorY;
-	AEInputGetCursorPosition(&cursorX, &cursorY);
-	f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
-	//std::cout << winX << ", " <<  winY << std::endl;
-	f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
-	std::cout << std::setprecision(2) << std::setw(5) << cursorXN << ", " << std::setw(5) << cursorYN << std::endl;
-	/************************************************************************/
-	s8 const* testStr = "TEST TEXT";
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);
+	//// IMPORTANT SNIPPET:
+	//	/***********************************************************************/
+	//s32 cursorX, cursorY;
+	//AEInputGetCursorPosition(&cursorX, &cursorY);
+	//f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
+	////std::cout << winX << ", " <<  winY << std::endl;
+	//f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
+	//std::cout << std::setprecision(2) << std::setw(5) << cursorXN << ", " << std::setw(5) << cursorYN << std::endl;
+	///************************************************************************/
+	//s8 const* testStr = "TEST TEXT";
+	//AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	//AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);
 
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
 

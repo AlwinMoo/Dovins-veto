@@ -9,21 +9,25 @@ namespace UI
 {
 	class UI_Manager
 	{
+		// Call this after setting position, scale or bounds
+		void ConvertToWS(Button* newButton);
 	public:
 		std::array<AEGfxTexture*, NUM_TEX> m_textures;
 		std::array<AEGfxVertexList*, NUM_MESH> m_mesh;
-		std::array<s8, NUM_FONTS> m_fonts;
+		AEVec2 m_winDim;
+		s8 m_fontID;
 		std::vector<Button*> m_buttons;
 
-		void CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_FONT fontID, void(*callback)() = nullptr);
+		void CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, void(*callback)() = nullptr);
 
 		void Load();
 
 		// TODO: UNLOAD
 		void Unload();
-
+		void SetWinDim(f32 x, f32 y);
 		void Update(AEVec2 mousePos, bool lClick);
 		void Draw();
+
 		UI_Manager();
 		~UI_Manager();
 	};
