@@ -1,5 +1,6 @@
-#include <AEEngine.h>
+#pragma once
 
+#include <AEEngine.h>
 
 class game_map
 {

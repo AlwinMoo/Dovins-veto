@@ -35,6 +35,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="EventSystem.cpp" />
+    <ClCompile Include="..\Source\Alwintest.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h">
@@ -87,6 +90,9 @@
     </ClInclude>
     <ClInclude Include="EventSystem.h" />
     <ClInclude Include="..\Source\UI_Types.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Alwintest.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,6 @@
 #include "pathfinder.h"
 
-constexpr static unsigned int MAX_ITER{ 1000 };
+constexpr static unsigned int MAX_ITER{ 10000 };
 
 PathManager::PathManager(game_map* Map)
 {
@@ -59,14 +59,17 @@ bool PathManager::CheckCell(AEVec2 CurrPos, AEVec2 LastPos, AEVec2 GoalPos)
 	frontier.push(std::make_pair(AEVec2{ CurrPos.x, CurrPos.y - 1 }, CurrPos));
 	frontier.push(std::make_pair(AEVec2{ CurrPos.x - 1, CurrPos.y }, CurrPos));
 
+	frontier.push(std::make_pair(AEVec2{ CurrPos.x + 1, CurrPos.y + 1 }, CurrPos));
+	frontier.push(std::make_pair(AEVec2{ CurrPos.x - 1, CurrPos.y - 1 }, CurrPos));
+	frontier.push(std::make_pair(AEVec2{ CurrPos.x - 1, CurrPos.y + 1 }, CurrPos));
+	frontier.push(std::make_pair(AEVec2{ CurrPos.x + 1, CurrPos.y - 1 }, CurrPos));
+
 	return false;
 }
 
 bool PathManager::IsPositionValid(AEVec2 coord)
 {
-	//return Map->map_arr[Map->get_index(Map->get_x(coord.x), Map->get_y(coord.y))] == 0; // is it ground
-
-	return true;
+	return Map->map_arr[Map->GetIndex(coord.x, coord.y)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(coord.x, coord.y)] >= game_map::TILE_TYPE::NUM_TYPES_TILE || static_cast<int>(Map->map_arr[Map->GetIndex(coord.x, coord.y)]) < 0; // is it ground
 }
 
 std::vector<AEVec2> PathManager::GetPath(AEVec2 StartPos, AEVec2 GoalPos)
@@ -104,7 +107,9 @@ std::vector<AEVec2> PathManager::GetPath(AEVec2 StartPos, AEVec2 GoalPos)
 	std::vector<AEVec2> backtrackPath{};
 
 	// clean up
-	frontier = {};
+	std::queue<std::pair<AEVec2, AEVec2>> empty{};
+	std::swap(frontier, empty);
+	visited.clear();
 
 	frontier.push(std::make_pair(StartPos, AEVec2{-1, -1}));
 

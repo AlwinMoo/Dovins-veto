@@ -38,7 +38,7 @@ namespace
 	bool player_moving{ false };
 	AEVec2 player_goal{0, 0};
 
-	PathManager* pathingObj = new PathManager(test_map);
+	PathManager* pathingObj{};
 	std::vector<AEVec2> player_path{};
 
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
@@ -120,25 +120,27 @@ void Alwintest_Initialize()
 
 	grass_Mesh = AEGfxMeshEnd();
 
-	test_map = new game_map(10, 10, AEGetWindowWidth(), AEGetWindowHeight(), true); // automatically destroyed in deconstructor
+	test_map = new game_map(30, 30, AEGetWindowWidth(), AEGetWindowHeight(), 0); // automatically destroyed in deconstructor
 
 	for (int i = 0; i < test_map->map_size; ++i)
 	{
 		GameObject* grass = FetchGO(GameObject::GO_GRASS);
-		grass->position = test_map->get_worldpos(i);
-		grass->scale.x = test_map->get_tile_size();
+		grass->position = test_map->GetWorldPos(i);
+		grass->scale.x = test_map->GetTileSize();
 		grass->scale.y = grass->scale.x;
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
-	player->scale.x = test_map->get_tile_size();
+	player->scale.x = test_map->GetTileSize();
 	player->scale.y = player->scale.x;
 	player->active = false;
 
 	cursor = FetchGO(GameObject::GO_PLANET);
-	cursor->scale.x = test_map->get_tile_size();
+	cursor->scale.x = test_map->GetTileSize();
 	cursor->scale.y = cursor->scale.x;
 	cursor->active = false;
+
+	pathingObj = new PathManager(test_map);
 }
 
 void Alwintest_Update()
@@ -165,11 +167,11 @@ void Alwintest_Update()
 
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
-		if (test_map->is_in_grid(mousePos))
+		if (test_map->IsInGrid(mousePos))
 		{
 			if (!player->active)
 			{
-				player->position = test_map->snap_coordinates(mousePos);
+				player->position = test_map->SnapCoordinates(mousePos);
 				player->active = true;
 
 				player_moving = false;
@@ -178,38 +180,49 @@ void Alwintest_Update()
 			{
 				player_moving = true;
 				//player_goal = test_map->snap_coordinates(mousePos);
-				player_path = pathingObj->GetPath(AEVec2{static_cast<float>(test_map->get_x(std::floor(player->position.x/test_map->get_tile_size()))), static_cast<float>(test_map->get_y(std::floor(player->position.y / test_map->get_tile_size()))) }, AEVec2{ static_cast<float>(test_map->get_x(std::floor(mousePos.x / test_map->get_tile_size()))), static_cast<float>(test_map->get_y(std::floor(mousePos.y / test_map->get_tile_size()))) });
-					
-				for (auto &pos : player_path)
+				player_path = pathingObj->GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(mousePos)), (float)test_map->GetY(test_map->WorldToIndex(mousePos)) });
+				
+				if (!player_path.empty())
 				{
-					pos = test_map->get_worldpos(test_map->get_index(pos.x, pos.y));
-				}
+					for (auto& pos : player_path)
+					{
+						pos = test_map->GetWorldPos(test_map->GetIndex(pos.x, pos.y));
+					}
 
-				player_goal = player_path.front();
-				player_path.erase(player_path.begin());
+					player_goal = player_path.front();
+					player_path.erase(player_path.end() - 1);
+					player_path.push_back(mousePos);
+				}
 			}
 		}
 	}
-	if (test_map->is_in_grid(mousePos))
+	if (test_map->IsInGrid(mousePos))
 	{
-		cursor->position = test_map->snap_coordinates(mousePos);
+		cursor->position = test_map->SnapCoordinates(mousePos);
 		cursor->active = true;
 	}
 	else
 		cursor->active = false;
 
-	if (player_moving)
+	if (player_moving && !player_path.empty())
 	{
-		if (player->position.x == player_goal.x && player->position.y == player_goal.y)
+		//if ((player->position.x <= player_goal.x - 0.1 || player->position.x >= player_goal.x + 0.1) && (player->position.y <= player_goal.y - 0.1 || player->position.y >= player_goal.y + 0.1))
+		AEVec2 leng{};
+		leng.x = player->position.x - player_goal.x;
+		leng.y = player->position.y - player_goal.y;
+
+		if (AEVec2Length(&leng) <= 5)
 		{
+			player_path.erase(player_path.begin());
+
 			if (player_path.empty())
 			{
+				// reset once reached goal
 				player_moving = false;
 			}
 			else
 			{
 				player_goal = player_path.front();
-				player_path.erase(player_path.begin());
 			}
 		}
 	}
@@ -227,7 +240,13 @@ void Alwintest_Update()
 				case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
 					if (player_moving && !player_path.empty())
 					{
-						AEVec2Lerp(&player->position, &player->position, &player_goal, 0.1);
+						AEVec2 out{};
+						AEVec2 norm{};
+						AEVec2Set(&norm, (player_goal.x - player->position.x), (player_goal.y - player->position.y));
+						AEVec2Normalize(&out, &norm);
+
+						player->position.x += out.x * AEFrameRateControllerGetFrameTime() * 600;
+						player->position.y += out.y * AEFrameRateControllerGetFrameTime() * 600;
 					}
 					break;
 			}
