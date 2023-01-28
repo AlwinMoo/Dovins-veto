@@ -97,6 +97,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\Bevantest.cpp" />
+    <ClCompile Include="..\Source\Button.cpp" />
     <ClCompile Include="..\Source\GameObject.cpp" />
     <ClCompile Include="..\Source\GameStateManager.cpp" />
     <ClCompile Include="..\Source\Map\Map.cpp" />
@@ -105,10 +106,12 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="..\Source\TestScene.cpp" />
     <ClCompile Include="..\Source\TextArea.cpp" />
     <ClCompile Include="..\Source\UI_Manager.cpp" />
+    <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h" />
+    <ClInclude Include="..\Source\Button.h" />
     <ClInclude Include="..\Source\GameObject.h" />
     <ClInclude Include="..\Source\GameScene.hpp" />
     <ClInclude Include="..\Source\GameStateList.h" />
@@ -122,6 +125,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClInclude Include="..\Source\TestScene.h" />
     <ClInclude Include="..\Source\TextArea.h" />
     <ClInclude Include="..\Source\UI_Manager.h" />
+    <ClInclude Include="EventSystem.h" />
     <ClInclude Include="Mesh.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

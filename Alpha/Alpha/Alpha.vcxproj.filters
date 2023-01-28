@@ -31,6 +31,10 @@
     <ClCompile Include="..\Source\UI_Manager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Button.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="EventSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h">
@@ -78,6 +82,10 @@
     <ClInclude Include="..\Source\UI_Manager.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Button.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="EventSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

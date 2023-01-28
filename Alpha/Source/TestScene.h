@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "AEEngine.h"
 #include "Map/Map.h"
-
+#include "UI_Manager.h"
 void TestScene_Load();
 
 void TestScene_Initialize();
@@ -23,7 +23,7 @@ namespace
 	int object_count;
 	GameObject* hoverStructure;
 	bool validPlacement;
-
+	UI::UI_Manager uiManager;
 	AEGfxTexture* planetTex;
 }
 

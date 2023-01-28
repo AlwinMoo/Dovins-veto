@@ -30,9 +30,12 @@ namespace
 		}
 }
 
+
 void TestScene_Load()
 {
-	planetTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
+	planetTex = AEGfxTextureLoad("Assets/grassTile.png");
+	// UI MANAGER
+	uiManager.LoadFont("Assets/Roboto-Regular.ttf");
 }
 
 void TestScene_Initialize()
@@ -46,6 +49,7 @@ void TestScene_Initialize()
 	hoverStructure->scale.x = test_map->get_tile_size();
 	hoverStructure->scale.y = hoverStructure->scale.x;
 	validPlacement = false;
+
 }
 
 void TestScene_Update()

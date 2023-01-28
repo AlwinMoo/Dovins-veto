@@ -6,7 +6,6 @@
 f32 winSizeX, winSizeY;
 s8 m_fontId;
 
-static UI::UI_Manager uiManager;
 
 #include <vector>
 #include "Map/Map.h"
