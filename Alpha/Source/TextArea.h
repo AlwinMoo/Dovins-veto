@@ -11,6 +11,7 @@ private:
 	s32 m_boxWidth, m_boxHeight;
 	s8 m_fontID;
 public:
+	TextArea(){}
 	TextArea(s32 w, s32 h);
 	~TextArea();
 };

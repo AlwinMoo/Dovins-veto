@@ -30,12 +30,13 @@ namespace
 		}
 }
 
-
+AEGfxTexture* texTest;
 void TestScene_Load()
 {
 	planetTex = AEGfxTextureLoad("Assets/grassTile.png");
 	// UI MANAGER
 	uiManager.LoadFont("Assets/Roboto-Regular.ttf");
+	texTest = AEGfxTextureLoad("Assets/SquareButton.png");
 }
 
 void TestScene_Initialize()
@@ -145,6 +146,29 @@ void TestScene_Draw()
 
 	// Render above
 	hoverStructure->Render();
+
+	// UI TEST
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetTintColor(1.f, 1.f, 1.f, 1.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.f);
+	AEGfxTextureSet(texTest, 0, 0);
+
+	AEMtx33 scale = { 0 };
+	AEMtx33Scale(&scale, 1.f, 1.f);
+
+	AEMtx33 rotate = { 0 };
+	AEMtx33Rot(&rotate, 0.f);
+
+	AEMtx33 translate = { 0 };
+	AEMtx33Trans(&translate, AEGetWindowWidth() / 2.f, AEGetWindowHeight() / 2.f);
+
+	AEMtx33 transform = { 0 };
+	AEMtx33Concat(&transform, &rotate, &scale);
+	AEMtx33Concat(&transform, &translate, &transform);
+
+	AEGfxSetTransform(transform.m);
+	//AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 }
 
 void TestScene_Free()

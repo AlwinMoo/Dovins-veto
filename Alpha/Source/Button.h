@@ -11,6 +11,10 @@ namespace UI
 		s8 font;
 		TextArea textArea;
 		void(*callback)(void*);
+		Button(){
+		}
+		~Button(){
+		}
 	};
 }
 #endif
