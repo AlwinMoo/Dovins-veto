@@ -5,7 +5,7 @@
 #include "TestScene.h"
 #include "Alwintest.h"
 
-int current = 0, previous = 0, next = 2;
+int current = 0, previous = 0, next = 0;
 
 FP fpLoad = nullptr, fpInitialize = nullptr, fpUpdate = nullptr, fpDraw = nullptr, fpFree = nullptr, fpUnload = nullptr;
 

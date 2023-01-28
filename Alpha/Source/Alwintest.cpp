@@ -206,7 +206,6 @@ void Alwintest_Update()
 
 	if (player_moving && !player_path.empty())
 	{
-		//if ((player->position.x <= player_goal.x - 0.1 || player->position.x >= player_goal.x + 0.1) && (player->position.y <= player_goal.y - 0.1 || player->position.y >= player_goal.y + 0.1))
 		AEVec2 leng{};
 		leng.x = player->position.x - player_goal.x;
 		leng.y = player->position.y - player_goal.y;

@@ -3,6 +3,7 @@
 #include "Rendering.hpp"
 #include "GameStateList.h"
 #include "GameStateManager.h"
+#include "Pathfinding/pathfinder.h"
 
 namespace
 {
@@ -11,7 +12,7 @@ namespace
 		for (auto it : go_list)
 		{
 			GameObject* go = (GameObject*)it;
-			if (!go->active)
+			if (!go->active && go->type == value)
 			{
 				switch (go->type)
 				{
@@ -32,7 +33,13 @@ namespace
 
 	}
 
+	GameObject* player;
 
+	bool player_moving{ false };
+	AEVec2 player_goal{ 0, 0 };
+
+	PathManager* pathingObj{};
+	std::vector<AEVec2> player_path{};
 }
 
 AEGfxTexture* texTest;
@@ -87,6 +94,13 @@ void TestScene_Initialize()
 		const AEVec2 buttonSize{ 50.f, 50.f };
 		uiManager->CreateButton(buttonPos, buttonSize, UI::WHITE_BUTTON, CALLBACKTEST);
 	}
+
+	player = FetchGO(GameObject::GO_PLAYER);
+	player->scale.x = test_map->GetTileSize();
+	player->scale.y = player->scale.x;
+	player->active = false;
+
+	pathingObj = new PathManager(test_map);
 }
 
 void TestScene_Update()
@@ -94,6 +108,9 @@ void TestScene_Update()
 	// Player Input
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
+	AEVec2 absMousePos{};
+	AEVec2Set(&absMousePos, mouseX, mouseY);
+
 	AEVec2 mouse_pos{};
 	AEVec2Set(&mouse_pos, mouseX, mouseY);
 	//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
@@ -115,6 +132,65 @@ void TestScene_Update()
 		hoverStructure->rotation = rand() % 360;
 
 		test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+	}
+
+	if (AEInputCheckTriggered(AEVK_RBUTTON) && !test_map->IsOccupied(test_map->WorldToIndex(mouse_pos)))
+	{
+		if (test_map->IsInGrid(absMousePos))
+		{
+			if (!player->active)
+			{
+				player->position = test_map->SnapCoordinates(absMousePos);
+				player->active = true;
+
+				player_moving = false;
+			}
+			else
+			{
+				player_moving = true;
+				//player_goal = test_map->snap_coordinates(mousePos);
+				player_path = pathingObj->GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absMousePos)), (float)test_map->GetY(test_map->WorldToIndex(absMousePos)) });
+
+				if (!player_path.empty())
+				{
+					for (auto& pos : player_path)
+					{
+						pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
+					}
+
+					player_path.erase(player_path.end() - 1);
+					player_path.push_back(absMousePos);
+					player_goal = player_path.front();
+				}
+				else
+				{
+					player_path.push_back(absMousePos);
+					player_goal = player_path.front();
+				}
+			}
+		}
+	}
+
+	if (player_moving && !player_path.empty())
+	{
+		AEVec2 leng{};
+		leng.x = player->position.x - player_goal.x;
+		leng.y = player->position.y - player_goal.y;
+
+		if (AEVec2Length(&leng) <= 5)
+		{
+			player_path.erase(player_path.begin());
+
+			if (player_path.empty())
+			{
+				// reset once reached goal
+				player_moving = false;
+			}
+			else
+			{
+				player_goal = player_path.front();
+			}
+		}
 	}
 
 	// Update position of hover structure
@@ -192,7 +268,25 @@ void TestScene_Update()
 	for (GameObject* gameObj : go_list)
 	{
 		if (gameObj->active)
+		{
 			gameObj->Update();
+
+			switch (gameObj->type)
+			{
+			case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
+				if (player_moving && !player_path.empty())
+				{
+					AEVec2 out{};
+					AEVec2 norm{};
+					AEVec2Set(&norm, (player_goal.x - player->position.x), (player_goal.y - player->position.y));
+					AEVec2Normalize(&out, &norm);
+
+					player->position.x += out.x * AEFrameRateControllerGetFrameTime() * 600;
+					player->position.y += out.y * AEFrameRateControllerGetFrameTime() * 600;
+				}
+				break;
+			}
+		}
 	}
 
 	
