@@ -125,6 +125,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClInclude Include="..\Source\TestScene.h" />
     <ClInclude Include="..\Source\TextArea.h" />
     <ClInclude Include="..\Source\UI_Manager.h" />
+    <ClInclude Include="..\Source\UI_Types.h" />
     <ClInclude Include="EventSystem.h" />
     <ClInclude Include="Mesh.hpp" />
   </ItemGroup>

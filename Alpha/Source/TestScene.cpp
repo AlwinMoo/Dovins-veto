@@ -1,6 +1,6 @@
 #include "TestScene.h"
 #include <iostream>
-
+#include "Rendering.hpp"
 namespace
 {
 		GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
@@ -31,16 +31,21 @@ namespace
 }
 
 AEGfxTexture* texTest;
+AEGfxVertexList* meshTest;
 void TestScene_Load()
 {
 	planetTex = AEGfxTextureLoad("Assets/grassTile.png");
 	// UI MANAGER
-	uiManager.LoadFont("Assets/Roboto-Regular.ttf");
-	texTest = AEGfxTextureLoad("Assets/SquareButton.png");
+	
+}
+
+void CALLBACKTEST() {
+	std::cout << "CALLED BACK" << std::endl;
 }
 
 void TestScene_Initialize()
 {
+	meshTest = render::GenerateQuad();
 	srand(time(NULL));
 
 	test_map = new game_map(10, 10, AEGetWindowWidth(), AEGetWindowHeight(), true);
@@ -51,6 +56,17 @@ void TestScene_Initialize()
 	hoverStructure->scale.y = hoverStructure->scale.x;
 	validPlacement = false;
 
+	// UI MANAGER
+#ifdef UI_TEST
+	{
+		uiManager.Load();
+		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
+		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+		const AEVec2 buttonPos{ screenWidthX / 4, screenWidthY / 4 };
+		const AEVec2 buttonSize{ 50.f, 50.f };
+		uiManager.CreateButton(buttonPos, buttonSize, UI::WHITE_BUTTON, UI::FONT_ROBOTO, CALLBACKTEST);
+	}
+#endif
 }
 
 void TestScene_Update()
@@ -146,34 +162,12 @@ void TestScene_Draw()
 
 	// Render above
 	hoverStructure->Render();
-
-	// UI TEST
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetTintColor(1.f, 1.f, 1.f, 1.0f);
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1.f);
-	AEGfxTextureSet(texTest, 0, 0);
-
-	AEMtx33 scale = { 0 };
-	AEMtx33Scale(&scale, 1.f, 1.f);
-
-	AEMtx33 rotate = { 0 };
-	AEMtx33Rot(&rotate, 0.f);
-
-	AEMtx33 translate = { 0 };
-	AEMtx33Trans(&translate, AEGetWindowWidth() / 2.f, AEGetWindowHeight() / 2.f);
-
-	AEMtx33 transform = { 0 };
-	AEMtx33Concat(&transform, &rotate, &scale);
-	AEMtx33Concat(&transform, &translate, &transform);
-
-	AEGfxSetTransform(transform.m);
-	//AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+	uiManager.Draw();
 }
 
 void TestScene_Free()
 {
-	
+	uiManager.Unload();
 }
 
 void TestScene_Unload()

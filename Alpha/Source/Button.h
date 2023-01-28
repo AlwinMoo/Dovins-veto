@@ -2,15 +2,20 @@
 #define BUTTON_H
 #include "AEEngine.h"
 #include "TextArea.h"
+#include "UI_Types.h"
 namespace UI 
 {
 	struct Button
 	{
+		UI_FONT fontID;
+		UI_TEX texID;
+		UI_MESH meshID;
 		AEVec2 pos;
-		AEVec2 size;
+		AEVec2 min, max;
+		AEVec2 scale;
 		s8 font;
 		TextArea textArea;
-		void(*callback)(void*);
+		void(*callback)();
 		Button(){
 		}
 		~Button(){

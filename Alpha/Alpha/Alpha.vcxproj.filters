@@ -86,6 +86,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="EventSystem.h" />
+    <ClInclude Include="..\Source\UI_Types.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
