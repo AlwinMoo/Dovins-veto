@@ -3,8 +3,9 @@
 #include "GameStateList.h"
 #include "Bevantest.h"
 #include "TestScene.h"
+#include "Alwintest.h"
 
-int current = 0, previous = 0, next = 0;
+int current = 0, previous = 0, next = 2;
 
 FP fpLoad = nullptr, fpInitialize = nullptr, fpUpdate = nullptr, fpDraw = nullptr, fpFree = nullptr, fpUnload = nullptr;
 
@@ -32,6 +33,14 @@ void GSM_Update()
 			fpDraw = TestScene_Draw;
 			fpFree = TestScene_Free;
 			fpUnload = TestScene_Unload;
+			break;
+		case GS_LEVEL3:
+			fpLoad = Alwintest_Load;
+			fpInitialize = Alwintest_Initialize;
+			fpUpdate = Alwintest_Update;
+			fpDraw = Alwintest_Draw;
+			fpFree = Alwintest_Free;
+			fpUnload = Alwintest_Unload;
 			break;
 		case GS_RESTART:
 			break;

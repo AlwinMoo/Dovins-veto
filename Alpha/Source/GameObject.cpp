@@ -2,6 +2,8 @@
 #include "Rendering.hpp"
 #include <iostream>
 
+#include <AEEngine.h>
+
 void GameObject::Update()
 {
 }
@@ -43,6 +45,7 @@ GameObject::GameObject(GAMEOBJECT_TYPE default_type) :
 	color.b = 1.0f;
 	position = { 0, 0 };
 	scale = { 1, 1 };
+	gridScale = { 1, 1 };
 
 }
 
