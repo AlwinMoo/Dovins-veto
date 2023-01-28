@@ -9,7 +9,7 @@ namespace UI
 		AEVec2 pos;
 		AEVec2 size;
 		s8 font;
-		TextArea textArea;
+		//TextArea textArea;
 		void(*callback)(void*);
 		Button(){
 		}
