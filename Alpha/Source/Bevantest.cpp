@@ -91,8 +91,8 @@ void Bevantest_Initialize()
 	for (int i = 0; i < test_map->map_size; ++i)
 	{
 		GameObject* test = FetchGO(GameObject::GO_PLANET);
-		test->position = test_map->get_worldpos(i);
-		test->scale.x = test_map->get_tile_size();
+		test->position = test_map->GetWorldPos(i);
+		test->scale.x = test_map->GetTileSize();
 		test->scale.y = test->scale.x;
 	}
 }
@@ -120,15 +120,15 @@ void Bevantest_Update()
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
 		/*GameObject* test = FetchGO(GameObject::GO_PLANET);
-		test->position.x = test_map->get_world_x(static_cast<int>(mouseX / test_map->get_tile_size()));
-		test->position.y = test_map->get_world_y(static_cast<int>(mouseY / test_map->get_tile_size()));
+		test->position.x = test_map->GetWorldX(static_cast<int>(mouseX / test_map->GetTileSize()));
+		test->position.y = test_map->GetWorldY(static_cast<int>(mouseY / test_map->GetTileSize()));
 		test->rotation = rand() % 360;
-		test->scale.x = test_map->get_tile_size();
+		test->scale.x = test_map->GetTileSize();
 		test->scale.y = test->scale.x;*/
 
-		if (test_map->get_index(static_cast<int>(mouseX / test_map->get_tile_size()), static_cast<int>(mouseY / test_map->get_tile_size())) < test_map->map_size && test_map->get_index(static_cast<int>(mouseX / test_map->get_tile_size()), static_cast<int>(mouseY / test_map->get_tile_size())) >= 0)
+		if (test_map->GetIndex(static_cast<int>(mouseX / test_map->GetTileSize()), static_cast<int>(mouseY / test_map->GetTileSize())) < test_map->map_size && test_map->GetIndex(static_cast<int>(mouseX / test_map->GetTileSize()), static_cast<int>(mouseY / test_map->GetTileSize())) >= 0)
 		{
-			std::cout << "Legal: " << test_map->get_index(static_cast<int>(mouseX / test_map->get_tile_size()), static_cast<int>(mouseY / test_map->get_tile_size())) << std::endl;
+			std::cout << "Legal: " << test_map->GetIndex(static_cast<int>(mouseX / test_map->GetTileSize()), static_cast<int>(mouseY / test_map->GetTileSize())) << std::endl;
 		}
 		else
 		{

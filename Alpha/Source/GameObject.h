@@ -32,6 +32,7 @@ public:
 
 	AEVec2 position;
 	AEVec2 scale;
+	AEVec2 gridScale;
 	double rotation;
 
 	AEGfxTexture* tex;

@@ -6,31 +6,33 @@
 
 namespace
 {
-		GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
+	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
+	{
+		for (auto it : go_list)
 		{
-			for (auto it : go_list)
+			GameObject* go = (GameObject*)it;
+			if (!go->active)
 			{
-				GameObject* go = (GameObject*)it;
-				if (!go->active)
+				switch (go->type)
 				{
-					switch (go->type)
-					{
-					default:
-						go->tex = planetTex;
-					}
-					go->active = true;
-					++object_count;
-					return go;
+				default:
+					go->tex = planetTex;
 				}
+				go->active = true;
+				++object_count;
+				return go;
 			}
-			GameObject* go{ new GameObject(value) };
-			go_list.push_back(go);
-
-			//CODE TO INITIALISE GO SPECIFIC VARIABLES
-
-			return FetchGO(value);
-
 		}
+		GameObject* go{ new GameObject(value) };
+		go_list.push_back(go);
+
+		//CODE TO INITIALISE GO SPECIFIC VARIABLES
+
+		return FetchGO(value);
+
+	}
+
+
 }
 
 AEGfxTexture* texTest;
@@ -53,21 +55,21 @@ void TestScene_Initialize()
 	meshTest = render::GenerateQuad();
 	srand(time(NULL));
 
-	test_map = new game_map(10, 10, AEGetWindowWidth(), AEGetWindowHeight(), true);
+	test_map = new game_map(10, 10, AEGetWindowWidth(), AEGetWindowHeight(), 4);
 
 	for (int i = 0; i < test_map->width * test_map->height; i++)
 	{
 		GameObject* temp = FetchGO(GameObject::GO_TILE);
-		temp->scale.x = test_map->get_tile_size();
-		temp->scale.y = test_map->get_tile_size();
-		temp->position = test_map->get_worldpos(i);
+		temp->scale.x = test_map->GetTileSize();
+		temp->scale.y = test_map->GetTileSize();
+		temp->position = test_map->GetWorldPos(i);
 		temp->tex = grassTex;
 	}
 
 	hoverStructure = FetchGO(GameObject::GO_HOVER_STRUCTURE);
 	hoverStructure->alpha = 0.5f;
 	hoverStructure->rotation = rand() % 360;
-	hoverStructure->scale.x = test_map->get_tile_size();
+	hoverStructure->scale.x = test_map->GetTileSize();
 	hoverStructure->scale.y = hoverStructure->scale.x;
 	validPlacement = false;
 
@@ -91,19 +93,19 @@ void TestScene_Update()
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 	AEVec2 mouse_pos{};
 	AEVec2Set(&mouse_pos, mouseX, mouseY);
-	mouse_pos = test_map->snap_coordinates(mouse_pos);
-	//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
+	mouse_pos = test_map->SnapCoordinates(mouse_pos);
+	//float mouseYGrid = static_cast<int>(mouseY / test_map->GetTileSize()) * test_map->GetTileSize() + (test_map->GetTileSize() * 0.5);
 
 	// Place Structure
 	if (AEInputCheckTriggered(AEVK_LBUTTON) && validPlacement)
 	{
 		GameObject* test = FetchGO(GameObject::GO_PLANET);
 		test->position = hoverStructure->position;
-		//test->position.y = mouseYGrid;
 		test->rotation = hoverStructure->rotation;
+		test->scale = hoverStructure->scale;
 		hoverStructure->rotation = rand() % 360;
-		test->scale.x = test_map->get_tile_size();
-		test->scale.y = test->scale.x;
+
+		test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 	}
 
 	// Update position of hover structure
@@ -111,10 +113,12 @@ void TestScene_Update()
 		|| hoverStructure->position.y != mouse_pos.y)
 	{
 		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 	}
 
 	// Turn on/off hover if in/out the grid
-	if (test_map->is_in_grid(mouse_pos))
+	if (test_map->IsInGrid(mouse_pos, hoverStructure->gridScale.x, hoverStructure->gridScale.y))
 	{
 		hoverStructure->active = true;
 		validPlacement = true;
@@ -123,6 +127,50 @@ void TestScene_Update()
 	{
 		hoverStructure->active = false;
 		validPlacement = false;
+	}
+
+	// Change selected structure
+	if (AEInputCheckTriggered(AEVK_1))
+	{
+		hoverStructure->gridScale = { 1, 1 };
+		hoverStructure->scale = { test_map->GetTileSize(), test_map->GetTileSize() };
+		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	}
+	else if (AEInputCheckTriggered(AEVK_2))
+	{
+		hoverStructure->gridScale = { 2, 2 };
+		hoverStructure->scale = { test_map->GetTileSize() * 2, test_map->GetTileSize() * 2 };
+		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	}
+	else if (AEInputCheckTriggered(AEVK_3))
+	{
+		hoverStructure->gridScale = { 3, 3 };
+		hoverStructure->scale = { test_map->GetTileSize() * 3, test_map->GetTileSize() * 3 };
+		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	}
+	else if (AEInputCheckTriggered(AEVK_4))
+	{
+		//DOESN'T WORK
+		hoverStructure->gridScale = { 2, 4 };
+		hoverStructure->scale = { test_map->GetTileSize() * 2, test_map->GetTileSize() * 4 };
+		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	}
+	else if (AEInputCheckTriggered(AEVK_5))
+	{
+		//DOESN'T WORK
+		hoverStructure->gridScale = { 5, 2 };
+		hoverStructure->scale = { test_map->GetTileSize() * 5, test_map->GetTileSize() * 2 };
+		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 	}
 
 	// Quit Game
@@ -135,33 +183,50 @@ void TestScene_Update()
 	for (GameObject* gameObj : go_list)
 	{
 		if (gameObj->active)
-		{
-			if (gameObj->type == GameObject::GO_PLANET)
-				gameObj->Update();
-		}
+			gameObj->Update();
 	}
 
-	// GameObject Collision (NON-GRID BASED, SHOULD CHANGE)
-	bool hoverCollided = false;
-	for (GameObject* gameObj : go_list)
+	
+
+	// GameObject Collision (GRID BASED)
+	if (test_map->IsOccupied(test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y))
 	{
-		if (gameObj != hoverStructure)
-		{
-			if (hoverStructure->position.x == gameObj->position.x &&
-				hoverStructure->position.y == gameObj->position.y)
-			{
-				hoverStructure->color.Set(1.0f, 0.2f, 0.2f);
-				hoverCollided = true;
-				validPlacement = false;
-				break;
-			}
-		}
+		hoverStructure->color.Set(1.0f, 0.2f, 0.2f);
+		validPlacement = false;
 	}
-	if (!hoverCollided && hoverStructure->active)
+	else if (hoverStructure->active)
 	{
 		hoverStructure->color.Set(1.0f, 1.0f, 1.0f);
 		validPlacement = true;
 	}
+
+	// GameObject Collision (NON-GRID BASED, SHOULD CHANGE)
+	//bool hoverCollided = false;
+	//for (GameObject* gameObj : go_list)
+	//{
+	//	if (!gameObj->active)
+	//		continue;
+	//
+	//	if (gameObj != hoverStructure)
+	//	{
+	//		if (gameObj->type == GameObject::GO_TILE)
+	//			continue;
+	//		if (hoverStructure->position.x == gameObj->position.x &&
+	//			hoverStructure->position.y == gameObj->position.y)
+	//		{
+	//			hoverStructure->color.Set(1.0f, 0.2f, 0.2f);
+	//			hoverCollided = true;
+	//			validPlacement = false;
+	//			break;
+	//		}
+	//	}
+	//}
+	//
+	//if (!hoverCollided && hoverStructure->active)
+	//{
+	//	hoverStructure->color.Set(1.0f, 1.0f, 1.0f);
+	//	validPlacement = true;
+	//}
 }
 
 void TestScene_Draw()
@@ -184,17 +249,12 @@ void TestScene_Draw()
 	//AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	////AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);
 
-	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+	AEGfxSetBackgroundColor(0.3f, 0.3f, 0.3f);
 	for (GameObject* gameObj : go_list)
 	{
 		//Gameobjects Render
 		if (gameObj->active)
-		{
-			if (gameObj->type == GameObject::GO_TILE)
-				gameObj->Render();
-			if (gameObj->type == GameObject::GO_PLANET)
-				gameObj->Render();
-		}
+			gameObj->Render();
 	}
 
 	// Render above

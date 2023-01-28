@@ -1,5 +1,6 @@
 #include <AEEngine.h>
 
+
 class game_map
 {
 	public:
@@ -9,6 +10,13 @@ class game_map
 	~game_map();
 	game_map();
 
+	enum class TILE_TYPE
+	{
+		TILE_NONE = 0, // THIS REPRESENTS EMPTY SPACE
+		TILE_PLANET,
+		NUM_TYPES_TILE
+	};
+
 	/*!
 	 * @brief initialises out parameter (out_obj) with default values and makes sure it exists
 	 * @param out_obj empty game_map object to be passed in so that default values can be written in and passed back
@@ -17,10 +25,10 @@ class game_map
 	 * @param world_width float max world width
 	 * @param world_height float max world height
 	*/
-	game_map(unsigned int width_size, unsigned int height_size, float world_width, float world_height, bool use_offset);
+	game_map(unsigned int width_size, unsigned int height_size, float world_width, float world_height, int use_offset);
 	
 	unsigned int map_size;
-	char* map_arr; //1D char map array
+	TILE_TYPE* map_arr; //1D char map array
 
 	unsigned int width; //grid total width
 	unsigned int height; //grid total height
@@ -28,7 +36,6 @@ class game_map
 	float world_width; //grid max world width
 	float world_height; //grid max world height
 
-	bool use_offset;
 	float world_offset;
 	int tile_offset;
 
@@ -38,7 +45,7 @@ class game_map
 	 * @param size integer max width of map
 	 * @return integer x-axis in 2D array
 	*/
-	int get_x(int index);
+	int GetX(int index);
 
 	/*!
 	 * @brief converts from 1D array index to 2D array y-axis
@@ -46,7 +53,7 @@ class game_map
 	 * @param size
 	 * @return integer y-axis in 2D array
 	*/
-	int get_y(int index);
+	int GetY(int index);
 
 	/*!
 	 * @brief converts from 2D grid coordinates to 1D array index
@@ -55,7 +62,7 @@ class game_map
 	 * @param width width of grid
 	 * @return integer index of 1D array
 	*/
-	int get_index(int x, int y);
+	int GetIndex(int x, int y);
 
 	/*!
 	 * @brief Calculates the world position using 1D array index
@@ -63,7 +70,7 @@ class game_map
 	 * @param in_map map object to access map information
 	 * @return AEVec2 of position in world positioning
 	*/
-	AEVec2 get_worldpos(int index);
+	AEVec2 GetWorldPos(int index);
 
 	/*!
 	 * @brief Calculates the world x-coord position using grid x-coord
@@ -71,7 +78,7 @@ class game_map
 	 * @param in_map map object to access map information
 	 * @return float of position of x-axis
 	*/
-	float get_world_x(int x);
+	float GetWorldX(int x);
 
 	/*!
 	 * @brief Calculates the world x-coord position using grid x-coord
@@ -79,56 +86,44 @@ class game_map
 	 * @param in_map map object to access map information
 	 * @return float of position of x-axis
 	*/
-	float get_world_y(int y);
+	float GetWorldY(int y);
 
-	bool is_in_grid(AEVec2 coord);
+	bool IsInGrid(AEVec2 coord, int gridSizeX=1, int gridSizeY=1);
 
-	AEVec2 snap_coordinates(AEVec2);
+	AEVec2 SnapCoordinates(AEVec2);
 
-	float get_tile_size();
+	float GetTileSize();
+
+	/*!
+	 * @brief Converts world pos to index, returns -1 if invalid position
+	 *
+	 * @param pos	- World pos
+	 * @return		- Index in grid
+	*/
+	int WorldToIndex(AEVec2 pos);
+
+	/*!
+	 * @brief Adds an item into the map based on index
+	 * 
+	 * @param tile			- Type of tile to put in the map
+	 * @param index			- Index to place tile
+	 * @param gridScaleX	- X Scale of new item
+	 * @param gridScaleY	- Y scale of new item
+	*/
+	void AddItem(TILE_TYPE tile, int index, int gridScalex = 1, int gridScaleY = 1);
+
+	/*!
+	 * @brief	Checks if an index is occupied. Scale is checked centered
+	 *			on top left, ex, scaleX of 3 will check index and 2 tile
+	 *			to the right of index
+	 * 
+	 * @param index			- Index to check
+	 * @param gridScaleX	- X Scale to check
+	 * @param gridScaleY	- Y scale to check
+	*/
+	bool IsOccupied(int index, int gridScalex=1, int gridScaleY=1);
 
 };
-
-//enum TILE_TYPE
-//{
-//	DEFAULT = 0, // THIS REPRESENTS EMPTY SPACE
-//	GROUND_1 = 1, // THIS IS A NORMAL GROUND TILE
-//	GROUND_2,
-//	GROUND_3,
-//	GROUND_4,
-//	GROUND_5,
-//	GROUND_6,
-//	GROUND_7,
-//	GROUND_8,
-//	GROUND_9,
-//	GROUND_10,
-//	WALL_1,
-//	WALL_2,
-//	WALL_3,
-//	WALL_4,
-//	WALL_5,
-//	WALL_6,
-//	WALL_7,
-//	WALL_8,
-//	WALL_9,
-//	WALL_10,
-//	WALL_11,
-//	WALL_12,
-//	WALL_13,
-//	WALL_14,
-//	WALL_15,
-//	WALL_16, 
-//	WALL_17,// this is not a hard thinggy
-//	WALL_18,
-//	WALL_19,
-//	WALL_20,
-//	WALL_21,
-//	WALL_22,
-//	WATER_1, // WOTAH
-//	CHEST_1,
-//	CHEST_2,
-//	NUM_TYPES_TILE
-//};
 
 //void load_file(game_map* dst, const char* src);
 
