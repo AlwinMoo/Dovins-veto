@@ -2,6 +2,8 @@
 #include "Rendering.hpp"
 #include <iostream>
 
+#include <AEEngine.h>
+
 void GameObject::Update()
 {
 }
