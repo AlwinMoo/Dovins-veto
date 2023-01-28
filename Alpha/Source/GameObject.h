@@ -19,7 +19,9 @@ public:
 	enum GAMEOBJECT_TYPE
 	{
 		GO_NONE = 0,
+		GO_PLAYER,
 		GO_PLANET,
+		GO_GRASS,
 		GO_HOVER_STRUCTURE,
 		GO_TILE,
 		GO_TOTAL,
