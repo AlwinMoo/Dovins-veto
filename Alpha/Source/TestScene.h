@@ -24,7 +24,10 @@ namespace
 	GameObject* hoverStructure;
 	bool validPlacement;
 	UI::UI_Manager uiManager;
+
+	// Textures
 	AEGfxTexture* planetTex;
+	AEGfxTexture* grassTex;
 }
 
 #endif // !TEST_SCENE_H

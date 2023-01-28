@@ -1,6 +1,9 @@
 #include "TestScene.h"
 #include <iostream>
 #include "Rendering.hpp"
+#include "GameStateList.h"
+#include "GameStateManager.h"
+
 namespace
 {
 		GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
@@ -34,7 +37,9 @@ AEGfxTexture* texTest;
 AEGfxVertexList* meshTest;
 void TestScene_Load()
 {
-	planetTex = AEGfxTextureLoad("Assets/grassTile.png");
+	planetTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
+	grassTex = AEGfxTextureLoad("Assets/GrassTile.png");
+
 	// UI MANAGER
 	
 }
@@ -49,6 +54,16 @@ void TestScene_Initialize()
 	srand(time(NULL));
 
 	test_map = new game_map(10, 10, AEGetWindowWidth(), AEGetWindowHeight(), true);
+
+	for (int i = 0; i < test_map->width * test_map->height; i++)
+	{
+		GameObject* temp = FetchGO(GameObject::GO_TILE);
+		temp->scale.x = test_map->get_tile_size();
+		temp->scale.y = test_map->get_tile_size();
+		temp->position = test_map->get_worldpos(i);
+		temp->tex = grassTex;
+	}
+
 	hoverStructure = FetchGO(GameObject::GO_HOVER_STRUCTURE);
 	hoverStructure->alpha = 0.5f;
 	hoverStructure->rotation = rand() % 360;
@@ -79,10 +94,11 @@ void TestScene_Update()
 	mouse_pos = test_map->snap_coordinates(mouse_pos);
 	//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
 
+	// Place Structure
 	if (AEInputCheckTriggered(AEVK_LBUTTON) && validPlacement)
 	{
 		GameObject* test = FetchGO(GameObject::GO_PLANET);
-		test->position = mouse_pos;
+		test->position = hoverStructure->position;
 		//test->position.y = mouseYGrid;
 		test->rotation = hoverStructure->rotation;
 		hoverStructure->rotation = rand() % 360;
@@ -90,10 +106,29 @@ void TestScene_Update()
 		test->scale.y = test->scale.x;
 	}
 
+	// Update position of hover structure
 	if (hoverStructure->position.x != mouse_pos.x
 		|| hoverStructure->position.y != mouse_pos.y)
 	{
 		hoverStructure->position = mouse_pos;
+	}
+
+	// Turn on/off hover if in/out the grid
+	if (test_map->is_in_grid(mouse_pos))
+	{
+		hoverStructure->active = true;
+		validPlacement = true;
+	}
+	else
+	{
+		hoverStructure->active = false;
+		validPlacement = false;
+	}
+
+	// Quit Game
+	if (AEInputCheckTriggered(AEVK_Q))
+	{
+		next = GS_QUIT;
 	}
 
 	// GameObject Update
@@ -115,14 +150,14 @@ void TestScene_Update()
 			if (hoverStructure->position.x == gameObj->position.x &&
 				hoverStructure->position.y == gameObj->position.y)
 			{
-				hoverStructure->color.Set(1.0f, 0.5f, 0.5f);
+				hoverStructure->color.Set(1.0f, 0.2f, 0.2f);
 				hoverCollided = true;
 				validPlacement = false;
 				break;
 			}
 		}
 	}
-	if (!hoverCollided)
+	if (!hoverCollided && hoverStructure->active)
 	{
 		hoverStructure->color.Set(1.0f, 1.0f, 1.0f);
 		validPlacement = true;
@@ -155,14 +190,39 @@ void TestScene_Draw()
 		//Gameobjects Render
 		if (gameObj->active)
 		{
+			if (gameObj->type == GameObject::GO_TILE)
+				gameObj->Render();
 			if (gameObj->type == GameObject::GO_PLANET)
 				gameObj->Render();
 		}
 	}
 
 	// Render above
-	hoverStructure->Render();
-	uiManager.Draw();
+	if(hoverStructure->active)
+		hoverStructure->Render();
+
+	// UI TEST
+	// AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	// AEGfxSetTintColor(1.f, 1.f, 1.f, 1.0f);
+	// AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	// AEGfxSetTransparency(1.f);
+	// AEGfxTextureSet(texTest, 0, 0);
+
+	// AEMtx33 scale = { 0 };
+	// AEMtx33Scale(&scale, 1.f, 1.f);
+
+	// AEMtx33 rotate = { 0 };
+	// AEMtx33Rot(&rotate, 0.f);
+
+	// AEMtx33 translate = { 0 };
+	// AEMtx33Trans(&translate, AEGetWindowWidth() / 2.f, AEGetWindowHeight() / 2.f);
+
+	// AEMtx33 transform = { 0 };
+	// AEMtx33Concat(&transform, &rotate, &scale);
+	// AEMtx33Concat(&transform, &translate, &transform);
+
+	// AEGfxSetTransform(transform.m);
+	// //AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 }
 
 void TestScene_Free()

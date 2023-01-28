@@ -21,6 +21,7 @@ public:
 		GO_NONE = 0,
 		GO_PLANET,
 		GO_HOVER_STRUCTURE,
+		GO_TILE,
 		GO_TOTAL,
 	};
 
