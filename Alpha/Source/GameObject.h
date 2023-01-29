@@ -24,6 +24,8 @@ public:
 		GO_GRASS,
 		GO_HOVER_STRUCTURE,
 		GO_TILE,
+		GO_TURRET,
+		GO_BULLET,
 		GO_TOTAL,
 	};
 
@@ -35,6 +37,7 @@ public:
 	AEVec2 position;
 	AEVec2 scale;
 	AEVec2 gridScale;
+	AEVec2 direction;
 	double rotation;
 
 	AEGfxTexture* tex;

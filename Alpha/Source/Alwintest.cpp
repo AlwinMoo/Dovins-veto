@@ -1,46 +1,30 @@
 #include "Alwintest.h"
-#include "AEEngine.h"
 #include <iostream>
-#include <iomanip>
-#include "UI_Manager.h"
-#include <vector>
-#include "Map/Map.h"
-#include "GameObject.h"
-#include "GameStateManager.h"
+#include "Rendering.hpp"
 #include "GameStateList.h"
+#include "GameStateManager.h"
 #include "Pathfinding/pathfinder.h"
-
-#include <iostream>
 
 namespace
 {
-	f32 winSizeX, winSizeY;
-	s8 m_fontId;
-
-	AEGfxTexture* pTex;
-	AEGfxVertexList* pMesh;
-
-	AEGfxTexture* grass_Tex;
-	AEGfxVertexList* grass_Mesh;
-
-	s32 click_pos_x;
-	s32 click_pos_y;
-	s32 pos_x, pos_y;
-	s32 x, y;
-
 	std::vector<GameObject*> go_list;
 	game_map* test_map;
 	int object_count;
+	GameObject* hoverStructure;
+	bool validPlacement;
+	UI::UI_Manager* uiManager;
 
-	GameObject* cursor;
-	GameObject* player;
+	// Textures
+	AEGfxTexture* planetTex;
+	AEGfxTexture* grassTex;
+	AEGfxTexture* bulletTex;
 
-	bool player_moving{ false };
-	AEVec2 player_goal{0, 0};
+	AEGfxTexture* texTest;
+	AEGfxVertexList* meshTest;
+}
 
-	PathManager* pathingObj{};
-	std::vector<AEVec2> player_path{};
-
+namespace
+{
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
 	{
 		for (auto it : go_list)
@@ -50,12 +34,8 @@ namespace
 			{
 				switch (go->type)
 				{
-					case GameObject::GAMEOBJECT_TYPE::GO_GRASS:
-						go->tex = grass_Tex;
-						break;
-					default:
-						go->tex = pTex;
-						break;
+				default:
+					go->tex = planetTex;
 				}
 				go->active = true;
 				++object_count;
@@ -70,64 +50,76 @@ namespace
 		return FetchGO(value);
 
 	}
+
+	//player
+	GameObject* player;
+
+	bool player_moving{ false };
+	AEVec2 player_goal{ 0, 0 };
+
+	PathManager* pathingObj{};
+	std::vector<AEVec2> player_path{};
+
+	//turret
+	bool placeTurret{ false };
+
+	GameObject* turret;
 }
 
 void Alwintest_Load()
 {
-	grass_Tex = AEGfxTextureLoad("Assets/GrassTile.png");
-	pTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
-	m_fontId = AEGfxCreateFont("Assets/Roboto-Regular.ttf", 16);
+	planetTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
+	grassTex = AEGfxTextureLoad("Assets/GrassTile.png");
+	bulletTex = AEGfxTextureLoad("Assets/YellowTexture.png");
+
 }
 
 void Alwintest_Initialize()
 {
-	winSizeX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
-	winSizeY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-
-	pos_x = 400;
-	pos_y = 300;
-	click_pos_x = 400;
-	click_pos_y = 300;
-	x = 0;
-	y = 0;
-	pMesh = 0;
-	AEGfxMeshStart();
-
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFF00FF, 0.0f, 0.0f,
-		0.5f, -0.5f, 0xFFFFFF00, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFF00FFFF, 0.0f, 1.0f);
-
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 1.0f);
-
-	pMesh = AEGfxMeshEnd();
-
-	grass_Mesh = 0;
-	AEGfxMeshStart();
-
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFF00FF, 0.0f, 0.0f,
-		0.5f, -0.5f, 0xFFFFFF00, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFF00FFFF, 0.0f, 1.0f);
-
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 1.0f);
-
-	grass_Mesh = AEGfxMeshEnd();
-
-	test_map = new game_map(30, 30, AEGetWindowWidth(), AEGetWindowHeight(), 0); // automatically destroyed in deconstructor
-
-	for (int i = 0; i < test_map->map_size; ++i)
+	// UI MANAGER
 	{
-		GameObject* grass = FetchGO(GameObject::GO_GRASS);
-		grass->position = test_map->GetWorldPos(i);
-		grass->scale.x = test_map->GetTileSize();
-		grass->scale.y = grass->scale.x;
+		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
+		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+		//auto meshTest = render::GenerateQuad();
+		uiManager = new UI::UI_Manager();
+		uiManager->SetWinDim(screenWidthX, screenHeightY);
+	}
+	srand(time(NULL));
+
+	test_map = new game_map(10, 10, AEGetWindowWidth(), AEGetWindowHeight(), 4);
+
+	for (int i = 0; i < test_map->width * test_map->height; i++)
+	{
+		GameObject* temp = FetchGO(GameObject::GO_TILE);
+		temp->scale.x = test_map->GetTileSize();
+		temp->scale.y = test_map->GetTileSize();
+		temp->position = test_map->GetWorldPos(i);
+		temp->tex = grassTex;
+	}
+
+	for (int i = 0; i < 50; i++) //bullets
+	{
+		GameObject* temp = FetchGO(GameObject::GO_BULLET);
+		temp->scale.x = 10;
+		temp->scale.y = 10;
+		temp->tex = bulletTex;
+		temp->active = false;
+	}
+
+	hoverStructure = FetchGO(GameObject::GO_HOVER_STRUCTURE);
+	hoverStructure->alpha = 0.5f;
+	hoverStructure->rotation = rand() % 360;
+	hoverStructure->scale.x = test_map->GetTileSize();
+	hoverStructure->scale.y = hoverStructure->scale.x;
+	validPlacement = false;
+
+	// UI MANAGER
+	{
+		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
+		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+		const AEVec2 buttonPos{ screenWidthX / 4, screenWidthY / 4 };
+		const AEVec2 buttonSize{ 50.f, 50.f };
+		//uiManager->CreateButton(buttonPos, buttonSize, UI::WHITE_BUTTON, CALLBACKTEST);
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
@@ -135,43 +127,66 @@ void Alwintest_Initialize()
 	player->scale.y = player->scale.x;
 	player->active = false;
 
-	cursor = FetchGO(GameObject::GO_PLANET);
-	cursor->scale.x = test_map->GetTileSize();
-	cursor->scale.y = cursor->scale.x;
-	cursor->active = false;
-
 	pathingObj = new PathManager(test_map);
 }
 
 void Alwintest_Update()
 {
-	// IMPORTANT SNIPPET:
-		/***********************************************************************/
-	s32 cursorX, cursorY;
-	AEInputGetCursorPosition(&cursorX, &cursorY);
-	f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
-	//std::cout << winX << ", " <<  winY << std::endl;
-	f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
-	//std::cout << std::setprecision(2) << std::setw(5) << cursorXN << ", " << std::setw(5) << cursorYN << std::endl;
-	/************************************************************************/
-	/*s8 const* testStr = "TEST TEXT";
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);*/
-
-	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
-
 	// Player Input
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
-	AEVec2 mousePos{mouseX, mouseY};
+	AEVec2 absMousePos{};
+	AEVec2Set(&absMousePos, mouseX, mouseY);
 
-	if (AEInputCheckTriggered(AEVK_LBUTTON))
+	//if (turret && turret->active)
+	//	std::cout << absMousePos.x << ',' << absMousePos.y << '[' << turret->position.x << ',' << turret->position.y << ']' << std::endl;
+
+	AEVec2 mouse_pos{};
+	AEVec2Set(&mouse_pos, mouseX, mouseY);
+	//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
 	{
-		if (test_map->IsInGrid(mousePos))
+		AEVec2 invert_mouse = mouse_pos;
+		invert_mouse.y = uiManager->m_winDim.y - mouse_pos.y;
+		uiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+	}
+	mouse_pos = test_map->SnapCoordinates(mouse_pos);
+	//float mouseYGrid = static_cast<int>(mouseY / test_map->GetTileSize()) * test_map->GetTileSize() + (test_map->GetTileSize() * 0.5);
+
+	// Place Structure
+
+	if (placeTurret) //if we have been given the turret flag
+	{
+		if (AEInputCheckTriggered(AEVK_LBUTTON) && validPlacement) // and a left click is detected
+		{
+			placeTurret = false;
+
+			turret = FetchGO(GameObject::GO_TURRET);
+			turret->position = hoverStructure->position;
+			turret->rotation = hoverStructure->rotation;
+			turret->scale = hoverStructure->scale;
+
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+
+		}
+	}
+	else if (AEInputCheckTriggered(AEVK_LBUTTON) && validPlacement)
+	{
+		GameObject* test = FetchGO(GameObject::GO_PLANET);
+		test->position = hoverStructure->position;
+		test->rotation = hoverStructure->rotation;
+		test->scale = hoverStructure->scale;
+		hoverStructure->rotation = rand() % 360;
+
+		test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+	}
+
+	if (AEInputCheckTriggered(AEVK_RBUTTON) && !test_map->IsOccupied(test_map->WorldToIndex(mouse_pos)))
+	{
+		if (test_map->IsInGrid(absMousePos))
 		{
 			if (!player->active)
 			{
-				player->position = test_map->SnapCoordinates(mousePos);
+				player->position = test_map->SnapCoordinates(absMousePos);
 				player->active = true;
 
 				player_moving = false;
@@ -180,29 +195,45 @@ void Alwintest_Update()
 			{
 				player_moving = true;
 				//player_goal = test_map->snap_coordinates(mousePos);
-				player_path = pathingObj->GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(mousePos)), (float)test_map->GetY(test_map->WorldToIndex(mousePos)) });
-				
+				player_path = pathingObj->GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absMousePos)), (float)test_map->GetY(test_map->WorldToIndex(absMousePos)) });
+
 				if (!player_path.empty())
 				{
 					for (auto& pos : player_path)
 					{
-						pos = test_map->GetWorldPos(test_map->GetIndex(pos.x, pos.y));
+						pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
 					}
 
-					player_goal = player_path.front();
-					player_path.erase(player_path.end() - 1);
-					player_path.push_back(mousePos);
+					AEVec2 leng{};
+					leng.x = player->position.x - player_path[0].x;
+					leng.y = player->position.y - player_path[0].y;
+
+					if (AEVec2Length(&leng) < test_map->GetTileSize() * 1.5)
+					{
+						player_path.erase(player_path.end() - 1);
+						player_path.push_back(absMousePos);
+						player_goal = player_path.front();
+					}
+					else
+					{
+						player_path.clear();
+					}
+				}
+				else
+				{
+					AEVec2 leng{};
+					leng.x = player->position.x - absMousePos.x;
+					leng.y = player->position.y - absMousePos.y;
+
+					if (AEVec2Length(&leng) <= 5)
+					{
+						player_path.push_back(absMousePos);
+						player_goal = player_path.front();
+					}
 				}
 			}
 		}
 	}
-	if (test_map->IsInGrid(mousePos))
-	{
-		cursor->position = test_map->SnapCoordinates(mousePos);
-		cursor->active = true;
-	}
-	else
-		cursor->active = false;
 
 	if (player_moving && !player_path.empty())
 	{
@@ -226,6 +257,81 @@ void Alwintest_Update()
 		}
 	}
 
+	// Update position of hover structure
+	if (hoverStructure->position.x != mouse_pos.x
+		|| hoverStructure->position.y != mouse_pos.y)
+	{
+		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	}
+
+	// Turn on/off hover if in/out the grid
+	if (test_map->IsInGrid(mouse_pos, hoverStructure->gridScale.x, hoverStructure->gridScale.y))
+	{
+		hoverStructure->active = true;
+		validPlacement = true;
+	}
+	else
+	{
+		hoverStructure->active = false;
+		validPlacement = false;
+	}
+
+	// Change selected structure
+	if (AEInputCheckTriggered(AEVK_1))
+	{
+		hoverStructure->gridScale = { 1, 1 };
+		hoverStructure->scale = { test_map->GetTileSize(), test_map->GetTileSize() };
+		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	}
+	else if (AEInputCheckTriggered(AEVK_2))
+	{
+		hoverStructure->gridScale = { 2, 2 };
+		hoverStructure->scale = { test_map->GetTileSize() * 2, test_map->GetTileSize() * 2 };
+		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	}
+	else if (AEInputCheckTriggered(AEVK_3))
+	{
+		hoverStructure->gridScale = { 3, 3 };
+		hoverStructure->scale = { test_map->GetTileSize() * 3, test_map->GetTileSize() * 3 };
+		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	}
+	else if (AEInputCheckTriggered(AEVK_4))
+	{
+		hoverStructure->gridScale = { 1, 1 };
+		hoverStructure->scale = { test_map->GetTileSize(), test_map->GetTileSize() };
+		hoverStructure->position = mouse_pos;
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+
+		placeTurret = true;
+	}
+
+	if (AEInputCheckTriggered(AEVK_SPACE))
+	{
+		GameObject* temp = FetchGO(GameObject::GO_BULLET);
+		temp->position = turret->position;
+		temp->active = true;
+		temp->scale.x = 10;
+		temp->scale.y = 10;
+		temp->tex = bulletTex;
+
+		AEVec2Set(&temp->direction, AESin(turret->rotation), AECos(turret->rotation));
+		AEVec2Normalize(&temp->direction, &temp->direction);
+	}
+
+	// Quit Game
+	if (AEInputCheckTriggered(AEVK_Q))
+	{
+		next = GS_QUIT;
+	}
 
 	// GameObject Update
 	for (GameObject* gameObj : go_list)
@@ -237,6 +343,7 @@ void Alwintest_Update()
 			switch (gameObj->type)
 			{
 				case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
+				{
 					if (player_moving && !player_path.empty())
 					{
 						AEVec2 out{};
@@ -248,90 +355,154 @@ void Alwintest_Update()
 						player->position.y += out.y * AEFrameRateControllerGetFrameTime() * 600;
 					}
 					break;
+				}
+				case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
+				{
+					AEVec2 result{0,0};
+					AEVec2Sub(&result, &absMousePos, &turret->position);
+					turret->rotation = atan2f(result.x, result.y);
+
+					break;
+				}
+				case (GameObject::GAMEOBJECT_TYPE::GO_BULLET):
+				{
+					gameObj->position.x += gameObj->direction.x * AEFrameRateControllerGetFrameTime() * 600;
+					gameObj->position.y += gameObj->direction.y * AEFrameRateControllerGetFrameTime() * 600;
+					
+					if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+						gameObj->active = false;
+
+					for (GameObject* go : go_list)
+					{
+						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_PLANET)
+						{
+							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+							{
+								go->active = false;
+								gameObj->active = false;
+							}
+						}
+					}
+
+					break;
+				}
 			}
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_RBUTTON))
+
+
+	// GameObject Collision (GRID BASED)
+	if (test_map->IsOccupied(test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y))
 	{
-		AEInputGetCursorPosition(&click_pos_x, &click_pos_y);
-		//click_check(click_pos_x, click_pos_y);
-		//click_check(pos_x, pos_y);
+		hoverStructure->color.Set(1.0f, 0.2f, 0.2f);
+		validPlacement = false;
+	}
+	else if (hoverStructure->active)
+	{
+		hoverStructure->color.Set(1.0f, 1.0f, 1.0f);
+		validPlacement = true;
 	}
 
-	// Your own update logic goes here
-	if (pos_x < click_pos_x)
-	{
-		x += 2;
-		pos_x += 2;
-	}
-
-	else if (pos_x > click_pos_x)
-	{
-		x -= 2;
-		pos_x -= 2;
-	}
-
-	if (pos_y < click_pos_y)
-	{
-		y -= 2;
-		pos_y += 2;
-	}
-
-	else if (pos_y > click_pos_y)
-	{
-		y += 2;
-		pos_y -= 2;
-	}
-
-	// Your own rendering logic goes here
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetTintColor(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1.0f);
-	AEGfxTextureSet(pTex, 0, 0);
-
-	//scale matrix
-	AEMtx33 scale{ 0 };
-	AEMtx33Scale(&scale, 150.0f, 150.0f);
-
-	//translation matrix
-	AEMtx33 translate{ 0 };
-	AEMtx33Trans(&translate, x, y);
-
-	//rotation matrix
-	AEMtx33 rotation{ 0 };
-	AEMtx33Rot(&rotation, 100.0f);
-
-	AEMtx33 transform{ 0 };
-	AEMtx33Concat(&transform, &rotation, &scale);
-	AEMtx33Concat(&transform, &translate, &transform);
-
-	//setting the transform
-	AEGfxSetTransform(transform.m);
+	// GameObject Collision (NON-GRID BASED, SHOULD CHANGE)
+	//bool hoverCollided = false;
+	//for (GameObject* gameObj : go_list)
+	//{
+	//	if (!gameObj->active)
+	//		continue;
+	//
+	//	if (gameObj != hoverStructure)
+	//	{
+	//		if (gameObj->type == GameObject::GO_TILE)
+	//			continue;
+	//		if (hoverStructure->position.x == gameObj->position.x &&
+	//			hoverStructure->position.y == gameObj->position.y)
+	//		{
+	//			hoverStructure->color.Set(1.0f, 0.2f, 0.2f);
+	//			hoverCollided = true;
+	//			validPlacement = false;
+	//			break;
+	//		}
+	//	}
+	//}
+	//
+	//if (!hoverCollided && hoverStructure->active)
+	//{
+	//	hoverStructure->color.Set(1.0f, 1.0f, 1.0f);
+	//	validPlacement = true;
+	//}
 }
 
 void Alwintest_Draw()
 {
-	//Draw mesh
-	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+	s32 cursorX, cursorY;
+	//s8 text[] = "TEST";
+	AEInputGetCursorPosition(&cursorX, &cursorY);
+	//f32 fcursorX, fcursorY;
+	//
+	//AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+	//
+	//// IMPORTANT SNIPPET:
+	///***********************************************************************/
+	//f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
+	////std::cout << winX << ", " <<  winY << std::endl;
+	//f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
+	//std::cout << cursorXN << ", " << cursorYN << std::endl;
+	///************************************************************************/
+	//s8 const* testStr = "BUILD PHASE";
+	//AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	////AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);
 
-	//Gameobjects Render
+	AEGfxSetBackgroundColor(0.3f, 0.3f, 0.3f);
 	for (GameObject* gameObj : go_list)
 	{
+		//Gameobjects Render
 		if (gameObj->active)
-		{
-			gameObj->Render();				
-		}
+			gameObj->Render();
+	}
+
+	// Render above
+	if (hoverStructure->active)
+		hoverStructure->Render();
+
+	f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
+	f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+
+	{
+		// THE WHERE'S MY CURSOR TEST?
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetTintColor(1.f, 1.f, 1.f, 1.0f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.f);
+		AEGfxTextureSet(texTest, 0, 0);
+
+		AEMtx33 scale = { 0 };
+		AEMtx33Scale(&scale, 50.f, 50.f);
+
+		AEMtx33 rotate = { 0 };
+		AEMtx33Rot(&rotate, 0.f);
+
+		AEMtx33 translate = { 0 };
+		//std::cout << cursorX << ", " << cursorY << std::endl;
+		AEMtx33Trans(&translate, cursorX - screenWidthX / 2, -cursorY + screenWidthY / 2 - 50);
+
+		AEMtx33 transform = { 0 };
+		AEMtx33Concat(&transform, &rotate, &scale);
+		AEMtx33Concat(&transform, &translate, &transform);
+
+		AEGfxSetTransform(transform.m);
+		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
+		// Render UI
+		uiManager->Draw();
 	}
 }
 
 void Alwintest_Free()
 {
-	AEGfxMeshFree(pMesh);
+	delete uiManager;
 }
 
 void Alwintest_Unload()
 {
-	AEGfxTextureUnload(pTex);
+
 }

@@ -1,4 +1,8 @@
 #pragma once
+#include "GameObject.h"
+#include "AEEngine.h"
+#include "Map/Map.h"
+#include "UI_Manager.h"
 
 void Alwintest_Load();
 
