@@ -26,6 +26,7 @@ public:
 		GO_TILE,
 		GO_TURRET,
 		GO_BULLET,
+		GO_ENEMY,
 		GO_TOTAL,
 	};
 
@@ -39,6 +40,8 @@ public:
 	AEVec2 gridScale;
 	AEVec2 direction;
 	double rotation;
+
+	std::vector<AEVec2> Path;
 
 	AEGfxTexture* tex;
 	AEGfxVertexList* mesh;

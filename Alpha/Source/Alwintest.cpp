@@ -18,6 +18,7 @@ namespace
 	AEGfxTexture* planetTex;
 	AEGfxTexture* grassTex;
 	AEGfxTexture* bulletTex;
+	AEGfxTexture* redTex;
 
 	AEGfxTexture* texTest;
 	AEGfxVertexList* meshTest;
@@ -57,13 +58,12 @@ namespace
 	bool player_moving{ false };
 	AEVec2 player_goal{ 0, 0 };
 
-	PathManager* pathingObj{};
-	std::vector<AEVec2> player_path{};
-
 	//turret
 	bool placeTurret{ false };
 
 	GameObject* turret;
+
+	float debounce{};
 }
 
 void Alwintest_Load()
@@ -71,6 +71,7 @@ void Alwintest_Load()
 	planetTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
 	grassTex = AEGfxTextureLoad("Assets/GrassTile.png");
 	bulletTex = AEGfxTextureLoad("Assets/YellowTexture.png");
+	redTex = AEGfxTextureLoad("Assets/RedTile.png");
 
 }
 
@@ -97,12 +98,21 @@ void Alwintest_Initialize()
 		temp->tex = grassTex;
 	}
 
-	for (int i = 0; i < 50; i++) //bullets
+	for (int i = 0; i < 50; i++) // make 50 bullets to instantiate later
 	{
 		GameObject* temp = FetchGO(GameObject::GO_BULLET);
 		temp->scale.x = 10;
 		temp->scale.y = 10;
 		temp->tex = bulletTex;
+		temp->active = false;
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		GameObject* temp = FetchGO(GameObject::GO_ENEMY);
+		temp->scale.x = test_map->GetTileSize();
+		temp->scale.y = test_map->GetTileSize();
+		temp->tex = redTex;
 		temp->active = false;
 	}
 
@@ -126,12 +136,12 @@ void Alwintest_Initialize()
 	player->scale.x = test_map->GetTileSize();
 	player->scale.y = player->scale.x;
 	player->active = false;
-
-	pathingObj = new PathManager(test_map);
 }
 
 void Alwintest_Update()
 {
+	debounce += AEFrameRateControllerGetFrameTime() * AEFrameRateControllerGetFrameRate(); // 1 sec
+
 	// Player Input
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -195,28 +205,29 @@ void Alwintest_Update()
 			{
 				player_moving = true;
 				//player_goal = test_map->snap_coordinates(mousePos);
-				player_path = pathingObj->GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absMousePos)), (float)test_map->GetY(test_map->WorldToIndex(absMousePos)) });
+				PathManager pathingObj(test_map);
+				player->Path = pathingObj.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absMousePos)), (float)test_map->GetY(test_map->WorldToIndex(absMousePos)) });
 
-				if (!player_path.empty())
+				if (!player->Path.empty())
 				{
-					for (auto& pos : player_path)
+					for (auto& pos : player->Path)
 					{
 						pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
 					}
 
 					AEVec2 leng{};
-					leng.x = player->position.x - player_path[0].x;
-					leng.y = player->position.y - player_path[0].y;
+					leng.x = player->position.x - player->Path[0].x;
+					leng.y = player->position.y - player->Path[0].y;
 
 					if (AEVec2Length(&leng) < test_map->GetTileSize() * 1.5)
 					{
-						player_path.erase(player_path.end() - 1);
-						player_path.push_back(absMousePos);
-						player_goal = player_path.front();
+						player->Path.erase(player->Path.end() - 1);
+						player->Path.push_back(absMousePos);
+						player_goal = player->Path.front();
 					}
 					else
 					{
-						player_path.clear();
+						player->Path.clear();
 					}
 				}
 				else
@@ -227,15 +238,15 @@ void Alwintest_Update()
 
 					if (AEVec2Length(&leng) <= 5)
 					{
-						player_path.push_back(absMousePos);
-						player_goal = player_path.front();
+						player->Path.push_back(absMousePos);
+						player_goal = player->Path.front();
 					}
 				}
 			}
 		}
 	}
 
-	if (player_moving && !player_path.empty())
+	if (player_moving && !player->Path.empty())
 	{
 		AEVec2 leng{};
 		leng.x = player->position.x - player_goal.x;
@@ -243,16 +254,16 @@ void Alwintest_Update()
 
 		if (AEVec2Length(&leng) <= 5)
 		{
-			player_path.erase(player_path.begin());
+			player->Path.erase(player->Path.begin());
 
-			if (player_path.empty())
+			if (player->Path.empty())
 			{
 				// reset once reached goal
 				player_moving = false;
 			}
 			else
 			{
-				player_goal = player_path.front();
+				player_goal = player->Path.front();
 			}
 		}
 	}
@@ -327,6 +338,17 @@ void Alwintest_Update()
 		AEVec2Normalize(&temp->direction, &temp->direction);
 	}
 
+	if (AEInputCheckTriggered(AEVK_P))
+	{
+		GameObject* temp = FetchGO(GameObject::GO_ENEMY);
+		temp->position = test_map->GetWorldPos(0);
+		temp->scale.x = test_map->GetTileSize();
+		temp->scale.y = test_map->GetTileSize();
+		temp->tex = planetTex;
+		temp->active = true;
+
+	}
+
 	// Quit Game
 	if (AEInputCheckTriggered(AEVK_Q))
 	{
@@ -342,9 +364,59 @@ void Alwintest_Update()
 
 			switch (gameObj->type)
 			{
+				case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
+				{
+					if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+						gameObj->active = false;
+
+					if (debounce >= 100.0f)
+					{
+						debounce = 0.0f;
+						std::cout << "Hit" << std::endl;
+						PathManager pathmaker(test_map);
+						gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) });
+						if (!gameObj->Path.empty())
+						{
+							gameObj->Path.erase(gameObj->Path.end() - 1);
+							for (auto& pos : gameObj->Path)
+							{
+								pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
+							}
+						}
+					}
+
+					AEVec2 result{ 0,0 };
+					AEVec2Sub(&result, &player->position, &gameObj->position);
+					gameObj->rotation = atan2f(result.x, result.y); // rotate to face player
+
+					if (!gameObj->Path.empty())
+					{
+						AEVec2 out{};
+						AEVec2 norm{};
+						AEVec2Set(&norm, (gameObj->Path[0].x - gameObj->position.x), (gameObj->Path[0].y - gameObj->position.y));
+						AEVec2Normalize(&out, &norm);
+						/*AEVec2Set(&gameObj->direction, AESin(gameObj->rotation), AECos(gameObj->rotation));
+						AEVec2Normalize(&gameObj->direction, &gameObj->direction);*/
+
+						gameObj->position.x += out.x * AEFrameRateControllerGetFrameTime() * 100;
+						gameObj->position.y += out.y * AEFrameRateControllerGetFrameTime() * 100;
+
+
+						AEVec2 leng{};
+						leng.x = gameObj->position.x - gameObj->Path[0].x;
+						leng.y = gameObj->position.y - gameObj->Path[0].y;
+
+						if (AEVec2Length(&leng) <= 5)
+						{
+							gameObj->Path.erase(gameObj->Path.begin());
+						}
+					}
+
+					break;
+				}
 				case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
 				{
-					if (player_moving && !player_path.empty())
+					if (player_moving && !player->Path.empty())
 					{
 						AEVec2 out{};
 						AEVec2 norm{};
@@ -374,7 +446,7 @@ void Alwintest_Update()
 
 					for (GameObject* go : go_list)
 					{
-						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_PLANET)
+						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
 						{
 							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 							{

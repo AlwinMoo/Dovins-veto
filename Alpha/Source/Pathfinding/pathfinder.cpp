@@ -45,6 +45,8 @@ bool PathManager::CheckCell(AEVec2 CurrPos, AEVec2 LastPos, AEVec2 GoalPos)
 
 bool PathManager::IsPositionValid(AEVec2 coord)
 {
+	if (coord.x < 0 || coord.y < 0 || coord.x >= Map->width || coord.y >= Map->height)
+		return false;
 	return Map->map_arr[Map->GetIndex(coord.x, coord.y)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(coord.x, coord.y)] >= game_map::TILE_TYPE::NUM_TYPES_TILE || static_cast<int>(Map->map_arr[Map->GetIndex(coord.x, coord.y)]) < 0; // is it ground
 }
 
@@ -58,6 +60,7 @@ std::vector<AEVec2> PathManager::GetPath(AEVec2 StartPos, AEVec2 GoalPos)
 	// clean up
 	std::queue<std::pair<AEVec2, AEVec2>> empty{};
 	std::swap(frontier, empty);
+
 	visited.clear();
 
 	frontier.push(std::make_pair(StartPos, AEVec2{-1, -1}));
