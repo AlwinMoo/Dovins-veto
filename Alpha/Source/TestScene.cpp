@@ -158,14 +158,32 @@ void TestScene_Update()
 						pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
 					}
 
-					player_path.erase(player_path.end() - 1);
-					player_path.push_back(absMousePos);
-					player_goal = player_path.front();
+					AEVec2 leng{};
+					leng.x = player->position.x - player_path[0].x;
+					leng.y = player->position.y - player_path[0].y;
+
+					if (AEVec2Length(&leng) < test_map->GetTileSize() * 1.5)
+					{
+						player_path.erase(player_path.end() - 1);
+						player_path.push_back(absMousePos);
+						player_goal = player_path.front();
+					}
+					else
+					{
+						player_path.clear();
+					}
 				}
 				else
 				{
-					player_path.push_back(absMousePos);
-					player_goal = player_path.front();
+					AEVec2 leng{};
+					leng.x = player->position.x - absMousePos.x;
+					leng.y = player->position.y - absMousePos.y;
+
+					if (AEVec2Length(&leng) <= 5)
+					{
+						player_path.push_back(absMousePos);
+						player_goal = player_path.front();
+					}
 				}
 			}
 		}

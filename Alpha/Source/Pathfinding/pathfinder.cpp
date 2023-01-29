@@ -19,32 +19,8 @@ std::string PathManager::VectorToString(AEVec2 pos)
 
 bool PathManager::CheckCell(AEVec2 CurrPos, AEVec2 LastPos, AEVec2 GoalPos)
 {
-	/*
-		if !can_move_to_spot(cur_pos):
-		return false
-		if str(cur_pos) in visited:
-			return false
-	
-		visited[str(cur_pos)] = last_pos
-		if cur_pos.x == goal_pos.x and cur_pos.y == goal_pos.y:
-			return true
-		queue.push_back({"pos": {"x": cur_pos.x, "y": cur_pos.y + 1}, "last_pos": cur_pos})
-		queue.push_back({"pos": {"x": cur_pos.x + 1, "y": cur_pos.y}, "last_pos": cur_pos})
-		queue.push_back({"pos": {"x": cur_pos.x, "y": cur_pos.y - 1}, "last_pos": cur_pos})
-		queue.push_back({"pos": {"x": cur_pos.x - 1, "y": cur_pos.y}, "last_pos": cur_pos})
-		return false
-	*/
-
 	if (!IsPositionValid(CurrPos)) // if the position is invalid
 		return false;
-
-	//for (auto &pos : visited)
-	//{
-	//	if ((CurrPos.x == pos.first.x && CurrPos.y == pos.first.y))
-	//	{
-	//		return false;
-	//	}
-	//}
 
 	if (visited.count(VectorToString(CurrPos))) // if we have visited it
 		return false;
@@ -74,33 +50,6 @@ bool PathManager::IsPositionValid(AEVec2 coord)
 
 std::vector<AEVec2> PathManager::GetPath(AEVec2 StartPos, AEVec2 GoalPos)
 {
-	/*
-		if !can_move_to_spot(goal_pos):
-		return []
-		queue = []
-		visited = {}
-		queue.push_back({"pos": start_pos, "last_pos": null})
-		var iters = 0
-		while queue.size() > 0:
-			var cell_info = queue.pop_front()
-			if check_cell(cell_info.pos, cell_info.last_pos, goal_pos):
-				break
-			iters += 1
-			if iters >= MAX_ITERS:
-				return []
-		var backtraced_path = []
-		var cur_pos = goal_pos
-		while str(cur_pos) in visited and visited[str(cur_pos)] != null:
-			if cur_pos != null:
-				backtraced_path.append(cur_pos)
-			cur_pos = visited[str(cur_pos)]
-		backtraced_path.invert()
-		return backtraced_path
-	*/
-
-	// pathtrace to the goal grid
-	// then when we are in the grid, lerp to absolute mouse position
-
 	if (!IsPositionValid(GoalPos))
 		return std::vector<AEVec2>();
 
