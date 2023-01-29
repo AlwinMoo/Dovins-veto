@@ -215,20 +215,9 @@ void Alwintest_Update()
 						pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
 					}
 
-					AEVec2 leng{};
-					leng.x = player->position.x - player->Path[0].x;
-					leng.y = player->position.y - player->Path[0].y;
-
-					if (AEVec2Length(&leng) < test_map->GetTileSize() * 1.5)
-					{
-						player->Path.erase(player->Path.end() - 1);
-						player->Path.push_back(absMousePos);
-						player_goal = player->Path.front();
-					}
-					else
-					{
-						player->Path.clear();
-					}
+					player->Path.erase(player->Path.end() - 1);
+					player->Path.push_back(absMousePos);
+					player_goal = player->Path.front();
 				}
 				else
 				{
