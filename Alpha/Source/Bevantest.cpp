@@ -13,19 +13,36 @@ s8 m_fontId;
 #include "GameStateManager.h"
 #include "GameStateList.h"
 #include <iostream>
+#include "Pathfinding/pathfinder.h"
+#include <cmath>
 
-AEGfxTexture* pTex;
-AEGfxVertexList* pMesh;
-s32 click_pos_x;
-s32 click_pos_y;
-s32 pos_x, pos_y;
-s32 x, y;
 
 namespace
 {
 	std::vector<GameObject*> go_list;
 	game_map* test_map;
 	int object_count;
+	f32 len_check;
+
+	UI::UI_Manager* uiManager;
+	//textures
+	AEGfxTexture* pTex;
+	AEGfxTexture* Grass;
+	AEGfxTexture* Player;
+	AEGfxTexture* Enemy;
+	AEGfxVertexList* pMesh;
+	//mouse stuff
+	s32 click_pos_x;
+	s32 click_pos_y;
+	s32 pos_x, pos_y;
+	s32 x, y;
+	//player
+	GameObject* player;
+	bool playermove;
+	AEVec2 player_goal{ 0,0 };
+
+	//enemy
+	GameObject* enemy;
 
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
 	{
@@ -57,43 +74,50 @@ namespace
 void Bevantest_Load()
 {
 	pTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
+	Grass = AEGfxTextureLoad("Assets/GrassTile.png");
+	Player = AEGfxTextureLoad("Assets/PlayerTexture.png");
+	Enemy = AEGfxTextureLoad("Assets/EnemyTexture.png");
 }
 
 void Bevantest_Initialize()
 {
 	winSizeX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 	winSizeY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+	{
+		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
+		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+		//auto meshTest = render::GenerateQuad();
+		uiManager = new UI::UI_Manager();
+		uiManager->SetWinDim(screenWidthX, screenHeightY);
+	}
 
-	pos_x = 400;
-	pos_y = 300;
-	click_pos_x = 400;
-	click_pos_y = 300;
-	x = 0;
-	y = 0;
-	pMesh = 0;
-	AEGfxMeshStart();
+	test_map = new game_map(10, 10, (float)AEGetWindowWidth(), (float)AEGetWindowHeight(), true); // automatically destroyed in deconstructor
 
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFF00FF, 0.0f, 0.0f,
-		0.5f, -0.5f, 0xFFFFFF00, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFF00FFFF, 0.0f, 1.0f);
-
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 1.0f);
-
-	pMesh = AEGfxMeshEnd();
-
-	test_map = new game_map(10, 10, 1600, 900, true); // automatically destroyed in deconstructor
 
 	for (int i = 0; i < test_map->map_size; ++i)
 	{
-		GameObject* test = FetchGO(GameObject::GO_PLANET);
+		GameObject* test = FetchGO(GameObject::GO_TILE);
 		test->position = test_map->GetWorldPos(i);
 		test->scale.x = test_map->GetTileSize();
 		test->scale.y = test->scale.x;
+		test->tex = Grass;
 	}
+	//player init
+	player = FetchGO(GameObject::GO_PLAYER);
+	player->position = test_map->GetWorldPos(11);
+	player->scale.x = test_map->GetTileSize();
+	player->scale.y = player->scale.x;
+	player->tex = Player;
+	player->active = true;
+	playermove = false;
+
+	//enemy init
+	enemy = FetchGO(GameObject::GO_ENEMY);
+	enemy->position = test_map->GetWorldPos(25);
+	enemy->scale.x = test_map->GetTileSize();
+	enemy->scale.y = enemy->scale.x;
+	enemy->tex = Enemy;
+	enemy->active = true;
 }
 
 void Bevantest_Update()
@@ -114,8 +138,19 @@ void Bevantest_Update()
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
 
 	// Player Input
+	AEVec2 mousepos{};
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
+	AEVec2 absmousepos;
+	len_check = sqrt(((player->position.x - enemy->position.x) * (player->position.x - enemy->position.x)) + ((player->position.y - enemy->position.y) * (player->position.y - enemy->position.y)));
+	AEVec2Set(&absmousepos, mouseX, mouseY);
+	{
+		AEVec2 invert_mouse = mousepos;
+		invert_mouse.y = uiManager->m_winDim.y - mousepos.y;
+		uiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+	}
+	mousepos = test_map->SnapCoordinates(mousepos);
+
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
 		/*GameObject* test = FetchGO(GameObject::GO_PLANET);
@@ -137,100 +172,138 @@ void Bevantest_Update()
 
 
 	// GameObject Update
+	if (len_check <= 75) enemy->active = false;
 	for (GameObject* gameObj : go_list)
 	{
 		if (gameObj->active)
 		{
-			if (gameObj->type == GameObject::GO_PLANET)
-				gameObj->Update();
+			//if (gameObj->type == GameObject::GO_TILE)
+			//	gameObj->Update();
+			switch(gameObj->type)
+
+				case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
+				{
+					if (playermove && !player->Path.empty())
+					{
+						AEVec2 out{};
+						AEVec2 norm{};
+						AEVec2Set(&norm, (player_goal.x - player->position.x), (player_goal.y - player->position.y));
+						AEVec2Normalize(&out, &norm);
+
+						player->position.x += out.x * AEFrameRateControllerGetFrameTime() * 600;
+						player->position.y += out.y * AEFrameRateControllerGetFrameTime() * 600;
+					}
+					break;
+				}
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_RBUTTON))
-	{
-		AEInputGetCursorPosition(&click_pos_x, &click_pos_y);
-		//click_check(click_pos_x, click_pos_y);
-		//click_check(pos_x, pos_y);
-	}
+	if(player)
+	if(AEInputCheckTriggered(AEVK_Q)) next = GS_QUIT;
+	if (AEInputCheckTriggered(AEVK_K)) next = GS_LEVEL3;
+	
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
 		next = GS_LEVEL2;
 	}
-
+	//if (AEInputCheckTriggered(AEVK_W)) next = GS_RESTART;
 	// Your own update logic goes here
-	if (pos_x < click_pos_x)
+	if (AEInputCheckTriggered(AEVK_RBUTTON))
 	{
-		x += 2;
-		pos_x += 2;
+		//std::cout << "IT WORKS";
+		if (test_map->IsInGrid(absmousepos))
+		{
+			playermove = true;
+			//player_goal = test_map->snap_coordinates(mousePos);
+			PathManager pathingObj(test_map);
+			player->Path = pathingObj.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absmousepos)), (float)test_map->GetY(test_map->WorldToIndex(absmousepos)) });
+
+			if (!player->Path.empty())
+			{
+				for (auto& pos : player->Path)
+				{
+					pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
+				}
+
+				player->Path.erase(player->Path.end() - 1);
+				player->Path.push_back(absmousepos);
+				player_goal = player->Path.front();
+			}
+			else
+			{
+				AEVec2 leng{};
+				leng.x = player->position.x - absmousepos.x;
+				leng.y = player->position.y - absmousepos.y;
+
+				if (AEVec2Length(&leng) <= 5)
+				{
+					player->Path.push_back(absmousepos);
+					player_goal = player->Path.front();
+				}
+			}
+		}
 	}
 
-	else if (pos_x > click_pos_x)
+	if (playermove && !player->Path.empty())
 	{
-		x -= 2;
-		pos_x -= 2;
+		AEVec2 leng{};
+		leng.x = player->position.x - player_goal.x;
+		leng.y = player->position.y - player_goal.y;
+
+		if (AEVec2Length(&leng) <= 5)
+		{
+			player->Path.erase(player->Path.begin());
+
+			if (player->Path.empty())
+			{
+				// reset once reached goal
+				playermove = false;
+			}
+			else
+			{
+				player_goal = player->Path.front();
+			}
+		}
 	}
 
-	if (pos_y < click_pos_y)
-	{
-		y -= 2;
-		pos_y += 2;
-	}
-
-	else if (pos_y > click_pos_y)
-	{
-		y += 2;
-		pos_y -= 2;
-	}
-
-	// Your own rendering logic goes here
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetTintColor(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1.0f);
-	AEGfxTextureSet(pTex, 0, 0);
-
-	//scale matrix
-	AEMtx33 scale{ 0 };
-	AEMtx33Scale(&scale, 150.0f, 150.0f);
-
-	//translation matrix
-	AEMtx33 translate{ 0 };
-	AEMtx33Trans(&translate, x, y);
-
-	//rotation matrix
-	AEMtx33 rotation{ 0 };
-	AEMtx33Rot(&rotation, 100.0f);
-
-	AEMtx33 transform{ 0 };
-	AEMtx33Concat(&transform, &rotation, &scale);
-	AEMtx33Concat(&transform, &translate, &transform);
-
-	//setting the transform
-	AEGfxSetTransform(transform.m);
+	
 }
 
 void Bevantest_Draw()
 {
 	//Draw mesh
-	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+	//AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
 	//Gameobjects Render
 	for (GameObject* gameObj : go_list)
 	{
 		if (gameObj->active)
 		{
-			if (gameObj->type == GameObject::GO_PLANET)
+			if (gameObj->type == GameObject::GO_TILE)
 				gameObj->Render();
 		}
 	}
+	//draw player
+	if (player->active)
+	{
+		player->Render();
+	}
+
+	if (enemy->active)
+	{
+		enemy->Render();
+	}
+	uiManager->Draw();
 }
 
 void Bevantest_Free()
 {
-	AEGfxMeshFree(pMesh);
+	//AEGfxMeshFree(pMesh);
+	delete uiManager;
 }
 
 void Bevantest_Unload()
 {
 	AEGfxTextureUnload(pTex);
+	AEGfxTextureUnload(Grass);
 }
