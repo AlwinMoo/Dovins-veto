@@ -43,6 +43,10 @@ namespace
 	float debounce{};
 }
 
+#pragma region UI_CALLBACK_DECLARATIONS
+void EndTurnButton();
+#pragma endregion
+
 void TestScene_Load()
 {
 	planetTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
@@ -59,7 +63,6 @@ void TestScene_Initialize()
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-		//auto meshTest = render::GenerateQuad();
 		uiManager = new UI::UI_Manager();
 		uiManager->SetWinDim(screenWidthX, screenHeightY);
 	}
@@ -101,13 +104,13 @@ void TestScene_Initialize()
 	hoverStructure->scale.y = hoverStructure->scale.x;
 	validPlacement = false;
 
-	// UI MANAGER
+	// UI MANAGER INITIALIZER
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		const AEVec2 buttonPos{ screenWidthX / 4, screenWidthY / 4 };
 		const AEVec2 buttonSize{ 50.f, 50.f };
-		//uiManager->CreateButton(buttonPos, buttonSize, UI::WHITE_BUTTON, CALLBACKTEST);
+		uiManager->CreateButton(buttonPos, buttonSize, UI::END_PHASE_BUTTON, EndTurnButton);
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
@@ -245,13 +248,7 @@ void TestScene_Update()
 		// CHANGE TO DEFEND MODE
 		if (AEInputCheckTriggered(AEVK_0))
 		{
-			buildPhase = false;
-			hoverStructure->active = false;
-			for (GameObject* tile : go_list)
-			{
-				if (tile->type == GameObject::GO_TILE)
-					tile->tex = grassBorderlessTex;
-			}
+			EndTurnButton();	// NOTE: Clicking button calls this
 		}
 	}
 	else
@@ -564,3 +561,15 @@ void TestScene_Unload()
 {
 
 }
+
+#pragma region UI_CALLBACK_DEFINITIONS
+void EndTurnButton() {
+	buildPhase = false;
+	hoverStructure->active = false;
+	for (GameObject* tile : go_list)
+	{
+		if (tile->type == GameObject::GO_TILE)
+			tile->tex = grassBorderlessTex;
+	}
+}
+#pragma endregion

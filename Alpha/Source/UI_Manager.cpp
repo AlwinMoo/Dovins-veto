@@ -6,13 +6,13 @@ namespace UI
 {
 	void UI_Manager::ConvertToWS(Button* newButton)
 	{
-		newButton->wsPos.x = newButton->pos.x - m_winDim.x / 2.f;
-		newButton->wsPos.y = newButton->pos.y - m_winDim.y / 2.f;
+		newButton->wsPos.x = newButton->pos.x - m_winDim.x * 0.5f;
+		newButton->wsPos.y = newButton->pos.y - m_winDim.y * 0.5f;
 
-		newButton->wsMin.x = newButton->min.x - m_winDim.x / 2.f;
-		newButton->wsMax.x = newButton->max.x - m_winDim.x / 2.f;
-		newButton->wsMin.y = newButton->min.y + m_winDim.y / 2.f;
-		newButton->wsMax.y = newButton->max.y + m_winDim.y / 2.f;
+		newButton->wsMin.x = newButton->min.x - m_winDim.x * 0.5f;
+		newButton->wsMax.x = newButton->max.x - m_winDim.x * 0.5f;
+		newButton->wsMin.y = newButton->min.y + m_winDim.y * 0.5f;
+		newButton->wsMax.y = newButton->max.y + m_winDim.y * 0.5f;
 	}
 	void UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, void(*callback)())
 	{
@@ -20,15 +20,19 @@ namespace UI
 		newButton->scale = size;
 		newButton->callback = callback;
 		newButton->pos = pos;
-
-		newButton->min.x = pos.x - size.x / 2.f;
-		newButton->max.x = pos.x + size.x / 2.f;
-		newButton->min.y = pos.y - size.y / 2.f;
-		newButton->max.y = pos.y + size.y / 2.f;
+		// WAIT WHAT??
+		newButton->min.x = pos.x - size.x * 0.5f;
+		newButton->max.x = pos.x + size.x * 0.5f;
+		newButton->min.y = pos.y - size.y * 0.5f;
+		newButton->max.y = pos.y + size.y * 0.5f;
 		ConvertToWS(newButton);
 		switch (type) {
 		case WHITE_BUTTON:
 			newButton->texID = TEX_BUTTON;
+			newButton->meshID = MESH_BOX;
+			break;
+		case END_PHASE_BUTTON:
+			newButton->texID = TEX_END_PHASE;
 			newButton->meshID = MESH_BOX;
 			break;
 		default:
@@ -40,6 +44,7 @@ namespace UI
 	{
 		m_fontID = g_fontID;
 		m_textures.at(TEX_BUTTON) = AEGfxTextureLoad("Assets/SquareButton.png");
+		m_textures.at(TEX_END_PHASE) = AEGfxTextureLoad("Assets/Hourglass.png");
 		m_mesh.at(MESH_BOX) = render::GenerateQuad();
 	}
 	void UI_Manager::Unload()
