@@ -49,7 +49,7 @@ void EndTurnButton();
 
 void TestScene_Load()
 {
-	planetTex = AEGfxTextureLoad("Assets/PlanetTexture.png");
+	planetTex = AEGfxTextureLoad("Assets/Tower.png");
 	grassTex = AEGfxTextureLoad("Assets/GrassTile.png");
 	bulletTex = AEGfxTextureLoad("Assets/YellowTexture.png");
 	grassBorderlessTex = AEGfxTextureLoad("Assets/GrassTileBorderless.png");
