@@ -524,6 +524,7 @@ void TestScene_Draw()
 	f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 	f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 
+#ifdef CURSOR_TEST
 	{
 		// THE WHERE'S MY CURSOR TEST?
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -551,6 +552,7 @@ void TestScene_Draw()
 		// Render UI
 		uiManager->Draw();
 	}
+#endif
 }
 
 void TestScene_Free()
