@@ -524,8 +524,8 @@ void TestScene_Draw()
 	f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 	f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 
-#ifdef CURSOR_TEST
 	{
+#ifdef CURSOR_TEST
 		// THE WHERE'S MY CURSOR TEST?
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetTintColor(1.f, 1.f, 1.f, 1.0f);
@@ -549,10 +549,10 @@ void TestScene_Draw()
 
 		AEGfxSetTransform(transform.m);
 		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
+#endif
 		// Render UI
 		uiManager->Draw();
 	}
-#endif
 }
 
 void TestScene_Free()
