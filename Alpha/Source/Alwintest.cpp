@@ -323,7 +323,7 @@ void Alwintest_Update()
 		temp->scale.y = 10;
 		temp->tex = bulletTex;
 
-		AEVec2Set(&temp->direction, AESin(turret->rotation), AECos(turret->rotation));
+		AEVec2Set(&temp->direction, AESinDeg(turret->rotation), AECosDeg(turret->rotation));
 		AEVec2Normalize(&temp->direction, &temp->direction);
 	}
 
@@ -376,7 +376,7 @@ void Alwintest_Update()
 
 					AEVec2 result{ 0,0 };
 					AEVec2Sub(&result, &player->position, &gameObj->position);
-					gameObj->rotation = atan2f(result.x, result.y); // rotate to face player
+					gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
 
 					if (!gameObj->Path.empty())
 					{
@@ -421,7 +421,7 @@ void Alwintest_Update()
 				{
 					AEVec2 result{0,0};
 					AEVec2Sub(&result, &absMousePos, &turret->position);
-					turret->rotation = atan2f(result.x, result.y);
+					turret->rotation = AERadToDeg(atan2f(result.x, result.y));
 
 					break;
 				}

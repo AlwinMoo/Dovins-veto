@@ -20,7 +20,7 @@ void GameObject::Render()
 	AEMtx33Scale(&scale, this->scale.x, this->scale.x);
 
 	AEMtx33 rotate = { 0 };
-	AEMtx33Rot(&rotate, rotation);
+	AEMtx33Rot(&rotate, AEDegToRad(rotation + 180));
 
 	AEMtx33 translate = { 0 };
 	AEMtx33Trans(&translate, position.x - AEGetWindowWidth() / 2.f, -position.y + AEGetWindowHeight() / 2.f);

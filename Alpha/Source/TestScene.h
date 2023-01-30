@@ -28,6 +28,14 @@ namespace
 	// Textures
 	AEGfxTexture* planetTex;
 	AEGfxTexture* grassTex;
+	AEGfxTexture* grassBorderlessTex;
+	AEGfxTexture* bulletTex;
+	AEGfxTexture* playerTex;
+	AEGfxTexture* enemyTex;
+	AEGfxTexture* texTest;
+	AEGfxVertexList* meshTest;
+
+	bool buildPhase;
 }
 
 #endif // !TEST_SCENE_H
