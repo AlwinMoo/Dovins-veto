@@ -108,7 +108,8 @@ void TestScene_Initialize()
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-		const AEVec2 buttonPos{ screenWidthX / 4, screenWidthY / 4 };
+		//const AEVec2 buttonPos{ screenWidthX * .25f, screenWidthY * .25f };
+		const AEVec2 buttonPos{ 100.f, screenWidthY * .25f };
 		const AEVec2 buttonSize{ 50.f, 50.f };
 		uiManager->CreateButton(buttonPos, buttonSize, UI::END_PHASE_BUTTON, EndTurnButton);
 	}
