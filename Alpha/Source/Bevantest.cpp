@@ -293,7 +293,7 @@ void Bevantest_Draw()
 	f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
 	//std::cout << std::setprecision(2) << std::setw(5) << cursorXN << ", " << std::setw(5) << cursorYN << std::endl;
 	/************************************************************************/
-	s8 const* testStr = "ME ME BIG BOY";
+	s8 const* testStr = "CLICK TO START";
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxPrint(1, (s8*)testStr, 0.5f, 0.f, 2.f, 1.f, 0.f, 0.f);
 }

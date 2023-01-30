@@ -10,9 +10,6 @@
     <ClCompile Include="..\Source\GameStateManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\Map\Map.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -34,8 +31,10 @@
     <ClCompile Include="..\Source\Button.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="..\Source\Alwintest.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -88,7 +87,6 @@
     <ClInclude Include="..\Source\Button.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="EventSystem.h" />
     <ClInclude Include="..\Source\UI_Types.h">
       <Filter>Header</Filter>
     </ClInclude>

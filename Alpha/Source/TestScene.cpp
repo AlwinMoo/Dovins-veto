@@ -424,6 +424,17 @@ void TestScene_Update()
 					player->position.x += out.x * AEFrameRateControllerGetFrameTime() * 600;
 					player->position.y += out.y * AEFrameRateControllerGetFrameTime() * 600;
 				}
+
+				for (GameObject* go : go_list)
+				{
+					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					{
+						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+						{
+							go->active = false;
+						}
+					}
+				}
 				break;
 			}
 			case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
