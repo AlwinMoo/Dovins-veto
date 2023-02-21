@@ -14,9 +14,9 @@ namespace UI
 	public:
 		std::array<AEGfxTexture*, NUM_TEX> m_textures;
 		std::array<AEGfxVertexList*, NUM_MESH> m_mesh;
+		std::vector<Button*> m_buttons;
 		AEVec2 m_winDim;
 		s8 m_fontID;
-		std::vector<Button*> m_buttons;
 
 		void CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, void(*callback)() = nullptr);
 

@@ -49,6 +49,15 @@ namespace UI
 	}
 	void UI_Manager::Unload()
 	{
+		for (AEGfxTexture* i : m_textures) {
+			AEGfxTextureUnload(i);
+		}
+		for (AEGfxVertexList* i : m_mesh) {
+			AEGfxMeshFree(i);
+		}
+		for (Button* i : m_buttons) {
+			delete i;
+		}
 	}
 	void UI_Manager::SetWinDim(f32 x, f32 y)
 	{

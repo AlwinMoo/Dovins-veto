@@ -21,10 +21,8 @@ namespace UI
 		s8 font;
 		TextArea textArea;
 		void(*callback)();
-		Button(){
-		}
-		~Button(){
-		}
+		Button();
+		~Button();
 	};
 }
 #endif
