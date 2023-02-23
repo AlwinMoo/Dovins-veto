@@ -5,6 +5,8 @@
 #include "GameStateManager.h"
 #include "Pathfinding/pathfinder.h"
 
+
+
 namespace
 {
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
@@ -59,6 +61,11 @@ void TestScene_Load()
 
 void TestScene_Initialize()
 {
+	// TEMP TEST: DELETE IF YOU SEE THIS
+	//{
+	//	UI::TextArea text{ 3, 5, "test 1 test 2 test 3 test 4 test 5" };
+	//	text.Draw();
+	//}
 	// UI MANAGER
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
@@ -569,12 +576,23 @@ void TestScene_Draw()
 void TestScene_Free()
 {
 	delete uiManager;
+	for (auto i : go_list)
+	{
+		delete i;
+	}
+	delete test_map;
 }
 
 void TestScene_Unload()
 {
-
-}
+	AEGfxTextureUnload(grassBorderlessTex); 
+	AEGfxTextureUnload(planetTex);
+ 	AEGfxTextureUnload(grassTex);
+ 	AEGfxTextureUnload(bulletTex);
+ 	AEGfxTextureUnload(playerTex);
+ 	AEGfxTextureUnload(enemyTex);
+ 	//AEGfxTextureUnload(texTest);
+ }
 
 #pragma region UI_CALLBACK_DEFINITIONS
 void EndTurnButton() {

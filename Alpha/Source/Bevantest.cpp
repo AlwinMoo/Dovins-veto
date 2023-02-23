@@ -226,10 +226,10 @@ void Bevantest_Update()
 	if(AEInputCheckTriggered(AEVK_Q)) next = GS_QUIT;
 	if (AEInputCheckTriggered(AEVK_K)) next = GS_LEVEL3;
 	
-	//if (AEInputCheckTriggered(AEVK_LBUTTON))
-	//{
-	//	next = GS_LEVEL2;
-	//}
+	if (AEInputCheckTriggered(AEVK_LBUTTON))
+	{
+		next = GS_LEVEL2;
+	}
 	//if (AEInputCheckTriggered(AEVK_W)) next = GS_RESTART;
 	// Your own update logic goes here
 	if (AEInputCheckTriggered(AEVK_RBUTTON))
@@ -363,6 +363,12 @@ void Bevantest_Free()
 {
 	//AEGfxMeshFree(pMesh);
 	delete uiManager;
+
+	for (GameObject* curr : go_list) 
+	{
+		delete curr;
+	}
+	delete test_map;
 }
 
 void Bevantest_Unload()

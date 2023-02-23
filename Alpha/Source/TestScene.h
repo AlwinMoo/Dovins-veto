@@ -26,14 +26,14 @@ namespace
 	UI::UI_Manager* uiManager;
 
 	// Textures
-	AEGfxTexture* planetTex;
-	AEGfxTexture* grassTex;
-	AEGfxTexture* grassBorderlessTex;
-	AEGfxTexture* bulletTex;
-	AEGfxTexture* playerTex;
-	AEGfxTexture* enemyTex;
-	AEGfxTexture* texTest;
-	AEGfxVertexList* meshTest;
+	AEGfxTexture*		planetTex;
+	AEGfxTexture*		grassTex;
+	AEGfxTexture*		grassBorderlessTex;
+	AEGfxTexture*		bulletTex;
+	AEGfxTexture*		playerTex;
+	AEGfxTexture*		enemyTex;
+	AEGfxTexture*		texTest;
+	AEGfxVertexList*	meshTest;
 
 	bool buildPhase;
 }

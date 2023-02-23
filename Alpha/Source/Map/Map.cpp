@@ -133,7 +133,7 @@ game_map::~game_map()
 	delete[] this->map_arr;
 	this->map_arr = nullptr;
 
-	delete this;
+	//delete this;
 }
 
 //void load_file(game_map* dst, const char* src)
