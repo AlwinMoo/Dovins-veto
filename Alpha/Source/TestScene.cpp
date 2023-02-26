@@ -43,6 +43,9 @@ namespace
 	GameObject* turret;
 
 	float debounce{};
+
+	// TEXT TEST
+	UI::TextArea testText;
 }
 
 #pragma region UI_CALLBACK_DECLARATIONS
@@ -61,17 +64,14 @@ void TestScene_Load()
 
 void TestScene_Initialize()
 {
-	// TEMP TEST: DELETE IF YOU SEE THIS
-	//{
-	//	UI::TextArea text{ 3, 5, "test 1 test 2 test 3 test 4 test 5" };
-	//	text.Draw();
-	//}
 	// UI MANAGER
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		uiManager = new UI::UI_Manager();
 		uiManager->SetWinDim(screenWidthX, screenHeightY);
+
+		testText = { .1f, 1.f, "test 1 test 2 test 3 test 4 test 5test 1 test 2 test 3 test 4 test 5test 1 test 2 test 3 test 4 test 5", 2.f};
 	}
 	srand(time(NULL));
 
@@ -512,6 +512,8 @@ void TestScene_Draw()
 	s32 cursorX, cursorY;
 	//s8 text[] = "TEST";
 	AEInputGetCursorPosition(&cursorX, &cursorY);
+	f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
+	f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
 	//f32 fcursorX, fcursorY;
 	//
 	//AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
@@ -541,6 +543,8 @@ void TestScene_Draw()
 
 	f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 	f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+
+	testText.Draw(cursorXN, cursorYN, 1.f, 0.f, 0.f);
 
 	{
 #ifdef CURSOR_TEST

@@ -20,7 +20,7 @@ namespace UI
 		newButton->scale = size;
 		newButton->callback = callback;
 		newButton->pos = pos;
-		// WAIT WHAT??
+		
 		newButton->min.x = pos.x - size.x * 0.5f;
 		newButton->max.x = pos.x + size.x * 0.5f;
 		newButton->min.y = pos.y - size.y * 0.5f;
