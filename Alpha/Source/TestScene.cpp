@@ -45,11 +45,13 @@ namespace
 	float debounce{};
 
 	// TEXT TEST
-	UI::TextArea testText;
+	UI::TextArea endTurnHoverText;
+	UI::TextArea buildTowerHoverText;
 }
 
 #pragma region UI_CALLBACK_DECLARATIONS
 void EndTurnButton();
+void PlaceTower1Button();
 #pragma endregion
 
 void TestScene_Load()
@@ -111,14 +113,16 @@ void TestScene_Initialize()
 
 	// UI MANAGER ELEMENTS INITIALIZER
 	{
-		testText = { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE", 2.f };
+		endTurnHoverText		= { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE"};
+		buildTowerHoverText		= { .3f, 1.f, "Builds a tower. Automatically attacks enemies from range."};
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		//const AEVec2 buttonPos{ screenWidthX * .25f, screenWidthY * .25f };
-		const AEVec2 buttonPos{ 100.f, screenWidthY * .25f };
-		const AEVec2 buttonSize{ 50.f, 50.f };
-		uiManager->CreateButton(buttonPos, buttonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &testText);
-		
+		AEVec2 buttonPos{ 100.f, screenWidthY * .25f };
+		AEVec2 buttonSize{ 50.f, 50.f };
+		uiManager->CreateButton(buttonPos, buttonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
+		buttonPos.x += buttonSize.x * 2.f;
+		uiManager->CreateButton(buttonPos, buttonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTower1Button, &buildTowerHoverText);
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
@@ -602,5 +606,14 @@ void EndTurnButton() {
 		if (tile->type == GameObject::GO_TILE)
 			tile->tex = grassBorderlessTex;
 	}
+}
+
+void PlaceTower1Button()
+{
+	hoverStructure->gridScale = { 1, 1 };
+	hoverStructure->scale = { test_map->GetTileSize(), test_map->GetTileSize() };
+	//hoverStructure->position = mouse_pos;
+	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 }
 #pragma endregion

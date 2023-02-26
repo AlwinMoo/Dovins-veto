@@ -29,9 +29,8 @@ namespace UI
 		newButton->max.y = pos.y + size.y * 0.5f;
 		ConvertToWS(newButton);
 		switch (type) {
-		case TEX_TOWER:
-		case TEX_NEXUS:
-			newButton->texID = TEX_BUTTON;
+		case BUILD_TOWER_BUTTON:
+			newButton->texID = TEX_TOWER;
 			newButton->meshID = MESH_BOX;
 			break;
 		case WHITE_BUTTON:
@@ -50,8 +49,9 @@ namespace UI
 	void UI_Manager::Load()
 	{
 		m_fontID = g_fontID;
-		m_textures.at(TEX_BUTTON) = AEGfxTextureLoad("Assets/SquareButton.png");
-		m_textures.at(TEX_END_PHASE) = AEGfxTextureLoad("Assets/Hourglass.png");
+		m_textures.at(TEX_BUTTON)		= AEGfxTextureLoad("Assets/SquareButton.png");
+		m_textures.at(TEX_END_PHASE)	= AEGfxTextureLoad("Assets/Hourglass.png");
+		m_textures.at(TEX_TOWER)		= AEGfxTextureLoad("Assets/Tower.png");
 		m_mesh.at(MESH_BOX) = render::GenerateQuad();
 	}
 	void UI_Manager::Unload()
@@ -133,7 +133,7 @@ namespace UI
 			// Render text if hovering
 			if (curr->bHovering && curr->hoverText)
 			{
-				curr->hoverText->Draw(mouseXN, mouseYN, 1.f, 1.f, 1.f);
+				curr->hoverText->Draw(mouseXN, mouseYN, 0.f, 0.f, 0.f);
 			}
 		}
 	}

@@ -24,8 +24,8 @@ public:
 
 	// Constructors
 	TextArea();
-	TextArea(f32 w, f32 h,					f32 scale = 1.f);
-	TextArea(f32 w, f32 h, std::string str, f32 scale = 1.f);
+	TextArea(f32 w, f32 h,					f32 scale = 1.5f);
+	TextArea(f32 w, f32 h, std::string str, f32 scale = 1.5f);
 
 	void Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b);
 
