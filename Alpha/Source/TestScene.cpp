@@ -70,8 +70,6 @@ void TestScene_Initialize()
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		uiManager = new UI::UI_Manager();
 		uiManager->SetWinDim(screenWidthX, screenHeightY);
-
-		testText = { .1f, 1.f, "test 1 test 2 test 3 test 4 test 5test 1 test 2 test 3 test 4 test 5test 1 test 2 test 3 test 4 test 5", 2.f};
 	}
 	srand(time(NULL));
 
@@ -111,14 +109,16 @@ void TestScene_Initialize()
 	hoverStructure->scale.y = hoverStructure->scale.x;
 	validPlacement = false;
 
-	// UI MANAGER INITIALIZER
+	// UI MANAGER ELEMENTS INITIALIZER
 	{
+		testText = { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE", 2.f };
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		//const AEVec2 buttonPos{ screenWidthX * .25f, screenWidthY * .25f };
 		const AEVec2 buttonPos{ 100.f, screenWidthY * .25f };
 		const AEVec2 buttonSize{ 50.f, 50.f };
-		uiManager->CreateButton(buttonPos, buttonSize, UI::END_PHASE_BUTTON, EndTurnButton);
+		uiManager->CreateButton(buttonPos, buttonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &testText);
+		
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
@@ -138,13 +138,13 @@ void TestScene_Update()
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 	AEVec2 absMousePos{};
-	AEVec2Set(&absMousePos, mouseX, mouseY);
+	AEVec2Set(&absMousePos, static_cast<f32>(mouseX), static_cast<f32>(mouseY));
 
 	//if (turret && turret->active)
 	//	std::cout << absMousePos.x << ',' << absMousePos.y << '[' << turret->position.x << ',' << turret->position.y << ']' << std::endl;
 
 	AEVec2 mouse_pos{};
-	AEVec2Set(&mouse_pos, mouseX, mouseY);
+	AEVec2Set(&mouse_pos, static_cast<f32>(mouseX), static_cast<f32>(mouseY));
 	//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
 	{
 		AEVec2 invert_mouse = mouse_pos;
@@ -541,11 +541,6 @@ void TestScene_Draw()
 	if (hoverStructure->active)
 		hoverStructure->Render();
 
-	f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
-	f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-
-	testText.Draw(cursorXN, cursorYN, 1.f, 0.f, 0.f);
-
 	{
 #ifdef CURSOR_TEST
 		// THE WHERE'S MY CURSOR TEST?
@@ -573,7 +568,7 @@ void TestScene_Draw()
 		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
 #endif
 		// Render UI
-		uiManager->Draw();
+		uiManager->Draw(cursorXN, cursorYN);
 	}
 }
 

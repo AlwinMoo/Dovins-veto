@@ -14,11 +14,13 @@ namespace UI
 		newButton->wsMin.y = newButton->min.y + m_winDim.y * 0.5f;
 		newButton->wsMax.y = newButton->max.y + m_winDim.y * 0.5f;
 	}
-	void UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, void(*callback)())
+	void UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, TextArea* buttonText, void(*callback)(), TextArea* hoverText)
 	{
 		Button* newButton = new Button();
 		newButton->scale = size;
 		newButton->callback = callback;
+		newButton->hoverText = hoverText;
+		newButton->buttonText = buttonText;
 		newButton->pos = pos;
 		
 		newButton->min.x = pos.x - size.x * 0.5f;
@@ -27,6 +29,11 @@ namespace UI
 		newButton->max.y = pos.y + size.y * 0.5f;
 		ConvertToWS(newButton);
 		switch (type) {
+		case TEX_TOWER:
+		case TEX_NEXUS:
+			newButton->texID = TEX_BUTTON;
+			newButton->meshID = MESH_BOX;
+			break;
 		case WHITE_BUTTON:
 			newButton->texID = TEX_BUTTON;
 			newButton->meshID = MESH_BOX;
@@ -50,12 +57,18 @@ namespace UI
 	void UI_Manager::Unload()
 	{
 		for (AEGfxTexture* i : m_textures) {
+			if (!i)
+				continue;
 			AEGfxTextureUnload(i);
 		}
 		for (AEGfxVertexList* i : m_mesh) {
+			if (!i)
+				continue;
 			AEGfxMeshFree(i);
 		}
 		for (Button* i : m_buttons) {
+			if (!i)
+				continue;
 			delete i;
 		}
 	}
@@ -67,21 +80,30 @@ namespace UI
 	void UI_Manager::Update(AEVec2 mousePos, bool lClick)
 	{
 		// IF IMPLEMENTING HOVER, REMOVE THIS IF
-		if (!lClick)
-			return;
 		for (Button* curr : m_buttons) {
-			std::cout << "MOUSEPOS = " << mousePos.x << ", " << mousePos.y << '\n';
-			std::cout << "CURRMIN  = " << curr->min.x << ", " << curr->min.y << '\n';
-			std::cout << "CURRMAX  = " << curr->max.x << ", " << curr->max.y << '\n';
-			std::cout << std::endl;
+			curr->bHovering = false;
+			//std::cout << "MOUSEPOS = " << mousePos.x << ", " << mousePos.y << '\n';
+			//std::cout << "CURRMIN  = " << curr->min.x << ", " << curr->min.y << '\n';
+			//std::cout << "CURRMAX  = " << curr->max.x << ", " << curr->max.y << '\n';
+			//std::cout << std::endl;
 			if (mousePos.x > curr->max.x || mousePos.x < curr->min.x || mousePos.y > curr->max.y || mousePos.y < curr->min.y)
 				continue;
-			// clicked assumed. edit if hover implemented
-			curr->callback();
-			// TODO: Hover logic if not clicking?
+			// CLICKING LOGIC
+			if (lClick)
+			{
+				// Set any bools?
+				if (curr->callback)
+					curr->callback();
+			}
+			// HOVER LOGIC
+			else
+			{
+				curr->bHovering = true;
+			}
 		}
 	}
-	void UI_Manager::Draw()
+
+	void UI_Manager::Draw(f32 const& mouseXN, f32 const& mouseYN)
 	{
 		for (Button* curr : m_buttons) {
 			// UI TEST
@@ -107,6 +129,12 @@ namespace UI
 
 			AEGfxSetTransform(transform.m);
 			AEGfxMeshDraw(m_mesh[curr->meshID], AE_GFX_MDM_TRIANGLES);
+			
+			// Render text if hovering
+			if (curr->bHovering && curr->hoverText)
+			{
+				curr->hoverText->Draw(mouseXN, mouseYN, 1.f, 1.f, 1.f);
+			}
 		}
 	}
 	UI_Manager::UI_Manager()

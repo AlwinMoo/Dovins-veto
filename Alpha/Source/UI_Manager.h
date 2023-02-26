@@ -18,15 +18,16 @@ namespace UI
 		AEVec2 m_winDim;
 		s8 m_fontID;
 
-		void CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, void(*callback)() = nullptr);
+		
+		void CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, TextArea* buttonText = nullptr, void(*callback)() = nullptr, TextArea* hoverText = nullptr);
 
 		void Load();
 
-		// TODO: UNLOAD
+		
 		void Unload();
 		void SetWinDim(f32 x, f32 y);
 		void Update(AEVec2 mousePos, bool lClick);
-		void Draw();
+		void Draw(f32 const& mouseXN = 0.f, f32 const& mouseYN = 0.f);
 
 		UI_Manager();
 		~UI_Manager();

@@ -18,9 +18,13 @@ namespace UI
 		// World space boundaries
 		AEVec2 wsMin, wsMax;
 		AEVec2 scale;
-		s8 font;
-		TextArea textArea;
+		s8 font; // TODO: REMOVE THIS WHEN IMPLEMENTED TEXT FULLY
+
+		TextArea* buttonText;
 		void(*callback)();
+		TextArea* hoverText;
+		bool bHovering;
+		
 		Button();
 		~Button();
 	};
