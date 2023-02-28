@@ -1,12 +1,9 @@
 #include "Bevantest.h"
+#include "Skills.h"
 #include "AEEngine.h"
 #include <iostream>
 #include <iomanip>
 #include "UI_Manager.h"
-f32 winSizeX, winSizeY;
-s8 m_fontId;
-
-
 #include <vector>
 #include "Map/Map.h"
 #include "GameObject.h"
@@ -16,7 +13,8 @@ s8 m_fontId;
 #include "Pathfinding/pathfinder.h"
 #include <cmath>
 
-
+f32 winSizeX, winSizeY;
+s8 m_fontId;
 
 
 namespace
@@ -52,6 +50,9 @@ namespace
 	#define BULLET_VEL 20.0f;
 	const double my_PI{ 3.14159265359 };
 	const int MAX_BULLET_INST{ 50 };
+	int bullet_flag{};
+	int shoot_flag{};
+	f64 bullet_cooldown {};
 
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
 	{
@@ -60,11 +61,6 @@ namespace
 			GameObject* go = (GameObject*)it;
 			if (!go->active)
 			{
-				switch (go->type)
-				{
-				default:
-					go->tex = pTex;
-				}
 				go->active = true;
 				++object_count;
 				return go;
@@ -130,14 +126,14 @@ void Bevantest_Initialize()
 	enemy->active = true;
 
 	//bullet init
-	for (int i{}; i < MAX_BULLET_INST; ++i)
-	{
-		GameObject* bullet = FetchGO(GameObject::GO_BULLET);
-		bullet->scale.x = BULLET_SIZE;
-		bullet->scale.y = BULLET_SIZE;
-		bullet->tex = Bullet;
-		bullet->active = false;
-	}
+	//for (int i{}; i < MAX_BULLET_INST; ++i)
+	//{
+	//	GameObject* bullet = FetchGO(GameObject::GO_BULLET);
+	//	bullet->scale.x = BULLET_SIZE;
+	//	bullet->scale.y = BULLET_SIZE;
+	//	bullet->tex = Bullet;
+	//	bullet->active = false;
+	//}
 }
 
 void Bevantest_Update()
@@ -172,30 +168,44 @@ void Bevantest_Update()
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_Z))
+	if (AEInputCheckTriggered(AEVK_Z) && shoot_flag == 0)
 	{
+		shoot_flag = 1;
+		bullet_cooldown = 0;
 		GameObject* bullet = FetchGO(GameObject::GO_BULLET);
-		double bullet_ang;
-		bullet->scale.x = BULLET_SIZE;
-		bullet->scale.y = BULLET_SIZE;
-		bullet->position.x = player->position.x;
-		bullet->position.y = player->position.y;
-		bullet->tex = Bullet;
-		bullet->active = true;
 
-		bullet_ang = atan2(static_cast<double>(bullet->position.y - static_cast<f32>(mouseY)), static_cast<double> (bullet->position.x - static_cast<f32>(mouseX)));
-		AEVec2Set(&bullet->direction, -cos(bullet_ang), -sin(bullet_ang));
+		bullet->tex = Bullet;
+		shoot_bullet(bullet, player, static_cast<f32>(mouseX), static_cast<f32>(mouseY), bullet_flag);
 	}
 
+	bullet_cooldown += AEFrameRateControllerGetFrameTime();
+
+	if (shoot_flag == 1)
+	{
+		if (bullet_flag == upgrade2)
+		{
+			if (bullet_cooldown == 5 * AEFrameRateControllerGetFrameTime() || bullet_cooldown == 7 * AEFrameRateControllerGetFrameTime())
+			{
+				GameObject* bullet = FetchGO(GameObject::GO_BULLET);
+				bullet->tex = Bullet;
+				shoot_bullet(bullet, player, static_cast<f32>(mouseX), static_cast<f32>(mouseY), bullet_flag);
+			}
+		}
+	}
+
+	if (bullet_cooldown >= static_cast<f64> (1))
+	{
+		shoot_flag = 0;
+		bullet_cooldown = 0;
+	}
 
 	// GameObject Update
 	if (len_check <= 75) enemy->active = false;
+
 	for (GameObject* gameObj : go_list)
 	{
 		if (gameObj->active)
 		{
-			//if (gameObj->type == GameObject::GO_TILE)
-			//	gameObj->Update();
 			switch (gameObj->type)
 			{
 			case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
@@ -225,6 +235,12 @@ void Bevantest_Update()
 
 	if(AEInputCheckTriggered(AEVK_Q)) next = GS_QUIT;
 	if (AEInputCheckTriggered(AEVK_K)) next = GS_LEVEL3;
+
+	if (AEInputCheckTriggered(AEVK_M))
+	{
+		if (bullet_flag == 1) bullet_flag = 2;
+		else bullet_flag = 1;
+	}
 	
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
@@ -288,26 +304,12 @@ void Bevantest_Update()
 			}
 		}
 	}
-
-	//for (int i{}; i < MAX_BULLET_INST; ++i)
-	//{
-	//	if (Bullet_arr[i]->active)
-	//	{
-	//		if (Bullet_arr[i]->position.x > winSizeX || Bullet_arr[i]->position.x < 0 || Bullet_arr[i]->position.y > winSizeY || Bullet_arr[i]->position.y < 0)
-	//		{
-	//			Bullet_arr[i]->active = false;
-	//			std::cout << "bullet destroyed" << std::endl;
-	//		}
-	//	}
-	//}
-
 	
 }
 
 void Bevantest_Draw()
 {
 	//Draw mesh
-	//AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 
 	//Gameobjects Render
 	for (GameObject* gameObj : go_list)
