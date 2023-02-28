@@ -4,6 +4,11 @@
 extern s8 g_fontID;
 namespace UI
 {
+	/*________________________________________________*/
+	// CONSTANT VARIABLES
+	const float BUTTON_HOVER_ALPHA{ 0.3f };
+	//const float BUTTON_NORMAL_ALPHA{ 0.f };
+	/*________________________________________________*/
 	void UI_Manager::ConvertToWS(Button* newButton)
 	{
 		newButton->wsPos.x = newButton->pos.x - m_winDim.x * 0.5f;
@@ -89,7 +94,6 @@ namespace UI
 	}
 	void UI_Manager::Update(AEVec2 mousePos, bool lClick)
 	{
-		// IF IMPLEMENTING HOVER, REMOVE THIS IF
 		for (Button* curr : m_buttons) {
 			curr->bHovering = false;
 			//std::cout << "MOUSEPOS = " << mousePos.x << ", " << mousePos.y << '\n';
@@ -138,19 +142,17 @@ namespace UI
 			AEMtx33Concat(&transform, &translate, &transform);
 
 			AEGfxSetTransform(transform.m);
+			AEGfxSetBlendColor(1.f, 1.f, 1.f, (curr->bHovering ? BUTTON_HOVER_ALPHA: 0.f));
 			AEGfxMeshDraw(m_mesh[curr->meshID], AE_GFX_MDM_TRIANGLES);
 			
-			// Render text if hovering
-			if (curr->bHovering && curr->hoverText)
-			{
-				curr->hoverText->Draw(mouseXN, mouseYN, 0.f, 0.f, 0.f);
-			}
 		}
+		AEGfxSetBlendColor(0.f, 0.f, 0.f, 0.f);
 
 		// NOW DRAW DESCRIPTIONS (IF ANY)
 		for (Button* curr : m_buttons) {
 			// UI TEST
 			// Render text if hovering
+			AEGfxSetBlendMode(AEGfxBlendMode::AE_GFX_BM_BLEND);
 			if (curr->bHovering && curr->hoverText)
 			{
 				curr->hoverText->Draw(mouseXN, mouseYN, 0.f, 0.f, 0.f);
