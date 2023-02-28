@@ -26,8 +26,10 @@ namespace
 	UI::UI_Manager* uiManager;
 
 	// Textures
-	AEGfxTexture*		planetTex;
+	AEGfxTexture*		turretTex;
 	AEGfxTexture*		grassTex;
+	AEGfxTexture*		nexusTex;
+	AEGfxTexture*		wallTex;
 	AEGfxTexture*		grassBorderlessTex;
 	AEGfxTexture*		bulletTex;
 	AEGfxTexture*		playerTex;
@@ -35,6 +37,8 @@ namespace
 	AEGfxTexture*		texTest;
 	AEGfxVertexList*	meshTest;
 
+	UI::Button* nexusButton;
+	bool nexusPlaced;
 	bool buildPhase;
 }
 

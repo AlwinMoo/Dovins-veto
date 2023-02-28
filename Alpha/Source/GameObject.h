@@ -25,6 +25,8 @@ public:
 		GO_HOVER_STRUCTURE,
 		GO_TILE,
 		GO_TURRET,
+		GO_WALL,
+		GO_NEXUS,
 		GO_BULLET,
 		GO_AOE,
 		GO_ENEMY,
