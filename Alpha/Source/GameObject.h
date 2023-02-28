@@ -4,6 +4,8 @@
 #include <vector>
 #include <AEEngine.h>
 
+#include "Turret/Turret.h"
+
 struct Color
 {
 	float r;
@@ -49,7 +51,9 @@ public:
 	AEGfxTexture* tex;
 	AEGfxVertexList* mesh;
 
-	virtual void Update()= 0;
+	Turret* turret;
+
+	void Update();
 	void Render();
 
 	GameObject(GAMEOBJECT_TYPE default_type = GO_NONE);

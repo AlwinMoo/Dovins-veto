@@ -3,5 +3,5 @@
 #include "../GameObject.h"
 class Enemy : public GameObject
 {
-	void Update() override;
+	void Update();
 };

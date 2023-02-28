@@ -99,6 +99,8 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="..\Source\Alwintest.cpp" />
     <ClCompile Include="..\Source\Bevantest.cpp" />
     <ClCompile Include="..\Source\Button.cpp" />
+    <ClCompile Include="..\Source\Enemy\Enemy.cpp" />
+    <ClCompile Include="..\Source\Enemy\StateMachine.cpp" />
     <ClCompile Include="..\Source\GameObject.cpp" />
     <ClCompile Include="..\Source\GameStateManager.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
@@ -109,12 +111,15 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="..\Source\TestScene.cpp" />
     <ClCompile Include="..\Source\TextArea.cpp" />
     <ClCompile Include="..\Source\TextLineInfo.cpp" />
+    <ClCompile Include="..\Source\Turret\Turret.cpp" />
     <ClCompile Include="..\Source\UI_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Alwintest.h" />
     <ClInclude Include="..\Source\Bevantest.h" />
     <ClInclude Include="..\Source\Button.h" />
+    <ClInclude Include="..\Source\Enemy\Enemy.h" />
+    <ClInclude Include="..\Source\Enemy\StateMachine.h" />
     <ClInclude Include="..\Source\GameObject.h" />
     <ClInclude Include="..\Source\GameScene.hpp" />
     <ClInclude Include="..\Source\GameStateList.h" />
@@ -129,6 +134,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClInclude Include="..\Source\TestScene.h" />
     <ClInclude Include="..\Source\TextArea.h" />
     <ClInclude Include="..\Source\TextLineInfo.h" />
+    <ClInclude Include="..\Source\Turret\Turret.h" />
     <ClInclude Include="..\Source\UI_Manager.h" />
     <ClInclude Include="..\Source\UI_Types.h" />
     <ClInclude Include="Mesh.hpp" />

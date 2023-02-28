@@ -43,6 +43,15 @@
     <ClCompile Include="..\Source\Skills.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Enemy\Enemy.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Enemy\StateMachine.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Turret\Turret.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h">
@@ -103,6 +112,15 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Skills.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Enemy\Enemy.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Enemy\StateMachine.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Turret\Turret.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
