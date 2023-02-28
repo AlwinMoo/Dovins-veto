@@ -43,10 +43,15 @@ namespace
 	GameObject* turret;
 
 	float debounce{};
+
+	// TEXT TEST
+	UI::TextArea endTurnHoverText;
+	UI::TextArea buildTowerHoverText;
 }
 
 #pragma region UI_CALLBACK_DECLARATIONS
 void EndTurnButton();
+void PlaceTower1Button();
 #pragma endregion
 
 void TestScene_Load()
@@ -61,11 +66,6 @@ void TestScene_Load()
 
 void TestScene_Initialize()
 {
-	// TEMP TEST: DELETE IF YOU SEE THIS
-	//{
-	//	UI::TextArea text{ 3, 5, "test 1 test 2 test 3 test 4 test 5" };
-	//	text.Draw();
-	//}
 	// UI MANAGER
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
@@ -111,14 +111,18 @@ void TestScene_Initialize()
 	hoverStructure->scale.y = hoverStructure->scale.x;
 	validPlacement = false;
 
-	// UI MANAGER INITIALIZER
+	// UI MANAGER ELEMENTS INITIALIZER
 	{
+		endTurnHoverText		= { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE"};
+		buildTowerHoverText		= { .3f, 1.f, "Builds a tower. Automatically attacks enemies from range."};
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		//const AEVec2 buttonPos{ screenWidthX * .25f, screenWidthY * .25f };
-		const AEVec2 buttonPos{ 100.f, screenWidthY * .25f };
-		const AEVec2 buttonSize{ 50.f, 50.f };
-		uiManager->CreateButton(buttonPos, buttonSize, UI::END_PHASE_BUTTON, EndTurnButton);
+		AEVec2 buttonPos{ 100.f, screenWidthY * .25f };
+		AEVec2 buttonSize{ 50.f, 50.f };
+		uiManager->CreateButton(buttonPos, buttonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
+		buttonPos.x += buttonSize.x * 2.f;
+		uiManager->CreateButton(buttonPos, buttonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTower1Button, &buildTowerHoverText);
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
@@ -138,13 +142,13 @@ void TestScene_Update()
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 	AEVec2 absMousePos{};
-	AEVec2Set(&absMousePos, mouseX, mouseY);
+	AEVec2Set(&absMousePos, static_cast<f32>(mouseX), static_cast<f32>(mouseY));
 
 	//if (turret && turret->active)
 	//	std::cout << absMousePos.x << ',' << absMousePos.y << '[' << turret->position.x << ',' << turret->position.y << ']' << std::endl;
 
 	AEVec2 mouse_pos{};
-	AEVec2Set(&mouse_pos, mouseX, mouseY);
+	AEVec2Set(&mouse_pos, static_cast<f32>(mouseX), static_cast<f32>(mouseY));
 	//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
 	{
 		AEVec2 invert_mouse = mouse_pos;
@@ -512,6 +516,8 @@ void TestScene_Draw()
 	s32 cursorX, cursorY;
 	//s8 text[] = "TEST";
 	AEInputGetCursorPosition(&cursorX, &cursorY);
+	f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
+	f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
 	//f32 fcursorX, fcursorY;
 	//
 	//AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
@@ -538,9 +544,6 @@ void TestScene_Draw()
 	// Render above
 	if (hoverStructure->active)
 		hoverStructure->Render();
-
-	f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
-	f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 
 	{
 #ifdef CURSOR_TEST
@@ -569,7 +572,7 @@ void TestScene_Draw()
 		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
 #endif
 		// Render UI
-		uiManager->Draw();
+		uiManager->Draw(cursorXN, cursorYN);
 	}
 }
 
@@ -603,5 +606,14 @@ void EndTurnButton() {
 		if (tile->type == GameObject::GO_TILE)
 			tile->tex = grassBorderlessTex;
 	}
+}
+
+void PlaceTower1Button()
+{
+	hoverStructure->gridScale = { 1, 1 };
+	hoverStructure->scale = { test_map->GetTileSize(), test_map->GetTileSize() };
+	//hoverStructure->position = mouse_pos;
+	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 }
 #pragma endregion
