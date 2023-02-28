@@ -28,6 +28,7 @@ public:
 		GO_WALL,
 		GO_NEXUS,
 		GO_BULLET,
+		GO_AOE,
 		GO_ENEMY,
 		GO_TOTAL,
 	};
