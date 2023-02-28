@@ -105,6 +105,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="..\Source\Map\Map.cpp" />
     <ClCompile Include="..\Source\Pathfinding\pathfinder.cpp" />
     <ClCompile Include="..\Source\Rendering.cpp" />
+    <ClCompile Include="..\Source\Skills.cpp" />
     <ClCompile Include="..\Source\TestScene.cpp" />
     <ClCompile Include="..\Source\TextArea.cpp" />
     <ClCompile Include="..\Source\TextLineInfo.cpp" />
@@ -124,6 +125,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClInclude Include="..\Source\Rendering.hpp" />
     <ClInclude Include="..\Source\SceneBase.hpp" />
     <ClInclude Include="..\Source\SceneManager.hpp" />
+    <ClInclude Include="..\Source\Skills.h" />
     <ClInclude Include="..\Source\TestScene.h" />
     <ClInclude Include="..\Source\TextArea.h" />
     <ClInclude Include="..\Source\TextLineInfo.h" />

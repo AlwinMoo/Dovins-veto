@@ -118,11 +118,14 @@ void TestScene_Initialize()
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		//const AEVec2 buttonPos{ screenWidthX * .25f, screenWidthY * .25f };
-		AEVec2 buttonPos{ 100.f, screenWidthY * .25f };
+		AEVec2 const buttonPosStart{ 100.f, screenWidthY * .25f };
 		AEVec2 buttonSize{ 50.f, 50.f };
+		AEVec2 buttonPos{ buttonPosStart };
 		uiManager->CreateButton(buttonPos, buttonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
 		buttonPos.x += buttonSize.x * 2.f;
 		uiManager->CreateButton(buttonPos, buttonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTower1Button, &buildTowerHoverText);
+		buttonPos.x += buttonSize.x * 2.f;
+		uiManager->CreateButton(buttonPos, buttonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceTower1Button, &buildTowerHoverText);
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
