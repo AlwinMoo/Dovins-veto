@@ -101,6 +101,20 @@ void game_map::AddItem(TILE_TYPE tile, int index, int gridScalex, int gridScaleY
 	}
 }
 
+void game_map::RemoveItem(int index, int gridScalex, int gridScaleY)
+{
+	int minXIndex = GetX(index);
+	int minYIndex = GetY(index);
+	int maxXIndex = minXIndex + gridScalex - 1;
+	int maxYIndex = minYIndex + gridScaleY - 1;
+
+	for (int i = minXIndex; i <= maxXIndex; i++)
+	{
+		for (int j = minYIndex; j <= maxYIndex; j++)
+			this->map_arr[GetIndex(i, j)] = TILE_TYPE::TILE_NONE;
+	}
+}
+
 bool game_map::IsOccupied(int index, int gridScalex, int gridScaleY)
 {
 	if (index < 0)

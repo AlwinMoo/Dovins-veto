@@ -55,6 +55,10 @@ namespace UI
 			newButton->texID = TEX_END_PHASE;
 			newButton->meshID = MESH_BOX;
 			break;
+		case ERASE_BUTTON:
+			newButton->texID = TEX_ERASE;
+			newButton->meshID = MESH_BOX;
+			break;
 		default:
 			break;
 		}
@@ -70,6 +74,7 @@ namespace UI
 		m_textures.at(TEX_NEXUS)		= AEGfxTextureLoad("Assets/Nexus.png");
 		m_textures.at(TEX_WALL)			= AEGfxTextureLoad("Assets/Wall.png");
 		m_textures.at(TEX_NEXUS_PLACED) = AEGfxTextureLoad("Assets/NexusPlaced.png");
+		m_textures.at(TEX_ERASE)		= AEGfxTextureLoad("Assets/Eraser.png");
 		m_mesh.at(MESH_BOX) = render::GenerateQuad();
 	}
 	void UI_Manager::Unload()

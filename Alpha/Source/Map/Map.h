@@ -114,6 +114,16 @@ class game_map
 	void AddItem(TILE_TYPE tile, int index, int gridScalex = 1, int gridScaleY = 1);
 
 	/*!
+	 * @brief Removes an item into the map based on index
+	 *
+	 * @param tile			- Type of tile to put in the map
+	 * @param index			- Index to place tile
+	 * @param gridScaleX	- X Scale of new item
+	 * @param gridScaleY	- Y scale of new item
+	*/
+	void RemoveItem(int index, int gridScalex = 1, int gridScaleY = 1);
+
+	/*!
 	 * @brief	Checks if an index is occupied. Scale is checked centered
 	 *			on top left, ex, scaleX of 3 will check index and 2 tile
 	 *			to the right of index

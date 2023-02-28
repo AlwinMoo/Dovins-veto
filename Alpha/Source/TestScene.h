@@ -30,6 +30,7 @@ namespace
 	AEGfxTexture*		grassTex;
 	AEGfxTexture*		nexusTex;
 	AEGfxTexture*		wallTex;
+	AEGfxTexture*		eraseTex;
 	AEGfxTexture*		grassBorderlessTex;
 	AEGfxTexture*		bulletTex;
 	AEGfxTexture*		playerTex;

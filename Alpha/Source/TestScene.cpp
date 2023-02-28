@@ -47,6 +47,7 @@ namespace
 	UI::TextArea buildNexusHoverText;
 	UI::TextArea buildWallHoverText;
 	UI::TextArea buildNexusPlacedHoverText;
+	UI::TextArea eraseHoverText;
 }
 
 #pragma region UI_CALLBACK_DECLARATIONS
@@ -54,6 +55,7 @@ void EndTurnButton();
 void PlaceNexusButton();
 void PlaceTowerButton();
 void PlaceWallButton();
+void EraseButton();
 #pragma endregion
 
 void TestScene_Load()
@@ -66,6 +68,7 @@ void TestScene_Load()
 	grassBorderlessTex = AEGfxTextureLoad("Assets/GrassTileBorderless.png");
 	playerTex = AEGfxTextureLoad("Assets/PlayerTexture.png");
 	enemyTex = AEGfxTextureLoad("Assets/EnemyTexture.png");
+	eraseTex = AEGfxTextureLoad("Assets/Eraser.png");
 }
 
 void TestScene_Initialize()
@@ -124,6 +127,7 @@ void TestScene_Initialize()
 		buildWallHoverText			= { .3f, 1.f, "Builds a wall. Most enemies walk around them." };
 		buildNexusHoverText			= { .3f, 1.f, "Builds the nexus. Protect it with your life." };
 		buildNexusPlacedHoverText	= { .3f, 1.f, "Nexus already built. You only get one." };
+		eraseHoverText				= { .3f, 1.f, "Erase your building. No shame in mistakes." };
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 
@@ -132,13 +136,15 @@ void TestScene_Initialize()
 		uiManager->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
 
 		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenWidthY * .9f };
-		AEVec2 const buildButtonSize{ screenWidthY * .15f, screenWidthY * .15f };
+		AEVec2 const buildButtonSize{ screenWidthY * .12f, screenWidthY * .12f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
 		nexusButton = uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
 		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &buildWallHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
 		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &buildTowerHoverText);
+		buildButtonPos.y -= buildButtonSize.y * 1.5f;
+		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &eraseHoverText);
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
@@ -176,40 +182,84 @@ void TestScene_Update()
 	{
 		// Place Structure
 
-		if (AEInputCheckTriggered(AEVK_LBUTTON) && validPlacement)
+		if (AEInputCheckTriggered(AEVK_LBUTTON))
 		{
-			GameObject* test = nullptr;
-
-			if (hoverStructure->tex == wallTex)
+			if (hoverStructure->tex == eraseTex)
 			{
-				if (buildResource < WALL_COST)
-					return;
-				test = FetchGO(GameObject::GO_WALL);
-				buildResource -= WALL_COST;
+				if (!validPlacement && test_map->IsInGrid(mouse_pos))
+				{
+					AEVec2 topRightPos;
+					AEVec2 deleteGridScale;
+					for (GameObject* gameObj : go_list)
+					{
+						if (gameObj->active)
+						{
+							if (gameObj->type == GameObject::GO_TILE || gameObj == hoverStructure)
+								continue;
+							if (AEVec2Distance(&gameObj->position, &hoverStructure->position) <= (gameObj->scale.x * 0.5f + hoverStructure->scale.x * 0.5f))
+							{
+								gameObj->active = false;
+								if (gameObj->type == GameObject::GO_WALL)
+									buildResource += WALL_COST;
+								else if (gameObj->type == GameObject::GO_TURRET)
+									buildResource += TOWER_COST;
+
+								topRightPos = gameObj->position;
+								topRightPos.x -= (gameObj->gridScale.x - 1) * 0.5 * test_map->GetTileSize();
+								topRightPos.y -= (gameObj->gridScale.y - 1) * 0.5 * test_map->GetTileSize();
+								deleteGridScale = gameObj->gridScale;
+
+								if (gameObj->type == GameObject::GO_NEXUS)
+								{
+									nexusPlaced = false;
+									nexusButton->texID = UI::TEX_NEXUS;
+									nexusButton->hoverText = &buildNexusHoverText;
+								}
+
+								break;
+							}
+						}
+					}
+
+					test_map->RemoveItem(test_map->WorldToIndex(topRightPos), deleteGridScale.x, deleteGridScale.y);
+				}
 			}
-			else if (hoverStructure->tex == turretTex)
+			else if (validPlacement)
 			{
-				if (buildResource < TOWER_COST)
-					return;
-				test = FetchGO(GameObject::GO_TURRET);
-				buildResource -= TOWER_COST;
-			}
-			else if (hoverStructure->tex == nexusTex)
-				test = FetchGO(GameObject::GO_NEXUS);
+				GameObject* test = nullptr;
 
-			test->position = hoverStructure->position;
-			test->rotation = hoverStructure->rotation;
-			test->scale = hoverStructure->scale;
-			test->tex = hoverStructure->tex;
+				if (hoverStructure->tex == wallTex)
+				{
+					if (buildResource < WALL_COST)
+						return;
+					test = FetchGO(GameObject::GO_WALL);
+					buildResource -= WALL_COST;
+				}
+				else if (hoverStructure->tex == turretTex)
+				{
+					if (buildResource < TOWER_COST)
+						return;
+					test = FetchGO(GameObject::GO_TURRET);
+					buildResource -= TOWER_COST;
+				}
+				else if (hoverStructure->tex == nexusTex)
+					test = FetchGO(GameObject::GO_NEXUS);
 
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+				test->position = hoverStructure->position;
+				test->rotation = hoverStructure->rotation;
+				test->scale = hoverStructure->scale;
+				test->tex = hoverStructure->tex;
+				test->gridScale = hoverStructure->gridScale;
 
-			if (test->type == GameObject::GO_NEXUS)
-			{
-				nexusPlaced = true;
-				nexusButton->texID = UI::TEX_NEXUS_PLACED;
-				nexusButton->hoverText = &buildNexusPlacedHoverText;
-				PlaceWallButton();
+				test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+
+				if (test->type == GameObject::GO_NEXUS)
+				{
+					nexusPlaced = true;
+					nexusButton->texID = UI::TEX_NEXUS_PLACED;
+					nexusButton->hoverText = &buildNexusPlacedHoverText;
+					PlaceWallButton();
+				}
 			}
 		}
 
@@ -636,5 +686,14 @@ void PlaceWallButton()
 	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
 	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 	hoverStructure->tex = wallTex;
+}
+
+void EraseButton()
+{
+	hoverStructure->gridScale = { 1, 1 };
+	hoverStructure->scale = { test_map->GetTileSize() * 1, test_map->GetTileSize() * 1 };
+	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	hoverStructure->tex = eraseTex;
 }
 #pragma endregion
