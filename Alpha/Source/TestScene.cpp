@@ -576,12 +576,19 @@ void TestScene_Unload()
 
 #pragma region UI_CALLBACK_DEFINITIONS
 void EndTurnButton() {
-	buildPhase = false;
-	hoverStructure->active = false;
-	for (GameObject* tile : go_list)
+	if (nexusPlaced)
 	{
-		if (tile->type == GameObject::GO_TILE)
-			tile->tex = grassBorderlessTex;
+		buildPhase = false;
+		hoverStructure->active = false;
+		for (GameObject* tile : go_list)
+		{
+			if (tile->type == GameObject::GO_TILE)
+				tile->tex = grassBorderlessTex;
+		}
+	}
+	else
+	{
+		//FEEDBACK IF PLAYER TRIES TO END TURN WITHOUT PLACING NEXUS
 	}
 }
 
