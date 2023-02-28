@@ -26,6 +26,7 @@ public:
 		GO_TILE,
 		GO_TURRET,
 		GO_BULLET,
+		GO_AOE,
 		GO_ENEMY,
 		GO_TOTAL,
 	};
