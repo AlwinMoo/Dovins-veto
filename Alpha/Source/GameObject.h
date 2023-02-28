@@ -49,7 +49,7 @@ public:
 	AEGfxTexture* tex;
 	AEGfxVertexList* mesh;
 
-	void Update();
+	virtual void Update()= 0;
 	void Render();
 
 	GameObject(GAMEOBJECT_TYPE default_type = GO_NONE);
