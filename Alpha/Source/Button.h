@@ -14,19 +14,19 @@ namespace UI
 		// world space pos
 		AEVec2 wsPos;
 
-		AEVec2 min, max;
-		// World space boundaries
-		AEVec2 wsMin, wsMax;
-		AEVec2 scale;
+		AEVec2 min, max;		//!< Boundaries for screen space
+		AEVec2 wsMin, wsMax;	//!< World space boundaries for rendering
+		AEVec2 scale;			//!< scale of button
 		s8 font; // TODO: REMOVE THIS WHEN IMPLEMENTED TEXT FULLY
 
 		TextArea* buttonText;
 		void(*callback)();
 		TextArea* hoverText;
 		bool bHovering;
+		float alpha;			//!< Alpha for rendering: CURRENTLY NOT BEING USED
 		
-		Button();
-		~Button();
+		Button() = default;
+		~Button() = default;
 	};
 }
 #endif
