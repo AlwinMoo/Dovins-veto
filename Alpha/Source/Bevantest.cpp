@@ -364,17 +364,16 @@ void Bevantest_Draw()
 void Bevantest_Free()
 {
 	//AEGfxMeshFree(pMesh);
-	delete uiManager;
-
 	for (GameObject* curr : go_list) 
 	{
 		delete curr;
 	}
-	delete test_map;
 }
 
 void Bevantest_Unload()
 {
+	delete uiManager;
+	delete test_map;
 	AEGfxTextureUnload(Bullet);
 	AEGfxTextureUnload(Enemy);
 	AEGfxTextureUnload(Player);

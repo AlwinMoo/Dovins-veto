@@ -26,8 +26,10 @@ namespace
 	UI::UI_Manager* uiManager;
 
 	// Textures
-	AEGfxTexture*		planetTex;
+	AEGfxTexture*		turretTex;
 	AEGfxTexture*		grassTex;
+	AEGfxTexture*		nexusTex;
+	AEGfxTexture*		wallTex;
 	AEGfxTexture*		grassBorderlessTex;
 	AEGfxTexture*		bulletTex;
 	AEGfxTexture*		playerTex;
