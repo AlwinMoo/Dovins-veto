@@ -141,6 +141,16 @@ namespace UI
 				curr->hoverText->Draw(mouseXN, mouseYN, 0.f, 0.f, 0.f);
 			}
 		}
+
+		// NOW DRAW DESCRIPTIONS (IF ANY)
+		for (Button* curr : m_buttons) {
+			// UI TEST
+			// Render text if hovering
+			if (curr->bHovering && curr->hoverText)
+			{
+				curr->hoverText->Draw(mouseXN, mouseYN, 0.f, 0.f, 0.f);
+			}
+		}
 	}
 	UI_Manager::UI_Manager()
 	{
