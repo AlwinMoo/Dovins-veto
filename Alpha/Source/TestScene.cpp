@@ -30,6 +30,9 @@ namespace
 
 	}
 
+	static const int WALL_COST			= 50;
+	static const int TOWER_COST			= 500;
+
 	//player
 	GameObject* player;
 
@@ -146,6 +149,7 @@ void TestScene_Initialize()
 
 	buildPhase = true;
 	nexusPlaced = false;
+	buildResource = 3000;
 }
 
 void TestScene_Update()
@@ -176,10 +180,20 @@ void TestScene_Update()
 		{
 			GameObject* test = nullptr;
 
-			if(hoverStructure->tex == wallTex)
+			if (hoverStructure->tex == wallTex)
+			{
+				if (buildResource < WALL_COST)
+					return;
 				test = FetchGO(GameObject::GO_WALL);
-			else if(hoverStructure->tex == turretTex)
+				buildResource -= WALL_COST;
+			}
+			else if (hoverStructure->tex == turretTex)
+			{
+				if (buildResource < TOWER_COST)
+					return;
 				test = FetchGO(GameObject::GO_TURRET);
+				buildResource -= TOWER_COST;
+			}
 			else if (hoverStructure->tex == nexusTex)
 				test = FetchGO(GameObject::GO_NEXUS);
 
@@ -548,6 +562,8 @@ void TestScene_Draw()
 #endif
 		// Render UI
 		uiManager->Draw(cursorXN, cursorYN);
+
+		std::cout << "Resource Left:" << buildResource << std::endl;
 	}
 }
 
