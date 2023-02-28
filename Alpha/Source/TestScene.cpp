@@ -43,6 +43,7 @@ namespace
 	UI::TextArea buildTowerHoverText;
 	UI::TextArea buildNexusHoverText;
 	UI::TextArea buildWallHoverText;
+	UI::TextArea buildNexusPlacedHoverText;
 }
 
 #pragma region UI_CALLBACK_DECLARATIONS
@@ -115,10 +116,11 @@ void TestScene_Initialize()
 
 	// UI MANAGER ELEMENTS INITIALIZER
 	{
-		endTurnHoverText		= { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE"};
-		buildTowerHoverText		= { .3f, 1.f, "Builds a tower. Automatically attacks enemies from range."};
-		buildWallHoverText		= { .3f, 1.f, "Builds a wall. Most enemies walk around them." };
-		buildNexusHoverText		= { .3f, 1.f, "Builds a nexus. Protect it with your life." };
+		endTurnHoverText			= { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE"};
+		buildTowerHoverText			= { .3f, 1.f, "Builds a tower. Automatically attacks enemies from range."};
+		buildWallHoverText			= { .3f, 1.f, "Builds a wall. Most enemies walk around them." };
+		buildNexusHoverText			= { .3f, 1.f, "Builds the nexus. Protect it with your life." };
+		buildNexusPlacedHoverText	= { .3f, 1.f, "Nexus already built. You only get one." };
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 
@@ -129,7 +131,7 @@ void TestScene_Initialize()
 		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenWidthY * .9f };
 		AEVec2 const buildButtonSize{ screenWidthY * .15f, screenWidthY * .15f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
-		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
+		nexusButton = uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
 		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &buildWallHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
@@ -143,6 +145,7 @@ void TestScene_Initialize()
 	player->tex = playerTex;
 
 	buildPhase = true;
+	nexusPlaced = false;
 }
 
 void TestScene_Update()
@@ -186,20 +189,14 @@ void TestScene_Update()
 			test->tex = hoverStructure->tex;
 
 			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
-		}
 
-		// Change selected structure
-		if (AEInputCheckTriggered(AEVK_1)) //NEXUS
-		{
-			
-		}
-		else if (AEInputCheckTriggered(AEVK_2)) //WALL
-		{
-			
-		}
-		else if (AEInputCheckTriggered(AEVK_3)) //TURRET
-		{
-			
+			if (test->type == GameObject::GO_NEXUS)
+			{
+				nexusPlaced = true;
+				nexusButton->texID = UI::TEX_NEXUS_PLACED;
+				nexusButton->hoverText = &buildNexusPlacedHoverText;
+				PlaceWallButton();
+			}
 		}
 
 		// Update position of hover structure
@@ -590,11 +587,14 @@ void EndTurnButton() {
 
 void PlaceNexusButton()
 {
-	hoverStructure->gridScale = { 3, 3 };
-	hoverStructure->scale = { test_map->GetTileSize() * 3, test_map->GetTileSize() * 3 };
-	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
-	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
-	hoverStructure->tex = nexusTex;
+	if (!nexusPlaced)
+	{
+		hoverStructure->gridScale = { 3, 3 };
+		hoverStructure->scale = { test_map->GetTileSize() * 3, test_map->GetTileSize() * 3 };
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+		hoverStructure->tex = nexusTex;
+	}
 }
 
 void PlaceTowerButton()
