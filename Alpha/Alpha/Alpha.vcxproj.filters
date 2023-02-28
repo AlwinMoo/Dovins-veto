@@ -37,6 +37,9 @@
     <ClCompile Include="..\Source\Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\TextLineInfo.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h">
@@ -91,6 +94,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Alwintest.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TextLineInfo.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
