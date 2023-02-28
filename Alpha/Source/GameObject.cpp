@@ -1,7 +1,6 @@
 #include "GameObject.h"
 #include "Rendering.hpp"
 #include <iostream>
-
 #include <AEEngine.h>
 
 void GameObject::Update()
@@ -52,7 +51,6 @@ GameObject::GameObject(GAMEOBJECT_TYPE default_type) :
 GameObject::~GameObject()
 {
 	AEGfxMeshFree(mesh);
-	AEGfxTextureUnload(tex);
 }
 
 void Color::Set(float r, float g, float b)
