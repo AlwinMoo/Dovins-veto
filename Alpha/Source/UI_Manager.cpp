@@ -37,6 +37,10 @@ namespace UI
 			newButton->texID = TEX_NEXUS;
 			newButton->meshID = MESH_BOX;
 			break;
+		case BUILD_WALL_BUTTON:
+			newButton->texID = TEX_WALL;
+			newButton->meshID = MESH_BOX;
+			break;
 		case WHITE_BUTTON:
 			newButton->texID = TEX_BUTTON;
 			newButton->meshID = MESH_BOX;
@@ -57,6 +61,7 @@ namespace UI
 		m_textures.at(TEX_END_PHASE)	= AEGfxTextureLoad("Assets/Hourglass.png");
 		m_textures.at(TEX_TOWER)		= AEGfxTextureLoad("Assets/Tower.png");
 		m_textures.at(TEX_NEXUS)		= AEGfxTextureLoad("Assets/Nexus.png");
+		m_textures.at(TEX_WALL)			= AEGfxTextureLoad("Assets/Wall.png");
 		m_mesh.at(MESH_BOX) = render::GenerateQuad();
 	}
 	void UI_Manager::Unload()

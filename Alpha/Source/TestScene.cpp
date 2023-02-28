@@ -41,11 +41,15 @@ namespace
 	// TEXT TEST
 	UI::TextArea endTurnHoverText;
 	UI::TextArea buildTowerHoverText;
+	UI::TextArea buildNexusHoverText;
+	UI::TextArea buildWallHoverText;
 }
 
 #pragma region UI_CALLBACK_DECLARATIONS
 void EndTurnButton();
-void PlaceTower1Button();
+void PlaceNexusButton();
+void PlaceTowerButton();
+void PlaceWallButton();
 #pragma endregion
 
 void TestScene_Load()
@@ -113,17 +117,23 @@ void TestScene_Initialize()
 	{
 		endTurnHoverText		= { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE"};
 		buildTowerHoverText		= { .3f, 1.f, "Builds a tower. Automatically attacks enemies from range."};
+		buildWallHoverText		= { .3f, 1.f, "Builds a wall. Most enemies walk around them." };
+		buildNexusHoverText		= { .3f, 1.f, "Builds a nexus. Protect it with your life." };
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-		//const AEVec2 buttonPos{ screenWidthX * .25f, screenWidthY * .25f };
-		AEVec2 const buttonPosStart{ 100.f, screenWidthY * .25f };
-		AEVec2 buttonSize{ 50.f, 50.f };
-		AEVec2 buttonPos{ buttonPosStart };
-		uiManager->CreateButton(buttonPos, buttonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
-		buttonPos.x += buttonSize.x * 2.f;
-		uiManager->CreateButton(buttonPos, buttonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTower1Button, &buildTowerHoverText);
-		buttonPos.x += buttonSize.x * 2.f;
-		uiManager->CreateButton(buttonPos, buttonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceTower1Button, &buildTowerHoverText);
+
+		AEVec2 const endButtonPos{ screenWidthX * .115f, screenWidthY * .2f };
+		AEVec2 const endButtonSize{ screenWidthX * .2f, screenWidthY * .15f };
+		uiManager->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
+
+		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenWidthY * .9f };
+		AEVec2 const buildButtonSize{ screenWidthY * .15f, screenWidthY * .15f };
+		AEVec2 buildButtonPos{ buildButtonStartPos };
+		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
+		buildButtonPos.y -= buildButtonSize.y * 1.5f;
+		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &buildWallHoverText);
+		buildButtonPos.y -= buildButtonSize.y * 1.5f;
+		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &buildTowerHoverText);
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
@@ -181,30 +191,15 @@ void TestScene_Update()
 		// Change selected structure
 		if (AEInputCheckTriggered(AEVK_1)) //NEXUS
 		{
-			hoverStructure->gridScale = { 3, 3 };
-			hoverStructure->scale = { test_map->GetTileSize() * 3, test_map->GetTileSize() * 3 };
-			hoverStructure->position = mouse_pos;
-			hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
-			hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
-			hoverStructure->tex = nexusTex;
+			
 		}
 		else if (AEInputCheckTriggered(AEVK_2)) //WALL
 		{
-			hoverStructure->gridScale = { 1, 1 };
-			hoverStructure->scale = { test_map->GetTileSize() * 1, test_map->GetTileSize() * 1 };
-			hoverStructure->position = mouse_pos;
-			hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
-			hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
-			hoverStructure->tex = wallTex;
+			
 		}
 		else if (AEInputCheckTriggered(AEVK_3)) //TURRET
 		{
-			hoverStructure->gridScale = { 2, 2 };
-			hoverStructure->scale = { test_map->GetTileSize() * 2, test_map->GetTileSize() * 2 };
-			hoverStructure->position = mouse_pos;
-			hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
-			hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
-			hoverStructure->tex = turretTex;
+			
 		}
 
 		// Update position of hover structure
@@ -593,12 +588,30 @@ void EndTurnButton() {
 	}
 }
 
-void PlaceTower1Button()
+void PlaceNexusButton()
 {
-	hoverStructure->gridScale = { 1, 1 };
-	hoverStructure->scale = { test_map->GetTileSize(), test_map->GetTileSize() };
-	//hoverStructure->position = mouse_pos;
+	hoverStructure->gridScale = { 3, 3 };
+	hoverStructure->scale = { test_map->GetTileSize() * 3, test_map->GetTileSize() * 3 };
 	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
 	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	hoverStructure->tex = nexusTex;
+}
+
+void PlaceTowerButton()
+{
+	hoverStructure->gridScale = { 2, 2 };
+	hoverStructure->scale = { test_map->GetTileSize() * 2, test_map->GetTileSize() * 2 };
+	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	hoverStructure->tex = turretTex;
+}
+
+void PlaceWallButton()
+{
+	hoverStructure->gridScale = { 1, 1 };
+	hoverStructure->scale = { test_map->GetTileSize() * 1, test_map->GetTileSize() * 1 };
+	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+	hoverStructure->tex = wallTex;
 }
 #pragma endregion

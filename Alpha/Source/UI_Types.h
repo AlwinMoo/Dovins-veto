@@ -7,6 +7,7 @@ namespace UI
 		END_PHASE_BUTTON,
 		BUILD_TOWER_BUTTON,
 		BUILD_NEXUS_BUTTON,
+		BUILD_WALL_BUTTON,
 		NUM_BUTTONS
 	};
 	enum UI_MESH
@@ -20,6 +21,7 @@ namespace UI
 		TEX_END_PHASE,
 		TEX_NEXUS,
 		TEX_TOWER,
+		TEX_WALL,
 		NUM_TEX
 	};
 }
