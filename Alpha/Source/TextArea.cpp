@@ -12,6 +12,7 @@ namespace UI{
 	{
 		f32 width, height;
 		GetPrintSize(line, width, height);
+		m_boxHeight += height * static_cast<f32>(AEGfxGetWinMaxY() - AEGfxGetWinMinY());
 		if (width < m_boxWidthN)
 			return 0;
 
@@ -32,6 +33,7 @@ namespace UI{
 		return newStr;
 	}
 
+	//!< NOT BEING USED AT THE MOMENT>  INCOMPLETE
 	void TextArea::SetString(std::string& str)
 	{
 		u32 index;
@@ -46,21 +48,25 @@ namespace UI{
 	{
 	}
 
-	TextArea::TextArea(f32 w, f32 h, f32 scale) : m_boxWidthN(w), m_boxHeightN(h), m_scale(scale)
+	TextArea::TextArea(f32 w, f32 h, f32 scale) : m_boxWidthN(w), m_boxHeightN(h), m_boxHeight(0.f), m_scale(scale)
 	{
-		m_boxWidth	= AEGetWindowWidth()	* m_boxWidthN;
-		m_boxHeight = AEGetWindowHeight()	* m_boxHeightN;
+		m_boxWidth = AEGetWindowWidth() * m_boxWidthN; // Width is determined before splitting lines
+		//m_boxHeight = AEGetWindowHeight() * m_boxHeightN;
 	}
 
 
 	TextArea::TextArea(f32 w, f32 h, std::string str, f32 scale)  : TextArea(w,h, scale)
 	{
 		// automatically calculate and sort strings
+
+		//m_boxWidth = AEGetWindowWidth() * m_boxWidthN;
+		//m_boxHeight = AEGetWindowHeight() * m_boxHeightN;
 		while (u32 index{ ProcessLine(str) }) 
 		{
 			lines.push_back(TextLineInfo{ SplitLine(str, index) , m_scale });
 		}
 		lines.push_back(TextLineInfo{ str, m_scale });
+
 	}
 
 	void TextArea::Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b)
@@ -76,6 +82,16 @@ namespace UI{
 			AEGfxPrint(FONT_ID, const_cast<s8*>(i.GetString()), screenX, screenY - offsetY, m_scale, r, g, b);
 			offsetY += i.Height();
 		}
+	}
+
+	f32 TextArea::GetBoxWidth()
+	{
+		return m_boxWidth;
+	}
+
+	f32 TextArea::GetBoxHeight()
+	{
+		return m_boxHeight;
 	}
 
 	TextArea::~TextArea()

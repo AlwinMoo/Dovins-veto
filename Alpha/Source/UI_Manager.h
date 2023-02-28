@@ -27,7 +27,12 @@ namespace UI
 		void Unload();
 		void SetWinDim(f32 x, f32 y);
 		void Update(AEVec2 mousePos, bool lClick);
-		void Draw(f32 const& mouseXN = 0.f, f32 const& mouseYN = 0.f);
+		/// <summary>
+		/// Draws buttons and associated objects. Additional behaviours rely on mouse pos
+		/// </summary>
+		/// <param name="mouseX">screenspace mouse coordinates [-width/2, width/2]</param>
+		/// <param name="mouseY">screenspace mouse coordinates [-height/2, height/2]</param>
+		void Draw(s32 mouseX = 0, s32 mouseY = 0);
 
 		UI_Manager();
 		~UI_Manager();

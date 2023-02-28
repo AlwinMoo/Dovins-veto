@@ -499,8 +499,8 @@ void TestScene_Draw()
 	s32 cursorX, cursorY;
 	//s8 text[] = "TEST";
 	AEInputGetCursorPosition(&cursorX, &cursorY);
-	f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
-	f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
+	//f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
+	//f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
 	//f32 fcursorX, fcursorY;
 	//
 	//AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
@@ -555,7 +555,7 @@ void TestScene_Draw()
 		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
 #endif
 		// Render UI
-		uiManager->Draw(cursorXN, cursorYN);
+		uiManager->Draw(cursorX, cursorY);
 	}
 }
 

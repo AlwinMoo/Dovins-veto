@@ -29,6 +29,9 @@ public:
 
 	void Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b);
 
+	// Getters
+	f32 GetBoxWidth();
+	f32 GetBoxHeight();
 	~TextArea();
 };
 }
