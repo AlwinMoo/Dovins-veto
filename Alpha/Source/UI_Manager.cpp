@@ -20,7 +20,7 @@ namespace UI
 		newButton->wsMin.y = newButton->min.y + m_winDim.y * 0.5f;
 		newButton->wsMax.y = newButton->max.y + m_winDim.y * 0.5f;
 	}
-	void UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, TextArea* buttonText, void(*callback)(), TextArea* hoverText)
+	Button* UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, TextArea* buttonText, void(*callback)(), TextArea* hoverText)
 	{
 		Button* newButton = new Button();
 		newButton->scale = size;
@@ -43,6 +43,10 @@ namespace UI
 			newButton->texID = TEX_NEXUS;
 			newButton->meshID = MESH_BOX;
 			break;
+		case BUILD_WALL_BUTTON:
+			newButton->texID = TEX_WALL;
+			newButton->meshID = MESH_BOX;
+			break;
 		case WHITE_BUTTON:
 			newButton->texID = TEX_BUTTON;
 			newButton->meshID = MESH_BOX;
@@ -55,6 +59,7 @@ namespace UI
 			break;
 		}
 		m_buttons.push_back(newButton);
+		return newButton;
 	}
 	void UI_Manager::Load()
 	{
@@ -63,6 +68,8 @@ namespace UI
 		m_textures.at(TEX_END_PHASE)	= AEGfxTextureLoad("Assets/Hourglass.png");
 		m_textures.at(TEX_TOWER)		= AEGfxTextureLoad("Assets/Tower.png");
 		m_textures.at(TEX_NEXUS)		= AEGfxTextureLoad("Assets/Nexus.png");
+		m_textures.at(TEX_WALL)			= AEGfxTextureLoad("Assets/Wall.png");
+		m_textures.at(TEX_NEXUS_PLACED) = AEGfxTextureLoad("Assets/NexusPlaced.png");
 		m_mesh.at(MESH_BOX) = render::GenerateQuad();
 	}
 	void UI_Manager::Unload()
@@ -131,7 +138,7 @@ namespace UI
 			AEMtx33Scale(&scale, curr->scale.x, curr->scale.y);
 
 			AEMtx33 rotate = { 0 };
-			AEMtx33Rot(&rotate, 0.f);
+			AEMtx33Rot(&rotate, PI);
 
 			AEMtx33 translate = { 0 };
 			//AEMtx33Trans(&translate, AEGetWindowWidth() / 2.f, AEGetWindowHeight() / 2.f);

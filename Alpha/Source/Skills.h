@@ -15,9 +15,6 @@
 #include <cmath>
 
 
-#define BULLET_SIZE 10.0f;
-#define BULLET_VEL 20.0f;
-
 enum Bullet_Flag
 {
 	no_upgrades = 0,
@@ -26,3 +23,4 @@ enum Bullet_Flag
 };
 
 void shoot_bullet(GameObject*, GameObject*, f32, f32, int);
+void AOE_move(GameObject*, double, double);

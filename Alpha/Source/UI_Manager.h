@@ -19,7 +19,7 @@ namespace UI
 		s8 m_fontID;
 
 		
-		void CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, TextArea* buttonText = nullptr, void(*callback)() = nullptr, TextArea* hoverText = nullptr);
+		Button* CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, TextArea* buttonText = nullptr, void(*callback)() = nullptr, TextArea* hoverText = nullptr);
 
 		void Load();
 
