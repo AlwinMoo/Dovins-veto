@@ -51,8 +51,6 @@ public:
 	AEGfxTexture* tex;
 	AEGfxVertexList* mesh;
 
-	Turret* turret;
-
 	void Update();
 	void Render();
 

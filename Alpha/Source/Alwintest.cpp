@@ -33,11 +33,13 @@ namespace
 
 	//player
 	GameObject* player;
+	GameObject* Nexus;
 
 	bool player_moving{ false };
 	AEVec2 player_goal{ 0, 0 };
 
 	float debounce{};
+	float turret_shoot_timer{};
 
 	// TEXT TEST
 	UI::TextArea endTurnHoverText;
@@ -46,15 +48,15 @@ namespace
 	UI::TextArea buildWallHoverText;
 	UI::TextArea buildNexusPlacedHoverText;
 	UI::TextArea eraseHoverText;
-}
 
 #pragma region UI_CALLBACK_DECLARATIONS
-void EndTurnButton();
-void PlaceNexusButton();
-void PlaceTowerButton();
-void PlaceWallButton();
-void EraseButton();
+	void EndTurnButton();
+	void PlaceNexusButton();
+	void PlaceTowerButton();
+	void PlaceWallButton();
+	void EraseButton();
 #pragma endregion
+}
 
 void Alwintest_Load()
 {
@@ -75,8 +77,8 @@ void Alwintest_Initialize()
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-		uiManager = new UI::UI_Manager();
-		uiManager->SetWinDim(screenWidthX, screenHeightY);
+		::uiManager = new UI::UI_Manager();
+		::uiManager->SetWinDim(screenWidthX, screenHeightY);
 	}
 	srand(time(NULL));
 
@@ -131,18 +133,18 @@ void Alwintest_Initialize()
 
 		AEVec2 const endButtonPos{ screenWidthX * .115f, screenWidthY * .2f };
 		AEVec2 const endButtonSize{ screenWidthX * .2f, screenWidthY * .15f };
-		uiManager->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
+		::uiManager->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
 
 		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenWidthY * .9f };
 		AEVec2 const buildButtonSize{ screenWidthY * .12f, screenWidthY * .12f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
-		nexusButton = uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
+		nexusButton = ::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &buildWallHoverText);
+		::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &buildWallHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &buildTowerHoverText);
+		::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &buildTowerHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &eraseHoverText);
+		::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &eraseHoverText);
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
@@ -158,7 +160,8 @@ void Alwintest_Initialize()
 
 void Alwintest_Update()
 {
-	debounce += AEFrameRateControllerGetFrameTime() * AEFrameRateControllerGetFrameRate(); // 1 sec
+	debounce += 60 * AEFrameRateControllerGetFrameRate(); // 1 sec
+	turret_shoot_timer += AEFrameRateControllerGetFrameRate();
 
 	// Player Input
 	s32 mouseX, mouseY;
@@ -171,8 +174,8 @@ void Alwintest_Update()
 	//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
 	{
 		AEVec2 invert_mouse = mouse_pos;
-		invert_mouse.y = uiManager->m_winDim.y - mouse_pos.y;
-		uiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+		invert_mouse.y = ::uiManager->m_winDim.y - mouse_pos.y;
+		::uiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 	}
 	mouse_pos = test_map->SnapCoordinates(mouse_pos);
 
@@ -212,6 +215,8 @@ void Alwintest_Update()
 									nexusPlaced = false;
 									nexusButton->texID = UI::TEX_NEXUS;
 									nexusButton->hoverText = &buildNexusHoverText;
+
+									Nexus = nullptr;
 								}
 
 								break;
@@ -232,6 +237,9 @@ void Alwintest_Update()
 						return;
 					test = FetchGO(GameObject::GO_WALL);
 					buildResource -= WALL_COST;
+
+					test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+
 				}
 				else if (hoverStructure->tex == turretTex)
 				{
@@ -239,17 +247,25 @@ void Alwintest_Update()
 						return;
 					test = FetchGO(GameObject::GO_TURRET);
 					buildResource -= TOWER_COST;
+
+					test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+
 				}
 				else if (hoverStructure->tex == nexusTex)
+				{
 					test = FetchGO(GameObject::GO_NEXUS);
+
+					//duplicate with nexus object below
+					Nexus = test;
+					test_map->AddItem(game_map::TILE_TYPE::TILE_NONE, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+
+				}
 
 				test->position = hoverStructure->position;
 				test->rotation = hoverStructure->rotation;
 				test->scale = hoverStructure->scale;
 				test->tex = hoverStructure->tex;
 				test->gridScale = hoverStructure->gridScale;
-
-				test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 
 				if (test->type == GameObject::GO_NEXUS)
 				{
@@ -302,6 +318,7 @@ void Alwintest_Update()
 	}
 	else
 	{
+		Nexus->active = true;
 		if (AEInputCheckTriggered(AEVK_RBUTTON) && !test_map->IsOccupied(test_map->WorldToIndex(mouse_pos)))
 		{
 			if (test_map->IsInGrid(absMousePos))
@@ -369,18 +386,18 @@ void Alwintest_Update()
 			}
 		}
 
-		//if (AEInputCheckTriggered(AEVK_SPACE))
-		//{
-		//	GameObject* temp = FetchGO(GameObject::GO_BULLET);
-		//	temp->position = turret->position;
-		//	temp->active = true;
-		//	temp->scale.x = 10;
-		//	temp->scale.y = 10;
-		//	temp->tex = bulletTex;
-		//
-		//	AEVec2Set(&temp->direction, AESinDeg(turret->rotation), AECosDeg(turret->rotation));
-		//	AEVec2Normalize(&temp->direction, &temp->direction);
-		//}
+		if (AEInputCheckTriggered(AEVK_SPACE))
+		{
+			GameObject* temp = FetchGO(GameObject::GO_BULLET);
+			temp->position = player->position;
+			temp->active = true;
+			temp->scale.x = 10;
+			temp->scale.y = 10;
+			temp->tex = bulletTex;
+		
+			AEVec2Set(&temp->direction, AESinDeg(player->rotation), AECosDeg(player->rotation));
+			AEVec2Normalize(&temp->direction, &temp->direction);
+		}
 
 		if (AEInputCheckTriggered(AEVK_P))
 		{
@@ -415,16 +432,14 @@ void Alwintest_Update()
 				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 					gameObj->active = false;
 
-				if (debounce >= 100.0f)
+				if (gameObj->Path.empty())
 				{
-					debounce = 0.0f;
-					std::cout << "Hit" << std::endl;
 					PathManager pathmaker(test_map);
-					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) });
+					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(Nexus->position)), (float)test_map->GetY(test_map->WorldToIndex(Nexus->position)) });
 					if (!gameObj->Path.empty())
 					{
-						gameObj->Path.erase(gameObj->Path.end() - 1);
-						for (auto& pos : gameObj->Path)
+						gameObj->Path.erase(gameObj->Path.end() - 2, gameObj->Path.end()); // remove last 2 check points so we're out of the nexus
+						for (auto& pos : gameObj->Path) // converting grid pos to world pos
 						{
 							pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
 						}
@@ -432,7 +447,7 @@ void Alwintest_Update()
 				}
 
 				AEVec2 result{ 0,0 };
-				AEVec2Sub(&result, &player->position, &gameObj->position);
+				AEVec2Sub(&result, &Nexus->position, &gameObj->position);
 				gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
 
 				if (!gameObj->Path.empty())
@@ -488,9 +503,41 @@ void Alwintest_Update()
 			case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
 			{
 				AEVec2 result{ 0,0 };
-				AEVec2Sub(&result, &gameObj->position, &absMousePos);
-				gameObj->rotation = AERadToDeg(atan2f(result.x, result.y));
-				gameObj->turret->Update();
+				f32 smallest_dist{FLT_MAX};
+
+				for (GameObject* other : go_list)
+				{
+					if (other->active && other->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					{
+						if (smallest_dist > AEVec2Distance(&gameObj->position, &other->position)) // old distance larger than new distance
+						{
+							smallest_dist = AEVec2Distance(&gameObj->position, &other->position);
+							result = other->position;
+						}
+					}
+				}
+
+				if (result.x != 0.0 && result.y != 0.0) // only if have enemy
+				{
+					AEVec2Sub(&result, &gameObj->position, &result);
+					gameObj->rotation = AERadToDeg(atan2f(result.x, result.y));
+
+					if (turret_shoot_timer >= 500.0f)
+					{
+						turret_shoot_timer = 0.0f;
+
+						GameObject* temp = FetchGO(GameObject::GO_BULLET);
+						temp->position = gameObj->position;
+						temp->active = true;
+						temp->scale.x = 10;
+						temp->scale.y = 10;
+						temp->tex = bulletTex;
+
+						AEVec2Set(&temp->direction, -AESinDeg(gameObj->rotation), -AECosDeg(gameObj->rotation)); // @TODO: ROTATION BANDAGE
+						AEVec2Normalize(&temp->direction, &temp->direction);
+					}
+				}
+
 
 				break;
 			}
@@ -639,60 +686,63 @@ void Alwintest_Unload()
 	//AEGfxTextureUnload(texTest);
 }
 
+namespace
+{
 #pragma region UI_CALLBACK_DEFINITIONS
-void EndTurnButton() {
-	if (nexusPlaced)
-	{
-		buildPhase = false;
-		hoverStructure->active = false;
-		for (GameObject* tile : go_list)
+	void EndTurnButton() {
+		if (nexusPlaced)
 		{
-			if (tile->type == GameObject::GO_TILE)
-				tile->tex = grassBorderlessTex;
+			buildPhase = false;
+			hoverStructure->active = false;
+			for (GameObject* tile : go_list)
+			{
+				if (tile->type == GameObject::GO_TILE)
+					tile->tex = grassBorderlessTex;
+			}
+		}
+		else
+		{
+			//FEEDBACK IF PLAYER TRIES TO END TURN WITHOUT PLACING NEXUS
 		}
 	}
-	else
-	{
-		//FEEDBACK IF PLAYER TRIES TO END TURN WITHOUT PLACING NEXUS
-	}
-}
 
-void PlaceNexusButton()
-{
-	if (!nexusPlaced)
+	void PlaceNexusButton()
 	{
-		hoverStructure->gridScale = { 3, 3 };
-		hoverStructure->scale = { test_map->GetTileSize() * 3, test_map->GetTileSize() * 3 };
+		if (!nexusPlaced)
+		{
+			hoverStructure->gridScale = { 3, 3 };
+			hoverStructure->scale = { test_map->GetTileSize() * 3, test_map->GetTileSize() * 3 };
+			hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+			hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+			hoverStructure->tex = nexusTex;
+		}
+	}
+
+	void PlaceTowerButton()
+	{
+		hoverStructure->gridScale = { 2, 2 };
+		hoverStructure->scale = { test_map->GetTileSize() * 2, test_map->GetTileSize() * 2 };
 		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
 		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
-		hoverStructure->tex = nexusTex;
+		hoverStructure->tex = turretTex;
 	}
-}
 
-void PlaceTowerButton()
-{
-	hoverStructure->gridScale = { 2, 2 };
-	hoverStructure->scale = { test_map->GetTileSize() * 2, test_map->GetTileSize() * 2 };
-	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
-	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
-	hoverStructure->tex = turretTex;
-}
+	void PlaceWallButton()
+	{
+		hoverStructure->gridScale = { 1, 1 };
+		hoverStructure->scale = { test_map->GetTileSize() * 1, test_map->GetTileSize() * 1 };
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+		hoverStructure->tex = wallTex;
+	}
 
-void PlaceWallButton()
-{
-	hoverStructure->gridScale = { 1, 1 };
-	hoverStructure->scale = { test_map->GetTileSize() * 1, test_map->GetTileSize() * 1 };
-	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
-	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
-	hoverStructure->tex = wallTex;
-}
-
-void EraseButton()
-{
-	hoverStructure->gridScale = { 1, 1 };
-	hoverStructure->scale = { test_map->GetTileSize() * 1, test_map->GetTileSize() * 1 };
-	hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
-	hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
-	hoverStructure->tex = eraseTex;
-}
+	void EraseButton()
+	{
+		hoverStructure->gridScale = { 1, 1 };
+		hoverStructure->scale = { test_map->GetTileSize() * 1, test_map->GetTileSize() * 1 };
+		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+		hoverStructure->tex = eraseTex;
+	}
 #pragma endregion
+}

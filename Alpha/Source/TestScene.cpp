@@ -492,7 +492,6 @@ void TestScene_Update()
 				AEVec2 result{ 0,0 };
 				AEVec2Sub(&result, &gameObj->position, &absMousePos);
 				gameObj->rotation = AERadToDeg(atan2f(result.x, result.y));
-				gameObj->turret->Update();
 
 				break;
 			}

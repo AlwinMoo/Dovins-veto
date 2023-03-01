@@ -45,15 +45,11 @@ GameObject::GameObject(GAMEOBJECT_TYPE default_type) :
 	position = { 0, 0 };
 	scale = { 1, 1 };
 	gridScale = { 1, 1 };
-
-	turret = new Turret();
 }
 
 GameObject::~GameObject()
 {
 	AEGfxMeshFree(mesh);
-
-	delete turret;
 }
 
 void Color::Set(float r, float g, float b)
