@@ -52,6 +52,9 @@
     <ClCompile Include="..\Source\Turret\Turret.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\CharacterStats.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h">
@@ -121,6 +124,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Turret\Turret.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\CharacterStats.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
