@@ -13,6 +13,7 @@ namespace
 void shoot_bullet(GameObject* Bullet, GameObject* Player, f32 mouseX, f32 mouseY, int flag)
 {
 	double bullet_ang;
+	Bullet->alpha = 1.0f;
 	Bullet->position.x = Player->position.x;
 	Bullet->position.y = Player->position.y;
 	bullet_ang = atan2(static_cast<double>(Bullet->position.y - (mouseY)), static_cast<double> (Bullet->position.x - (mouseX)));
@@ -46,6 +47,12 @@ void AOE_move(GameObject* AOE, double player_x, double player_y)
 	AOE->scale.y = AOE_SIZE;
 	AOE->alpha = AOE_ALPHA;
 
+}
+
+void player_blink(GameObject* player, f32 mousex, f32 mousey)
+{
+	player->position.x = mousex;
+	player->position.y = mousey;
 }
 
 

@@ -58,8 +58,15 @@ namespace
 	//AOE
 	int AOE_flag{};
 	bool AOE_begincd{ false };
+	//bool AOE_active{ false };
 	f64 AOE_cooldown{};
+	f64 AOE_timer{};
+	f32 AOE_posx;
+	f32 AOE_posy;
 
+	//blink
+	bool blink_ok{ false };
+	f64 blink_cd{};
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
 	{
 		for (auto it : go_list)
@@ -130,16 +137,6 @@ void Bevantest_Initialize()
 	enemy->scale.y = enemy->scale.x;
 	enemy->tex = Enemy;
 	enemy->active = true;
-
-	//bullet init
-	//for (int i{}; i < MAX_BULLET_INST; ++i)
-	//{
-	//	GameObject* bullet = FetchGO(GameObject::GO_BULLET);
-	//	bullet->scale.x = BULLET_SIZE;
-	//	bullet->scale.y = BULLET_SIZE;
-	//	bullet->tex = Bullet;
-	//	bullet->active = false;
-	//}
 }
 
 void Bevantest_Update()
@@ -172,6 +169,14 @@ void Bevantest_Update()
 		{
 			std::cout << "Illegal" << std::endl;
 		}
+	}
+	
+
+	//L-shift muscle to blink
+	if (AEInputCheckTriggered(AEVK_LSHIFT) && !blink_ok) //cant blink while blinking
+	{
+		player_blink(player, mouseX, mouseY);
+		blink_ok = true;
 	}
 	
 	//z-muscle to shoot
@@ -220,11 +225,13 @@ void Bevantest_Update()
 			GameObject* AOE = FetchGO(GameObject::GO_AOE);
 			AOE->tex = Bullet;
 			AOE_move(AOE, static_cast<double> (player->position.x), static_cast<double> (player->position.y));
+			AOE_posx = player->position.x;
+			AOE_posy = player->position.y;
 			AOE_begincd = true;
 		}
 	}
 	
-	if (AOE_begincd == true)
+	if (AOE_begincd)
 	{
 		AOE_cooldown += AEFrameRateControllerGetFrameTime();
 		if (AOE_cooldown > static_cast<f64> (2.0f))
@@ -254,6 +261,16 @@ void Bevantest_Update()
 					player->position.x += out.x * AEFrameRateControllerGetFrameTime() * 600;
 					player->position.y += out.y * AEFrameRateControllerGetFrameTime() * 600;
 				}
+				if (blink_ok)
+				{
+					blink_cd += AEFrameRateControllerGetFrameTime();
+					if (blink_cd >= static_cast<f64> (5.0))
+					{
+						blink_ok = false;
+						blink_cd = 0;
+					}
+				}
+				
 				break;
 			case (GameObject::GAMEOBJECT_TYPE::GO_BULLET) :
 				gameObj->position.x += gameObj->direction.x * BULLET_VEL;
@@ -261,12 +278,23 @@ void Bevantest_Update()
 				if (gameObj->position.x > winSizeX || gameObj->position.x < 0 || gameObj->position.y > winSizeY || gameObj->position.y < 0)
 				{
 					gameObj->active = false;
-					std::cout << "bullet destroyed" << std::endl;
 				}
+				break;
 
 			case (GameObject::GAMEOBJECT_TYPE::GO_AOE) :
+				gameObj->position.x = AOE_posx;
+				gameObj->position.y = AOE_posy;
+				AOE_timer += AEFrameRateControllerGetFrameTime();
+
+				if (AOE_timer > static_cast<f64> (0.2f))
+				{
+					gameObj->alpha -= 0.10f;
+					AOE_timer = 0;
+				}
+
 				if (gameObj->alpha <= 0) gameObj->active = false;
-				gameObj->alpha -= 0.05f;
+				break;
+
 			}
 		}
 	}
@@ -288,6 +316,8 @@ void Bevantest_Update()
 		if (AOE_flag == 0) AOE_flag = 1;
 		else if (AOE_flag == 1) AOE_flag = 2;
 	}
+
+
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
 		next = GS_LEVEL2;

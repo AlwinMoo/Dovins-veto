@@ -24,3 +24,4 @@ enum Bullet_Flag
 
 void shoot_bullet(GameObject*, GameObject*, f32, f32, int);
 void AOE_move(GameObject*, double, double);
+void player_blink(GameObject*, f32, f32);
