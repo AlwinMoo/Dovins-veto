@@ -35,5 +35,6 @@ public:
 	
 	// Setters
 	void	SetRawStat(STAT_TYPE stat, int val);
+	void	SetStat(STAT_TYPE stat, float val); //!< should only be called if you don't plan on using raw. Overwritten when raw stat set
 };
 #endif
