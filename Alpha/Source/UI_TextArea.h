@@ -1,15 +1,15 @@
-#ifndef TEXTAREA_H
-#define TEXTAREA_H
+#ifndef UI_TEXTAREA_H
+#define UI_TEXTAREA_H
 #include "AEEngine.h"
 #include <string>
 #include <vector>
-#include "TextLineInfo.h"
+#include "UI_TextLineInfo.h"
 namespace UI
 {
-class TextArea
+class UI_TextArea
 {
 private:
-	std::vector<TextLineInfo> lines;
+	std::vector<UI_TextLineInfo> lines;
 	f32 m_boxWidthN,	m_boxHeightN;		//!< NORMALIZED DIMENSIONS
 	f32 m_boxWidth,		m_boxHeight;		//!< WORLD SPACE DIMENSIONS
 	f32 m_scale;
@@ -23,16 +23,16 @@ private:
 public:
 
 	// Constructors
-	TextArea();
-	TextArea(f32 w, f32 h,					f32 scale = 1.5f);
-	TextArea(f32 w, f32 h, std::string str, f32 scale = 1.5f);
+	UI_TextArea();
+	UI_TextArea(f32 w, f32 h,					f32 scale = 1.5f);
+	UI_TextArea(f32 w, f32 h, std::string str, f32 scale = 1.5f);
 
 	void Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b);
 
 	// Getters
 	f32 GetBoxWidth();
 	f32 GetBoxHeight();
-	~TextArea();
+	~UI_TextArea();
 };
 }
 #endif 

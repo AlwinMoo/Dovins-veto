@@ -42,12 +42,12 @@ namespace
 	float debounce{};
 
 	// TEXT TEST
-	UI::TextArea endTurnHoverText;
-	UI::TextArea buildTowerHoverText;
-	UI::TextArea buildNexusHoverText;
-	UI::TextArea buildWallHoverText;
-	UI::TextArea buildNexusPlacedHoverText;
-	UI::TextArea eraseHoverText;
+	UI::UI_TextArea endTurnHoverText;
+	UI::UI_TextArea buildTowerHoverText;
+	UI::UI_TextArea buildNexusHoverText;
+	UI::UI_TextArea buildWallHoverText;
+	UI::UI_TextArea buildNexusPlacedHoverText;
+	UI::UI_TextArea eraseHoverText;
 }
 
 #pragma region UI_CALLBACK_DECLARATIONS

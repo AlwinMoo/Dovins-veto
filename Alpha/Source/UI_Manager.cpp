@@ -10,7 +10,7 @@ namespace UI
 	const float HOVER_RGBA[4]{ 0.541f, 0.376f, 0.f, 1.f };
 	//const float BUTTON_NORMAL_ALPHA{ 0.f };
 	/*________________________________________________*/
-	void UI_Manager::ConvertToWS(Button* newButton)
+	void UI_Manager::ConvertToWS(UI_Button* newButton)
 	{
 		newButton->wsPos.x = newButton->pos.x - m_winDim.x * 0.5f;
 		newButton->wsPos.y = newButton->pos.y - m_winDim.y * 0.5f;
@@ -20,9 +20,9 @@ namespace UI
 		newButton->wsMin.y = newButton->min.y + m_winDim.y * 0.5f;
 		newButton->wsMax.y = newButton->max.y + m_winDim.y * 0.5f;
 	}
-	Button* UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, TextArea* buttonText, void(*callback)(), TextArea* hoverText)
+	UI_Button* UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText, void(*callback)(), UI_TextArea* hoverText)
 	{
-		Button* newButton = new Button();
+		UI_Button* newButton = new UI_Button();
 		newButton->scale = size;
 		newButton->callback = callback;
 		newButton->hoverText = hoverText;
@@ -89,7 +89,7 @@ namespace UI
 				continue;
 			AEGfxMeshFree(i);
 		}
-		for (Button* i : m_buttons) {
+		for (UI_Button* i : m_buttons) {
 			if (!i)
 				continue;
 			delete i;
@@ -102,7 +102,7 @@ namespace UI
 	}
 	void UI_Manager::Update(AEVec2 mousePos, bool lClick)
 	{
-		for (Button* curr : m_buttons) {
+		for (UI_Button* curr : m_buttons) {
 			curr->bHovering = false;
 			//std::cout << "MOUSEPOS = " << mousePos.x << ", " << mousePos.y << '\n';
 			//std::cout << "CURRMIN  = " << curr->min.x << ", " << curr->min.y << '\n';
@@ -132,7 +132,7 @@ namespace UI
 		// Now safe to recalculate mouse pos to worldspace coordinates
 		mouseX -= static_cast<s32>(winX)/ 2;
 		mouseY -= static_cast<s32>(winY) / 2;
-		for (Button* curr : m_buttons) {
+		for (UI_Button* curr : m_buttons) {
 			AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 			AEGfxSetTintColor(1.f, 1.f, 1.f, 1.0f);
 			AEGfxSetBlendMode(AE_GFX_BM_BLEND);
@@ -161,7 +161,7 @@ namespace UI
 		AEGfxSetBlendColor(0.f, 0.f, 0.f, 0.f);
 
 		// NOW DRAW DESCRIPTIONS (IF ANY)
-		for (Button* curr : m_buttons) {
+		for (UI_Button* curr : m_buttons) {
 			// UI TEST
 			// Render text if hovering
 			AEGfxSetBlendMode(AEGfxBlendMode::AE_GFX_BM_BLEND);

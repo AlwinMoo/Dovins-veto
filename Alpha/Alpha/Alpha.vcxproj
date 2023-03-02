@@ -98,7 +98,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
   <ItemGroup>
     <ClCompile Include="..\Source\Alwintest.cpp" />
     <ClCompile Include="..\Source\Bevantest.cpp" />
-    <ClCompile Include="..\Source\Button.cpp" />
+    <ClCompile Include="..\Source\UI_Button.cpp" />
     <ClCompile Include="..\Source\CharacterStats.cpp" />
     <ClCompile Include="..\Source\Enemy\Enemy.cpp" />
     <ClCompile Include="..\Source\Enemy\StateMachine.cpp" />
@@ -110,15 +110,16 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="..\Source\Rendering.cpp" />
     <ClCompile Include="..\Source\Skills.cpp" />
     <ClCompile Include="..\Source\TestScene.cpp" />
-    <ClCompile Include="..\Source\TextArea.cpp" />
-    <ClCompile Include="..\Source\TextLineInfo.cpp" />
+    <ClCompile Include="..\Source\UI_TextArea.cpp" />
+    <ClCompile Include="..\Source\UI_TextLineInfo.cpp" />
     <ClCompile Include="..\Source\Turret\Turret.cpp" />
     <ClCompile Include="..\Source\UI_Manager.cpp" />
+    <ClCompile Include="..\Source\UI_StatElement.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Alwintest.h" />
     <ClInclude Include="..\Source\Bevantest.h" />
-    <ClInclude Include="..\Source\Button.h" />
+    <ClInclude Include="..\Source\UI_Button.h" />
     <ClInclude Include="..\Source\CharacterStats.h" />
     <ClInclude Include="..\Source\Enemy\Enemy.h" />
     <ClInclude Include="..\Source\Enemy\StateMachine.h" />
@@ -134,10 +135,12 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClInclude Include="..\Source\SceneManager.hpp" />
     <ClInclude Include="..\Source\Skills.h" />
     <ClInclude Include="..\Source\TestScene.h" />
-    <ClInclude Include="..\Source\TextArea.h" />
-    <ClInclude Include="..\Source\TextLineInfo.h" />
+    <ClInclude Include="..\Source\UI_TextArea.h" />
+    <ClInclude Include="..\Source\UI_TextLineInfo.h" />
     <ClInclude Include="..\Source\Turret\Turret.h" />
+    <ClInclude Include="..\Source\UI_Def.h" />
     <ClInclude Include="..\Source\UI_Manager.h" />
+    <ClInclude Include="..\Source\UI_StatElement.h" />
     <ClInclude Include="..\Source\UI_Types.h" />
     <ClInclude Include="Mesh.hpp" />
   </ItemGroup>

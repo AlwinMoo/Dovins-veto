@@ -4,22 +4,22 @@
 #include "AEEngine.h"
 #include <vector>
 #include "UI_Types.h"
-#include "Button.h"
+#include "UI_Button.h"
 namespace UI 
 {
 	class UI_Manager
 	{
 		// Call this after setting position, scale or bounds
-		void ConvertToWS(Button* newButton);
+		void ConvertToWS(UI_Button* newButton);
 	public:
 		std::array<AEGfxTexture*, NUM_TEX> m_textures;
 		std::array<AEGfxVertexList*, NUM_MESH> m_mesh;
-		std::vector<Button*> m_buttons;
+		std::vector<UI_Button*> m_buttons;
 		AEVec2 m_winDim;
 		s8 m_fontID;
 
 		
-		Button* CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, TextArea* buttonText = nullptr, void(*callback)() = nullptr, TextArea* hoverText = nullptr);
+		UI_Button* CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText = nullptr, void(*callback)() = nullptr, UI_TextArea* hoverText = nullptr);
 
 		void Load();
 

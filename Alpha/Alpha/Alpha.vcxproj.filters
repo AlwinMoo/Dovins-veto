@@ -22,13 +22,13 @@
     <ClCompile Include="..\Source\TestScene.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\TextArea.cpp">
+    <ClCompile Include="..\Source\UI_TextArea.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\UI_Manager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Button.cpp">
+    <ClCompile Include="..\Source\UI_Button.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Alwintest.cpp">
@@ -37,7 +37,7 @@
     <ClCompile Include="..\Source\Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\TextLineInfo.cpp">
+    <ClCompile Include="..\Source\UI_TextLineInfo.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Skills.cpp">
@@ -53,6 +53,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\CharacterStats.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\UI_StatElement.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -96,13 +99,13 @@
     <ClInclude Include="..\Source\TestScene.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\TextArea.h">
+    <ClInclude Include="..\Source\UI_TextArea.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\UI_Manager.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Button.h">
+    <ClInclude Include="..\Source\UI_Button.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\UI_Types.h">
@@ -111,7 +114,7 @@
     <ClInclude Include="..\Source\Alwintest.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\TextLineInfo.h">
+    <ClInclude Include="..\Source\UI_TextLineInfo.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Skills.h">
@@ -127,6 +130,12 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\CharacterStats.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\UI_Def.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\UI_StatElement.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,14 +1,14 @@
-#ifndef TEXT_LINE_INFO_H
-#define TEXT_LINE_INFO_H
+#ifndef UI_TEXT_LINE_INFO_H
+#define UI_TEXT_LINE_INFO_H
 #include <string>
 #include "AEEngine.h"
 namespace UI
 {
-	class TextLineInfo
+	class UI_TextLineInfo
 	{
 	public:
-		TextLineInfo(std::string const& str, f32 scale);
-		~TextLineInfo();
+		UI_TextLineInfo(std::string const& str, f32 scale);
+		~UI_TextLineInfo();
 		f32 Height()const;
 		f32 Width()const;
 		char const* GetString()const;

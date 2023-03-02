@@ -1,11 +1,11 @@
-#ifndef BUTTON_H
-#define BUTTON_H
+#ifndef UI_BUTTON_H
+#define UI_BUTTON_H
 #include "AEEngine.h"
-#include "TextArea.h"
+#include "UI_TextArea.h"
 #include "UI_Types.h"
 namespace UI 
 {
-	struct Button
+	struct UI_Button
 	{
 		UI_TEX texID;
 		UI_MESH meshID;
@@ -19,14 +19,14 @@ namespace UI
 		AEVec2 scale;			//!< scale of button
 		s8 font; // TODO: REMOVE THIS WHEN IMPLEMENTED TEXT FULLY
 
-		TextArea* buttonText;
+		UI_TextArea* buttonText;
 		void(*callback)();
-		TextArea* hoverText;
+		UI_TextArea* hoverText;
 		bool bHovering;
 		float alpha;			//!< Alpha for rendering: CURRENTLY NOT BEING USED
 		
-		Button() = default;
-		~Button() = default;
+		UI_Button() = default;
+		~UI_Button() = default;
 	};
 }
 #endif

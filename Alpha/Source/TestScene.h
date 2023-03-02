@@ -38,7 +38,7 @@ namespace
 	AEGfxTexture*		texTest;
 	AEGfxVertexList*	meshTest;
 
-	UI::Button* nexusButton;
+	UI::UI_Button* nexusButton;
 	bool nexusPlaced;
 	bool buildPhase;
 
