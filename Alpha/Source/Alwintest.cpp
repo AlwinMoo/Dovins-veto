@@ -848,7 +848,7 @@ namespace
 	void EraseButton()
 	{
 		hoverStructure->gridScale = { 1, 1 };
-		hoverStructure->scale = { test_map->GetTileSize() * 1, test_map->GetTileSize() * 1 };
+		hoverStructure->scale = { test_map->GetTileSize() * 1 - EPSILON, test_map->GetTileSize() * 1 - EPSILON };
 		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
 		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 		hoverStructure->tex = eraseTex;
