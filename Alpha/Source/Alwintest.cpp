@@ -763,7 +763,10 @@ void Alwintest_Draw()
 		// Render UI
 		uiManager->Draw(cursorX, cursorY);
 
-		std::cout << "Resource Left:" << buildResource << std::endl;
+		char buff[30]{};
+		sprintf_s(buff, "Resources Left: %d", buildResource);
+		AEGfxPrint(1, buff, .7f, .9f, 1.5f, 1.f, 1.f, 0.f);
+		//std::cout << "Resource Left:" << buildResource << std::endl;
 	}
 }
 
