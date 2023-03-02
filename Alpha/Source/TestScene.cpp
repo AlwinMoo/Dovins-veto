@@ -640,6 +640,7 @@ void TestScene_Unload()
  	AEGfxTextureUnload(enemyTex);
 	AEGfxTextureUnload(wallTex);
 	AEGfxTextureUnload(nexusTex);
+	AEGfxTextureUnload(eraseTex);
  	//AEGfxTextureUnload(texTest);
  }
 
