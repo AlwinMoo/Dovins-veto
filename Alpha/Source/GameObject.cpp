@@ -34,7 +34,7 @@ void GameObject::Render()
 }
 
 GameObject::GameObject(GAMEOBJECT_TYPE default_type) :
-	type(default_type), active(false), rotation(0)
+	type(default_type), active(false), rotation(0), direction()
 {
 	tex = nullptr;
 	mesh = render::GenerateQuad();

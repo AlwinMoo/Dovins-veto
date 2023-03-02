@@ -64,8 +64,13 @@ namespace
 	bool player_moving{ false };
 	AEVec2 player_goal{ 0, 0 };
 
-	float debounce{};
 	float turret_shoot_timer{};
+
+	bool enemy_init{ true };
+	int enemy_it{ 0 };
+	f32 enemy_timer{5.0f};
+
+	bool player_init{ true };
 
 	// TEXT TEST
 	UI::TextArea endTurnHoverText;
@@ -186,7 +191,6 @@ void Alwintest_Initialize()
 
 void Alwintest_Update()
 {
-	debounce += 60 * AEFrameRateControllerGetFrameRate(); // 1 sec
 	turret_shoot_timer += AEFrameRateControllerGetFrameRate();
 
 	// Player Input
@@ -344,47 +348,55 @@ void Alwintest_Update()
 	}
 	else
 	{
-		Nexus->active = true;
+		if (player_init)
+		{
+			if (!player->active)
+			{
+				for (int j = test_map->map_size - 1; j >= 0; --j)
+				{
+					if (!test_map->IsOccupied(j)) // if the tile is not occupied
+					{
+						player->position = test_map->GetWorldPos(j);
+						player->active = true;
+					}
+				}
+
+				player_moving = false;
+
+				player_init = false;
+			}
+		}
+
 		if (AEInputCheckTriggered(AEVK_RBUTTON) && !test_map->IsOccupied(test_map->WorldToIndex(mouse_pos)))
 		{
 			if (test_map->IsInGrid(absMousePos))
 			{
-				if (!player->active)
-				{
-					player->position = test_map->SnapCoordinates(absMousePos);
-					player->active = true;
+				player_moving = true;
+				//player_goal = test_map->snap_coordinates(mousePos);
+				PathManager pathingObj(test_map);
+				player->Path = pathingObj.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absMousePos)), (float)test_map->GetY(test_map->WorldToIndex(absMousePos)) });
 
-					player_moving = false;
+				if (!player->Path.empty())
+				{
+					for (auto& pos : player->Path)
+					{
+						pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
+					}
+
+					player->Path.erase(player->Path.end() - 1);
+					player->Path.push_back(absMousePos);
+					player_goal = player->Path.front();
 				}
 				else
 				{
-					player_moving = true;
-					//player_goal = test_map->snap_coordinates(mousePos);
-					PathManager pathingObj(test_map);
-					player->Path = pathingObj.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absMousePos)), (float)test_map->GetY(test_map->WorldToIndex(absMousePos)) });
+					AEVec2 leng{};
+					leng.x = player->position.x - absMousePos.x;
+					leng.y = player->position.y - absMousePos.y;
 
-					if (!player->Path.empty())
+					if (AEVec2Length(&leng) <= 5)
 					{
-						for (auto& pos : player->Path)
-						{
-							pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
-						}
-
-						player->Path.erase(player->Path.end() - 1);
 						player->Path.push_back(absMousePos);
 						player_goal = player->Path.front();
-					}
-					else
-					{
-						AEVec2 leng{};
-						leng.x = player->position.x - absMousePos.x;
-						leng.y = player->position.y - absMousePos.y;
-
-						if (AEVec2Length(&leng) <= 5)
-						{
-							player->Path.push_back(absMousePos);
-							player_goal = player->Path.front();
-						}
 					}
 				}
 			}
@@ -435,6 +447,50 @@ void Alwintest_Update()
 			temp->active = true;
 
 		}
+
+		if (enemy_init)
+		{
+			enemy_timer += AEFrameRateControllerGetFrameTime();
+
+			if (enemy_it < 10)
+			{
+				if (enemy_timer > 1.f)
+				{
+					GameObject* temp = FetchGO(GameObject::GO_ENEMY);
+
+					for (int j = 0; j < test_map->map_size; ++j)
+					{
+						if (!test_map->IsOccupied(j)) // if the tile is not occupied
+						{
+							temp->position = test_map->GetWorldPos(j);
+							break;
+						}
+					}
+
+					temp->scale.x = test_map->GetTileSize();
+					temp->scale.y = test_map->GetTileSize();
+					temp->tex = enemyTex;
+					temp->active = true;
+					temp->enemy_stats.path_timer = 5.0f;
+
+					if (rand() % 2)
+					{
+						temp->enemy_stats.target = Nexus->position;
+						temp->enemy_stats.target_type = Enemy_GO::TARGET_TYPE::TAR_NEXUS;
+					}
+					else
+					{
+						temp->enemy_stats.target = player->position;
+						temp->enemy_stats.target_type = Enemy_GO::TARGET_TYPE::TAR_PLAYER;
+					}
+
+					++enemy_it;
+					enemy_timer = 0.0f;
+				}
+			}
+			else
+				enemy_init = false;
+		}
 	}
 
 
@@ -455,35 +511,57 @@ void Alwintest_Update()
 			{
 			case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
 			{
+				gameObj->enemy_stats.path_timer += AEFrameRateControllerGetFrameTime();
 				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 					gameObj->active = false;
 
-				if (gameObj->Path.empty())
+				if (gameObj->enemy_stats.target_type == Enemy_GO::TARGET_TYPE::TAR_NEXUS)
+				{
+					if (AEVec2Distance(&gameObj->position, &gameObj->enemy_stats.target) <= Nexus->scale.x)
+					{
+						Nexus->active = false;
+					}
+				}
+				else if (gameObj->enemy_stats.target_type == Enemy_GO::TARGET_TYPE::TAR_PLAYER)
+				{
+					gameObj->enemy_stats.target = player->position;
+				}
+
+				if (gameObj->enemy_stats.path_timer >= 2.0f)
 				{
 					PathManager pathmaker(test_map);
-					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(Nexus->position)), (float)test_map->GetY(test_map->WorldToIndex(Nexus->position)) });
+					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->enemy_stats.target)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->enemy_stats.target)) });
 					if (!gameObj->Path.empty())
 					{
-						gameObj->Path.erase(gameObj->Path.end() - 2, gameObj->Path.end()); // remove last 2 check points so we're out of the nexus
+						gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
 						for (auto& pos : gameObj->Path) // converting grid pos to world pos
 						{
 							pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
 						}
 					}
+
+					gameObj->enemy_stats.path_timer = 0.0f;
 				}
 
-				AEVec2 result{ 0,0 };
-				AEVec2Sub(&result, &Nexus->position, &gameObj->position);
-				gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
+				if (gameObj->enemy_stats.target_type == Enemy_GO::TARGET_TYPE::TAR_NEXUS)
+				{
+					AEVec2 result{ 0,0 };
+					AEVec2Sub(&result, &Nexus->position, &gameObj->position);
+					gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
+				}
+				else if (gameObj->enemy_stats.target_type == Enemy_GO::TARGET_TYPE::TAR_PLAYER)
+				{
+					AEVec2 result{ 0,0 };
+					AEVec2Sub(&result, &player->position, &gameObj->position);
+					gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
+				}
 
-				if (!gameObj->Path.empty())
+				if (!gameObj->Path.empty()) // applying pathfinding to movement
 				{
 					AEVec2 out{};
 					AEVec2 norm{};
 					AEVec2Set(&norm, (gameObj->Path[0].x - gameObj->position.x), (gameObj->Path[0].y - gameObj->position.y));
 					AEVec2Normalize(&out, &norm);
-					/*AEVec2Set(&gameObj->direction, AESin(gameObj->rotation), AECos(gameObj->rotation));
-					AEVec2Normalize(&gameObj->direction, &gameObj->direction);*/
 
 					gameObj->position.x += out.x * AEFrameRateControllerGetFrameTime() * 100;
 					gameObj->position.y += out.y * AEFrameRateControllerGetFrameTime() * 100;
@@ -725,6 +803,7 @@ namespace
 				if (tile->type == GameObject::GO_TILE)
 					tile->tex = grassBorderlessTex;
 			}
+			Nexus->active = true;
 		}
 		else
 		{
