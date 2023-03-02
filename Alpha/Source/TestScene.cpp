@@ -5,7 +5,7 @@
 #include "GameStateManager.h"
 #include "Pathfinding/pathfinder.h"
 
-
+#include <cstdio>
 
 namespace
 {
@@ -123,11 +123,11 @@ void TestScene_Initialize()
 	// UI MANAGER ELEMENTS INITIALIZER
 	{
 		endTurnHoverText			= { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE"};
-		buildTowerHoverText			= { .3f, 1.f, "Builds a tower. Automatically attacks enemies from range."};
-		buildWallHoverText			= { .3f, 1.f, "Builds a wall. Most enemies walk around them." };
+		buildTowerHoverText			= { .3f, 1.f, "Builds a tower. Automatically attacks enemies from range. COST: 500"};
+		buildWallHoverText			= { .3f, 1.f, "Builds a wall. Most enemies walk around them. COST: 50" };
 		buildNexusHoverText			= { .3f, 1.f, "Builds the nexus. Protect it with your life." };
 		buildNexusPlacedHoverText	= { .3f, 1.f, "Nexus already built. You only get one." };
-		eraseHoverText				= { .3f, 1.f, "Erase your building. No shame in mistakes." };
+		eraseHoverText				= { .3f, 1.f, "Erase your building. No shame in mistakes. 100% cost refunded." };
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 
@@ -613,7 +613,10 @@ void TestScene_Draw()
 		// Render UI
 		uiManager->Draw(cursorX, cursorY);
 
-		std::cout << "Resource Left:" << buildResource << std::endl;
+		char buff[30]{};
+		sprintf_s(buff, "Resources Left: %d", buildResource);
+		AEGfxPrint(1, buff, .7f, .9f, 1.5f, 1.f, 1.f, 0.f);
+		//std::cout << "Resource Left:" << buildResource << std::endl;
 	}
 }
 
