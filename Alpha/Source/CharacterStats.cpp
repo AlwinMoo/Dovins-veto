@@ -42,3 +42,9 @@ float CharacterStats::GetStat(STAT_TYPE stat)
 		CalculateStats();
 	return m_stats.at(stat);
 }
+
+void CharacterStats::SetRawStat(STAT_TYPE stat, int val)
+{
+	m_dirty = true;
+	m_rawStats.at(stat) = val;
+}

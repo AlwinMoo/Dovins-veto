@@ -32,5 +32,8 @@ public:
 	void	AddStat(AddStatInfo const* info); //!< adds to a raw stat and dirty = true
 	int		GetRawStat(STAT_TYPE stat); //!< get raw stat
 	float	GetStat(STAT_TYPE stat); //!< get stat. Automatically calculates if fields are dirty
+	
+	// Setters
+	void	SetRawStat(STAT_TYPE stat, int val);
 };
 #endif
