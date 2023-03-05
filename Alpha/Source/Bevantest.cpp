@@ -320,7 +320,7 @@ void Bevantest_Update()
 
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
-		next = GS_LEVEL2;
+		next = GS_LEVEL3;
 	}
 	//if (AEInputCheckTriggered(AEVK_W)) next = GS_RESTART;
 	// Your own update logic goes here
