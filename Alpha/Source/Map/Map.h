@@ -15,6 +15,7 @@ class game_map
 	{
 		TILE_NONE = 0, // THIS REPRESENTS EMPTY SPACE
 		TILE_PLANET,
+		TILE_NEXUS,
 		NUM_TYPES_TILE
 	};
 

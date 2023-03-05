@@ -1,30 +1,42 @@
-﻿  Bevantest.cpp
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Bevantest.cpp(42,5): warning C4065: switch statement contains 'default' but no 'case' labels
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Bevantest.cpp(92,20): warning C4018: '<': signed/unsigned mismatch
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Bevantest.cpp(130,135): warning C4018: '<': signed/unsigned mismatch
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Bevantest.cpp(200,30): warning C4244: 'argument': conversion from 's32' to 'f32', possible loss of data
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Bevantest.cpp(200,27): warning C4244: 'argument': conversion from 's32' to 'f32', possible loss of data
-  GameObject.cpp
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\GameObject.cpp(21,22): warning C4244: 'argument': conversion from 'double' to 'f32', possible loss of data
-  GameStateManager.cpp
-  Map.cpp
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Map\Map.cpp(19,96): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Map\Map.cpp(20,30): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Map\Map.cpp(38,108): warning C4244: 'argument': conversion from 'double' to 'f32', possible loss of data
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Map\Map.cpp(45,67): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\Map\Map.cpp(50,35): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-  pathfinder.cpp
-  Rendering.cpp
-  TestScene.cpp
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\TestScene.cpp(17,6): warning C4065: switch statement contains 'default' but no 'case' labels
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\TestScene.cpp(40,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\TestScene.cpp(56,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\Source\TestScene.cpp(57,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  TextArea.cpp
-  UI_Manager.cpp
-  Main.cpp
-  Generating Code...
-  Alpha.vcxproj -> D:\SchoolProjects\csd1401f22\Dovins-veto\Alpha\bin\Debug-x64\Alpha.exe
-  5 File(s) copied
+﻿  Alwintest.cpp
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(114,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(116,71): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(116,50): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(118,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(194,59): warning C4244: '+=': conversion from 'f64' to 'float', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(239,84): warning C4244: '-=': conversion from 'double' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(240,84): warning C4244: '-=': conversion from 'double' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(257,98): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(257,79): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(271,147): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(271,118): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(281,147): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(281,118): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(290,146): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(290,117): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(320,91): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(320,62): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(332,117): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(332,88): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(383,88): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(383,60): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(436,32): warning C4244: 'argument': conversion from 'double' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(436,60): warning C4244: 'argument': conversion from 'double' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(453,54): warning C4244: '+=': conversion from 'f64' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(461,24): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(514,69): warning C4244: '+=': conversion from 'f64' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(539,89): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(539,61): warning C4244: 'argument': conversion from 'f32' to 'int', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(566,78): warning C4244: '+=': conversion from 'f64' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(567,78): warning C4244: '+=': conversion from 'f64' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(591,77): warning C4244: '+=': conversion from 'f64' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(592,77): warning C4244: '+=': conversion from 'f64' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(609,89): warning C4244: 'argument': conversion from 'f64' to 'float', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(641,36): warning C4244: 'argument': conversion from 'double' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(641,66): warning C4244: 'argument': conversion from 'double' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(651,92): warning C4244: '+=': conversion from 'f64' to 'f32', possible loss of data
+C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\Source\Alwintest.cpp(652,92): warning C4244: '+=': conversion from 'f64' to 'f32', possible loss of data
+  Alpha.vcxproj -> C:\Users\Alwin\Dropbox\Work\School\Y1T2\1451\Dovins-veto\Alpha\bin\Debug-x64\Alpha.exe
+  16 File(s) copied
   1 File(s) copied
   1 File(s) copied

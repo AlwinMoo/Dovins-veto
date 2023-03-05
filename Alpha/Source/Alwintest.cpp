@@ -287,7 +287,7 @@ void Alwintest_Update()
 
 					//duplicate with nexus object below
 					Nexus = test;
-					test_map->AddItem(game_map::TILE_TYPE::TILE_NONE, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+					test_map->AddItem(game_map::TILE_TYPE::TILE_NEXUS, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 
 				}
 
@@ -471,17 +471,17 @@ void Alwintest_Update()
 					temp->scale.y = test_map->GetTileSize();
 					temp->tex = enemyTex;
 					temp->active = true;
-					temp->enemy_stats.path_timer = 5.0f;
+					temp->Stats.path_timer = 5.0f;
 
 					if (rand() % 2)
 					{
-						temp->enemy_stats.target = Nexus->position;
-						temp->enemy_stats.target_type = Enemy_GO::TARGET_TYPE::TAR_NEXUS;
+						temp->Stats.target = Nexus->position;
+						temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
 					}
 					else
 					{
-						temp->enemy_stats.target = player->position;
-						temp->enemy_stats.target_type = Enemy_GO::TARGET_TYPE::TAR_PLAYER;
+						temp->Stats.target = player->position;
+						temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_PLAYER;
 					}
 
 					++enemy_it;
@@ -511,26 +511,26 @@ void Alwintest_Update()
 			{
 			case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
 			{
-				gameObj->enemy_stats.path_timer += AEFrameRateControllerGetFrameTime();
+				gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
 				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 					gameObj->active = false;
 
-				if (gameObj->enemy_stats.target_type == Enemy_GO::TARGET_TYPE::TAR_NEXUS)
+				if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
 				{
-					if (AEVec2Distance(&gameObj->position, &gameObj->enemy_stats.target) <= Nexus->scale.x)
+					if (AEVec2Distance(&gameObj->position, &gameObj->Stats.target) <= Nexus->scale.x)
 					{
 						Nexus->active = false;
 					}
 				}
-				else if (gameObj->enemy_stats.target_type == Enemy_GO::TARGET_TYPE::TAR_PLAYER)
+				else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
 				{
-					gameObj->enemy_stats.target = player->position;
+					gameObj->Stats.target = player->position;
 				}
 
-				if (gameObj->enemy_stats.path_timer >= 2.0f)
+				if (gameObj->Stats.path_timer >= 2.0f)
 				{
 					PathManager pathmaker(test_map);
-					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->enemy_stats.target)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->enemy_stats.target)) });
+					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->Stats.target)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->Stats.target)) });
 					if (!gameObj->Path.empty())
 					{
 						gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
@@ -540,16 +540,16 @@ void Alwintest_Update()
 						}
 					}
 
-					gameObj->enemy_stats.path_timer = 0.0f;
+					gameObj->Stats.path_timer = 0.0f;
 				}
 
-				if (gameObj->enemy_stats.target_type == Enemy_GO::TARGET_TYPE::TAR_NEXUS)
+				if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
 				{
 					AEVec2 result{ 0,0 };
 					AEVec2Sub(&result, &Nexus->position, &gameObj->position);
 					gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
 				}
-				else if (gameObj->enemy_stats.target_type == Enemy_GO::TARGET_TYPE::TAR_PLAYER)
+				else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
 				{
 					AEVec2 result{ 0,0 };
 					AEVec2Sub(&result, &player->position, &gameObj->position);
@@ -606,6 +606,7 @@ void Alwintest_Update()
 			}
 			case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
 			{
+				gameObj->Stats.SetStat(STAT_ATTACK_SPEED, gameObj->Stats.GetStat(STAT_ATTACK_SPEED) + AEFrameRateControllerGetFrameTime());
 				AEVec2 result{ 0,0 };
 				f32 smallest_dist{FLT_MAX};
 
@@ -626,9 +627,9 @@ void Alwintest_Update()
 					AEVec2Sub(&result, &gameObj->position, &result);
 					gameObj->rotation = AERadToDeg(atan2f(result.x, result.y));
 
-					if (turret_shoot_timer >= 500.0f)
+					if (gameObj->Stats.GetStat(STAT_ATTACK_SPEED) >= 2.0f)
 					{
-						turret_shoot_timer = 0.0f;
+						gameObj->Stats.SetStat(STAT_ATTACK_SPEED, 0.0f);
 
 						GameObject* temp = FetchGO(GameObject::GO_BULLET);
 						temp->position = gameObj->position;

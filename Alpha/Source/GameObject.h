@@ -4,7 +4,7 @@
 #include <vector>
 #include <AEEngine.h>
 
-#include "Turret/Turret.h"
+#include "CharacterStats.h"
 
 struct Color
 {
@@ -13,23 +13,6 @@ struct Color
 	float b;
 
 	void Set(float r, float g, float b);
-};
-
-struct Enemy_GO
-{
-	AEVec2 target;
-	bool at_goal;
-	f32 path_timer;
-
-	enum class TARGET_TYPE
-	{
-		TAR_PLAYER,
-		TAR_NEXUS,
-		TAR_WALL,
-
-		NUM_TAR
-	};
-	TARGET_TYPE target_type;
 };
 
 class GameObject
@@ -64,7 +47,7 @@ public:
 	double rotation;
 
 	std::vector<AEVec2> Path;
-	Enemy_GO enemy_stats;
+	CharacterStats Stats;
 
 	AEGfxTexture* tex;
 	AEGfxVertexList* mesh;

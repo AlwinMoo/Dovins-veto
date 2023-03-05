@@ -35,6 +35,20 @@ public:
 	
 	// Setters
 	void	SetRawStat(STAT_TYPE stat, int val);
-	void	SetStat(STAT_TYPE stat, float val); //!< should only be called if you don't plan on using raw. Overwritten when raw stat set
+	void SetStat(STAT_TYPE stat, float val);
+
+	AEVec2 target;
+	bool at_goal;
+	f32 path_timer;
+
+	enum class TARGET_TYPE
+	{
+		TAR_PLAYER,
+		TAR_NEXUS,
+		TAR_WALL,
+
+		NUM_TAR
+	};
+	TARGET_TYPE target_type;
 };
 #endif
