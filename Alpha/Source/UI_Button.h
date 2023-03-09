@@ -2,7 +2,7 @@
 #define UI_BUTTON_H
 #include "AEEngine.h"
 #include "UI_TextArea.h"
-#include "UI_Types.h"
+#include "UI_Def.h"
 namespace UI 
 {
 	struct UI_Button

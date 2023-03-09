@@ -58,6 +58,9 @@
     <ClCompile Include="..\Source\UI_StatElement.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\UI_Def.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h">
@@ -106,9 +109,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\UI_Button.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\UI_Types.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Alwintest.h">

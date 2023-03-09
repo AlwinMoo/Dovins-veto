@@ -5,7 +5,7 @@
 #include "../Source/GameStateManager.h"
 #include "../Source/GameStateList.h"
 #include "../Source/TestScene.h"
-
+#include "UI_Def.h"
 // ---------------------------------------------------------------------------
 // main
 s8 g_fontID;
@@ -27,6 +27,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Using custom window procedure
 	//AESysInit(hInstance, nCmdShow, 800, 600, 1, 60, true, NULL);
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, true, NULL);
+
+	UI::InitUI();
 
 	// Changing the window title
 	AESysSetWindowTitle("My New Demo!");
@@ -90,6 +92,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	//AEGfxDestroyFont(defaultFont);
+	UI::UnloadUI();
 	// free the system
 	AESysExit();
 }

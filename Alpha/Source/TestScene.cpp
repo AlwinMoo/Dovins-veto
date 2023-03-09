@@ -139,11 +139,11 @@ void TestScene_Initialize()
 		AEVec2 const buildButtonSize{ screenWidthY * .12f, screenWidthY * .12f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
 		nexusButton = uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
-		buildButtonPos.y -= buildButtonSize.y * 1.5f;
+		buildButtonPos.y -= buildButtonSize.y * 1.5f;	// Offset button y pos downwards!
 		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &buildWallHoverText);
-		buildButtonPos.y -= buildButtonSize.y * 1.5f;
+		buildButtonPos.y -= buildButtonSize.y * 1.5f;	// Offset button y pos downwards!
 		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &buildTowerHoverText);
-		buildButtonPos.y -= buildButtonSize.y * 1.5f;
+		buildButtonPos.y -= buildButtonSize.y * 1.5f;	// Offset button y pos downwards!
 		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &eraseHoverText);
 	}
 

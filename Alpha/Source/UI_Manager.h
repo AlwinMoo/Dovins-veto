@@ -3,7 +3,7 @@
 #include <array>
 #include "AEEngine.h"
 #include <vector>
-#include "UI_Types.h"
+#include "UI_Def.h"
 #include "UI_Button.h"
 namespace UI 
 {
@@ -12,8 +12,6 @@ namespace UI
 		// Call this after setting position, scale or bounds
 		void ConvertToWS(UI_Button* newButton);
 	public:
-		std::array<AEGfxTexture*, NUM_TEX> m_textures;
-		std::array<AEGfxVertexList*, NUM_MESH> m_mesh;
 		std::vector<UI_Button*> m_buttons;
 		AEVec2 m_winDim;
 		s8 m_fontID;
@@ -26,7 +24,9 @@ namespace UI
 		
 		void Unload();
 		void SetWinDim(f32 x, f32 y);
+
 		void Update(AEVec2 mousePos, bool lClick);
+
 		/// <summary>
 		/// Draws buttons and associated objects. Additional behaviours rely on mouse pos
 		/// </summary>

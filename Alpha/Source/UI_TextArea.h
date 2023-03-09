@@ -25,7 +25,7 @@ public:
 	// Constructors
 	UI_TextArea();
 	UI_TextArea(f32 w, f32 h,					f32 scale = 1.5f);
-	UI_TextArea(f32 w, f32 h, std::string str, f32 scale = 1.5f);
+	UI_TextArea(f32 w, f32 h, std::string str,	f32 scale = 1.5f);
 
 	void Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b);
 
