@@ -14,6 +14,8 @@ namespace UI
 		TextureList.at(TEX_WALL) = AEGfxTextureLoad("Assets/Wall.png");
 		TextureList.at(TEX_NEXUS_PLACED) = AEGfxTextureLoad("Assets/NexusPlaced.png");
 		TextureList.at(TEX_ERASE) = AEGfxTextureLoad("Assets/Eraser.png");
+		TextureList.at(TEX_PLAYER) = AEGfxTextureLoad("Assets/PlayerTexture.png");
+		TextureList.at(TEX_PLAYER_PLACED) = AEGfxTextureLoad("Assets/PlayerPlaced.png");
 		MeshList.at(MESH_BOX) = render::GenerateQuad();
 	}
 

@@ -59,6 +59,10 @@ namespace UI
 			newButton->texID = TEX_ERASE;
 			newButton->meshID = MESH_BOX;
 			break;
+		case BUILD_PLAYER_BUTTON:
+			newButton->texID = TEX_PLAYER;
+			newButton->meshID = MESH_BOX;
+			break;
 		default:
 			break;
 		}
