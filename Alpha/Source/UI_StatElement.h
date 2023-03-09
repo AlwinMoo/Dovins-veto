@@ -1,26 +1,27 @@
 #ifndef UI_STAT_ELEMENT_H
 #define UI_STAT_ELEMENT_H
 #include "UI_Def.h"
+#include "UI_TextArea.h"
 #include <array>
 #include <string>
 namespace UI {
 
 	struct UI_StatInfo 
 	{
-		f32 xN, yN;
-		f32 x, y; //!< world space pos
-		double value; //!< rendering bars
-
-		UI_Color colorTint; //!< color (including alpha) of image and text
-		UI_Color colorFont; //!< color (including alpha) of image and text
+		AEVec2	posN;			//!< normalized pos for text
+		AEVec2	posWS;			//!< world space pos of object
+		AEVec2	meshPos;		//!< world space pos of mesh start
+		AEVec2	meshScale;		//!< mesh scale (unmanipulated)
+		UI_TextArea* textArea;	//!< text area
 		
-		float m_scale;			//!< scale of text and image
-		std::string str;
+		double value;			//!< rendering bars
+
+		UI_Color colorTint;		//!< color (including alpha) of image
 
 		// textures
-		AEGfxTexture* m_tex;
+		UI_TEX m_tex;
 		// Mesh
-		AEGfxVertexList* m_mesh;
+		UI_MESH m_mesh;
 	};
 
 
@@ -28,6 +29,7 @@ namespace UI {
 	class UI_StatElement
 	{
 		//void (*m_drawFuncArr[UI_STAT_ELEMENT_TOTAL])();
+		// TODO: remove this
 		std::array<void (*)(), UI_STAT_ELEMENT_TOTAL>m_drawFuncArr;
 		UI_STAT_ELEMENT_TYPE m_type;
 		
@@ -44,11 +46,11 @@ namespace UI {
 		
 
 		// Private Methods
-		void CalculatePositions();
 	public:
-		UI_StatElement();
+		UI_StatElement(UI_TextArea* text = nullptr);
 		~UI_StatElement() = default;
 		UI_StatElement& operator=(const UI_StatElement&) = delete;
+		void CalculatePositions();
 
 		void Update(double dt);
 		void Draw();

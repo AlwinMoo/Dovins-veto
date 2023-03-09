@@ -79,6 +79,8 @@ namespace
 	UI::UI_TextArea buildWallHoverText;
 	UI::UI_TextArea buildNexusPlacedHoverText;
 	UI::UI_TextArea eraseHoverText;
+	
+	UI::UI_TextArea elementTestText;
 
 #pragma region UI_CALLBACK_DECLARATIONS
 	void EndTurnButton();
@@ -151,7 +153,7 @@ void Alwintest_Initialize()
 	hoverStructure->gridScale = { 3, 3 };
 	validPlacement = false;
 
-	// UI MANAGER ELEMENTS INITIALIZER
+	// UI MANAGER BUTTONS INITIALIZER
 	{
 		endTurnHoverText = { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE" };
 		buildTowerHoverText = { .3f, 1.f, "Builds a tower. Automatically attacks enemies from range." };
@@ -176,6 +178,12 @@ void Alwintest_Initialize()
 		::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &buildTowerHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
 		::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &eraseHoverText);
+	}
+	// UI MANAGER ELEMENTS INITIALIZER
+	{
+		elementTestText = { .2f, 0.f, "HEALTH:" };
+		AEVec2 healthBarPos{ 0.f, 0.f }, healthBarScale{ 5.f, 2.f };
+		uiManager->CreateUIStat(healthBarPos, healthBarScale, &elementTestText);
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);

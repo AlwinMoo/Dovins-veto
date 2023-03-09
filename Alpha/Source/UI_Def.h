@@ -39,6 +39,7 @@ namespace UI
 	{
 		UI_STAT_ELEMENT_INT = 0,
 		UI_STAT_ELEMENT_FLOAT,
+		UI_STAT_ELEMENT_BAR,
 		UI_STAT_TEXT,
 		UI_STAT_ELEMENT_TOTAL
 	};
@@ -53,9 +54,13 @@ namespace UI
 
 	void UnloadUI();
 
-	void AEGfxPrint(s8 const* pStr, f32 screenX, f32 screenY, f32 scale, UI_Color const& color);
+	void AEGfxPrint(s8 const* pStr, AEVec2 const& screenPosN, f32 scale, UI_Color const& color);
 
-	void RenderMesh(AEVec2& pos, AEVec2& meshScale, UI_TEX texID);
+	void AEGfxGetPrintSize(s8 const* pStr, AEVec2& screenPosN, f32 scale);
+
+	void DrawMesh(AEVec2 const& pos, AEVec2 const& meshScale, UI_TEX texID);
+
+	void DrawMesh(AEVec2 const& pos, AEVec2 const& meshScale, UI_TEX texID, UI_Color const& color);
 }
 
 // Globals

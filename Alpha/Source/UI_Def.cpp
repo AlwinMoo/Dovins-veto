@@ -34,12 +34,17 @@ namespace UI
 
 	
 
-	void AEGfxPrint(s8 const* pStr, f32 screenX, f32 screenY, f32 scale, UI_Color const& color)
+	void AEGfxPrint(s8 const* pStr, AEVec2 const& screenPosN, f32 scale, UI_Color const& color)
 	{
-		::AEGfxPrint(g_fontID, const_cast<s8*>(pStr), screenX, screenY, scale, color.r, color.g, color.b);
+		::AEGfxPrint(g_fontID, const_cast<s8*>(pStr), screenPosN.x, screenPosN.y, scale, color.r, color.g, color.b);
 	}
 
-	void RenderMesh(AEVec2& pos, AEVec2& meshScale, UI_TEX texID)
+	void AEGfxGetPrintSize(s8 const* pStr, AEVec2& screenPosN, f32 scale)
+	{
+		::AEGfxGetPrintSize(g_fontID, const_cast<s8*>(pStr), screenPosN.x, screenPosN.y, scale);
+	}
+
+	void DrawMesh(AEVec2 const& pos, AEVec2 const& meshScale, UI_TEX texID)
 	{
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetTintColor(1.f, 1.f, 1.f, 1.0f);
@@ -62,5 +67,10 @@ namespace UI
 
 		AEGfxSetTransform(transform.m);
 		AEGfxMeshDraw(MeshList[MESH_BOX], AE_GFX_MDM_TRIANGLES);
+	}
+	void DrawMesh(AEVec2 const& pos, AEVec2 const& meshScale, UI_TEX texID, UI_Color const& color)
+	{
+		AEGfxSetBlendColor(color.r, color.g, color.b, color.a);
+		DrawMesh(pos, meshScale, texID);
 	}
 }

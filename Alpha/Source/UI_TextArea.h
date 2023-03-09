@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include "UI_TextLineInfo.h"
+#include "UI_Def.h"
+
 namespace UI
 {
 class UI_TextArea
@@ -27,11 +29,14 @@ public:
 	UI_TextArea(f32 w, f32 h,					f32 scale = 1.5f);
 	UI_TextArea(f32 w, f32 h, std::string str,	f32 scale = 1.5f);
 
-	void Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b);
+	void Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b)const;
+	void Draw(AEVec2 screenPosN, UI_Color color)const;
 
 	// Getters
 	f32 GetBoxWidth();
 	f32 GetBoxHeight();
+	f32 GetBoxWidthN();
+	f32 GetBoxHeightN();
 	~UI_TextArea();
 };
 }

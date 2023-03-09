@@ -12,10 +12,10 @@ namespace UI
 		
 		AEVec2 pos;
 		// world space pos
-		AEVec2 wsPos;
+		AEVec2 posWS;
 
 		AEVec2 min, max;		//!< Boundaries for screen space
-		AEVec2 wsMin, wsMax;	//!< World space boundaries for rendering
+		AEVec2 minWS, maxWS;	//!< World space boundaries for rendering
 		AEVec2 scale;			//!< scale of button
 		s8 font; // TODO: REMOVE THIS WHEN IMPLEMENTED TEXT FULLY
 

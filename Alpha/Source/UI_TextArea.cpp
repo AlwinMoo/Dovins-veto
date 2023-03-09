@@ -3,9 +3,10 @@
 #include <algorithm>
 namespace UI{
 	const s8 FONT_ID{ 1 };
+	// TODO: STORE COLOR IN TEXTAREA
 	void UI_TextArea::GetPrintSize(std::string const& str, f32& width, f32& height)
 	{
-		AEGfxGetPrintSize(FONT_ID, const_cast<s8*>(str.c_str()), m_scale, width, height);
+		::AEGfxGetPrintSize(FONT_ID, const_cast<s8*>(str.c_str()), m_scale, width, height);
 	}
 
 	u32 UI_TextArea::ProcessLine(std::string const& line)
@@ -69,7 +70,7 @@ namespace UI{
 
 	}
 
-	void UI_TextArea::Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b)
+	void UI_TextArea::Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b)const
 	{
 		f32 screenHeight{ static_cast<f32>(AEGetWindowHeight()) };
 		f32 screenWidth{ static_cast<f32>(AEGetWindowWidth()) };
@@ -78,10 +79,15 @@ namespace UI{
 		// Automatically offset x based on screen bounds
 		screenX = (screenX < -1.f ? -1.f : (screenX > 1.f - m_boxWidthN ? 1.f - m_boxWidthN : screenX));
 		for (UI_TextLineInfo const& i : lines) {
-			//std::cout << i.GetString() << std::endl;
-			AEGfxPrint(FONT_ID, const_cast<s8*>(i.GetString()), screenX, screenY - offsetY, m_scale, r, g, b);
+			::AEGfxPrint(FONT_ID, const_cast<s8*>(i.GetString()), screenX, screenY - offsetY, m_scale, r, g, b);
 			offsetY += i.Height();
 		}
+	}
+
+	// Shorter way to call draw
+	void UI_TextArea::Draw(AEVec2 screenPosN, UI_Color color) const
+	{
+		Draw(screenPosN.x, screenPosN.y, color.r, color.g, color.b);
 	}
 
 	f32 UI_TextArea::GetBoxWidth()
@@ -92,6 +98,16 @@ namespace UI{
 	f32 UI_TextArea::GetBoxHeight()
 	{
 		return m_boxHeight;
+	}
+
+	f32 UI_TextArea::GetBoxWidthN()
+	{
+		return m_boxWidthN;
+	}
+
+	f32 UI_TextArea::GetBoxHeightN()
+	{
+		return m_boxHeightN;
 	}
 
 	UI_TextArea::~UI_TextArea()
