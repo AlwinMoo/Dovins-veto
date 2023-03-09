@@ -7,6 +7,9 @@
 
 namespace
 {
+	static int		MAX_ENEMY = 10;
+	static float	ENEMY_SPAWN_RATE = 1.f;
+
 	std::vector<GameObject*> go_list;
 	game_map* test_map;
 	int object_count;
@@ -28,7 +31,9 @@ namespace
 	AEGfxVertexList* meshTest;
 
 	UI::UI_Button* nexusButton;
+	UI::UI_Button* playerButton;
 	bool nexusPlaced;
+	bool playerPlaced;
 	bool buildPhase;
 
 	int buildResource;
@@ -76,13 +81,16 @@ namespace
 	UI::UI_TextArea endTurnHoverText;
 	UI::UI_TextArea buildTowerHoverText;
 	UI::UI_TextArea buildNexusHoverText;
+	UI::UI_TextArea buildPlayerHoverText;
 	UI::UI_TextArea buildWallHoverText;
 	UI::UI_TextArea buildNexusPlacedHoverText;
+	UI::UI_TextArea buildPlayerPlacedHoverText;
 	UI::UI_TextArea eraseHoverText;
 
 #pragma region UI_CALLBACK_DECLARATIONS
 	void EndTurnButton();
 	void PlaceNexusButton();
+	void PlacePlayerButton();
 	void PlaceTowerButton();
 	void PlaceWallButton();
 	void EraseButton();
@@ -157,7 +165,9 @@ void Alwintest_Initialize()
 		buildTowerHoverText = { .3f, 1.f, "Builds a tower. Automatically attacks enemies from range." };
 		buildWallHoverText = { .3f, 1.f, "Builds a wall. Most enemies walk around them." };
 		buildNexusHoverText = { .3f, 1.f, "Builds the nexus. Protect it with your life." };
+		buildPlayerHoverText = { .3f, 1.f, "Place the player. Defend your base." };
 		buildNexusPlacedHoverText = { .3f, 1.f, "Nexus already built. You only get one." };
+		buildPlayerPlacedHoverText = { .3f, 1.f, "Player already placed. You only get one." };
 		eraseHoverText = { .3f, 1.f, "Erase your building. No shame in mistakes." };
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
@@ -169,7 +179,11 @@ void Alwintest_Initialize()
 		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenWidthY * .9f };
 		AEVec2 const buildButtonSize{ screenWidthY * .12f, screenWidthY * .12f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
+		buildButtonPos.x -= buildButtonSize.y * 0.75f;
 		nexusButton = ::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
+		buildButtonPos.x += buildButtonSize.y * 1.5f;
+		playerButton = ::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_PLAYER_BUTTON, nullptr, PlacePlayerButton, &buildPlayerHoverText);
+		buildButtonPos.x -= buildButtonSize.y * 0.75f;
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
 		::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &buildWallHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
@@ -248,6 +262,12 @@ void Alwintest_Update()
 
 									Nexus = nullptr;
 								}
+								else if (gameObj->type == GameObject::GO_PLAYER)
+								{
+									playerPlaced = false;
+									playerButton->texID = UI::TEX_PLAYER;
+									playerButton->hoverText = &buildPlayerHoverText;
+								}
 
 								break;
 							}
@@ -288,7 +308,12 @@ void Alwintest_Update()
 					//duplicate with nexus object below
 					Nexus = test;
 					test_map->AddItem(game_map::TILE_TYPE::TILE_NEXUS, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
-
+				}
+				else if (hoverStructure->tex == playerTex)
+				{
+					player->active = true;
+					test = player;
+					test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 				}
 
 				test->position = hoverStructure->position;
@@ -302,6 +327,13 @@ void Alwintest_Update()
 					nexusPlaced = true;
 					nexusButton->texID = UI::TEX_NEXUS_PLACED;
 					nexusButton->hoverText = &buildNexusPlacedHoverText;
+					PlaceWallButton();
+				}
+				else if (test->type == GameObject::GO_PLAYER)
+				{
+					playerPlaced = true;
+					playerButton->texID = UI::TEX_PLAYER_PLACED;
+					playerButton->hoverText = &buildPlayerPlacedHoverText;
 					PlaceWallButton();
 				}
 			}
@@ -452,9 +484,9 @@ void Alwintest_Update()
 		{
 			enemy_timer += AEFrameRateControllerGetFrameTime();
 
-			if (enemy_it < 10)
+			if (enemy_it < MAX_ENEMY)
 			{
-				if (enemy_timer > 1.f)
+				if (enemy_timer > ENEMY_SPAWN_RATE)
 				{
 					GameObject* temp = FetchGO(GameObject::GO_ENEMY);
 
@@ -799,7 +831,7 @@ namespace
 {
 #pragma region UI_CALLBACK_DEFINITIONS
 	void EndTurnButton() {
-		if (nexusPlaced)
+		if (nexusPlaced && playerPlaced)
 		{
 			buildPhase = false;
 			hoverStructure->active = false;
@@ -809,6 +841,9 @@ namespace
 					tile->tex = grassBorderlessTex;
 			}
 			Nexus->active = true;
+
+			// Remove player from collision map
+			test_map->RemoveItem(test_map->WorldToIndex(player->position));
 		}
 		else
 		{
@@ -825,6 +860,18 @@ namespace
 			hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
 			hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 			hoverStructure->tex = nexusTex;
+		}
+	}
+
+	void PlacePlayerButton()
+	{
+		if (!playerPlaced)
+		{
+			hoverStructure->gridScale = { 1, 1 };
+			hoverStructure->scale = { test_map->GetTileSize(), test_map->GetTileSize()};
+			hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
+			hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
+			hoverStructure->tex = playerTex;
 		}
 	}
 

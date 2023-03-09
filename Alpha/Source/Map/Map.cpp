@@ -132,7 +132,6 @@ bool game_map::IsOccupied(int index, int gridScalex, int gridScaleY)
 			
 			if (map_arr[GetIndex(i, j)] != TILE_TYPE::TILE_NONE)
 			{
-				// THIS IS A BAND AID, MEMORY ISSUE SOMEWHERE I'VE BEEN STUCK FOR A FEW HOURS
 				if (map_arr[GetIndex(i, j)] >= TILE_TYPE::NUM_TYPES_TILE || (int)map_arr[GetIndex(i, j)] < 0)
 					continue;
 				return true;
