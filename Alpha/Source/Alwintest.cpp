@@ -227,7 +227,7 @@ void Alwintest_Update()
 	{
 		// Place Structure
 
-		if (AEInputCheckTriggered(AEVK_LBUTTON))
+		if (AEInputCheckCurr(AEVK_LBUTTON) && hoverStructure->active)
 		{
 			if (hoverStructure->tex == eraseTex)
 			{
@@ -273,33 +273,40 @@ void Alwintest_Update()
 							}
 						}
 					}
-
 					test_map->RemoveItem(test_map->WorldToIndex(topRightPos), deleteGridScale.x, deleteGridScale.y);
 				}
 			}
 			else if (validPlacement)
 			{
 				GameObject* test = nullptr;
+				AEVec2 hoverTopLeftPos = hoverStructure->position;
+				hoverTopLeftPos.x -= hoverStructure->scale.x / 2.f;
+				if ((int)hoverStructure->gridScale.x % 2)
+					hoverTopLeftPos.x += test_map->GetTileSize() / 2.f;
+				hoverTopLeftPos.y -= hoverStructure->scale.y / 2.f;
+				if ((int)hoverStructure->gridScale.y % 2)
+					hoverTopLeftPos.y += test_map->GetTileSize() / 2.f;
+				
 
 				if (hoverStructure->tex == wallTex)
 				{
-					if (buildResource < WALL_COST)
-						return;
-					test = FetchGO(GameObject::GO_WALL);
-					buildResource -= WALL_COST;
+					if (buildResource >= WALL_COST)
+					{
+						test = FetchGO(GameObject::GO_WALL);
+						buildResource -= WALL_COST;
 
-					test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
-
+						test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+					}
 				}
 				else if (hoverStructure->tex == turretTex)
 				{
-					if (buildResource < TOWER_COST)
-						return;
-					test = FetchGO(GameObject::GO_TURRET);
-					buildResource -= TOWER_COST;
+					if (buildResource >= TOWER_COST)
+					{
+						test = FetchGO(GameObject::GO_TURRET);
+						buildResource -= TOWER_COST;
 
-					test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
-
+						test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+					}
 				}
 				else if (hoverStructure->tex == nexusTex)
 				{
@@ -307,34 +314,36 @@ void Alwintest_Update()
 
 					//duplicate with nexus object below
 					Nexus = test;
-					test_map->AddItem(game_map::TILE_TYPE::TILE_NEXUS, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+					test_map->AddItem(game_map::TILE_TYPE::TILE_NEXUS, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 				}
 				else if (hoverStructure->tex == playerTex)
 				{
 					player->active = true;
 					test = player;
-					test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+					test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 				}
-
-				test->position = hoverStructure->position;
-				test->rotation = hoverStructure->rotation;
-				test->scale = hoverStructure->scale;
-				test->tex = hoverStructure->tex;
-				test->gridScale = hoverStructure->gridScale;
-
-				if (test->type == GameObject::GO_NEXUS)
+				if (test)
 				{
-					nexusPlaced = true;
-					nexusButton->texID = UI::TEX_NEXUS_PLACED;
-					nexusButton->hoverText = &buildNexusPlacedHoverText;
-					PlaceWallButton();
-				}
-				else if (test->type == GameObject::GO_PLAYER)
-				{
-					playerPlaced = true;
-					playerButton->texID = UI::TEX_PLAYER_PLACED;
-					playerButton->hoverText = &buildPlayerPlacedHoverText;
-					PlaceWallButton();
+					test->position = hoverStructure->position;
+					test->rotation = hoverStructure->rotation;
+					test->scale = hoverStructure->scale;
+					test->tex = hoverStructure->tex;
+					test->gridScale = hoverStructure->gridScale;
+
+					if (test->type == GameObject::GO_NEXUS)
+					{
+						nexusPlaced = true;
+						nexusButton->texID = UI::TEX_NEXUS_PLACED;
+						nexusButton->hoverText = &buildNexusPlacedHoverText;
+						PlaceWallButton();
+					}
+					else if (test->type == GameObject::GO_PLAYER)
+					{
+						playerPlaced = true;
+						playerButton->texID = UI::TEX_PLAYER_PLACED;
+						playerButton->hoverText = &buildPlayerPlacedHoverText;
+						PlaceWallButton();
+					}
 				}
 			}
 		}
