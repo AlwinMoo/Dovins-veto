@@ -7,9 +7,6 @@
 
 namespace
 {
-	static int		MAX_ENEMY = 10;
-	static float	ENEMY_SPAWN_RATE = 1.f;
-
 	std::vector<GameObject*> go_list;
 	game_map* test_map;
 	int object_count;
@@ -54,9 +51,13 @@ namespace
 
 	float turret_shoot_timer{};
 
-	bool enemy_init{ true };
-	int enemy_it{ 0 };
-	f32 enemy_timer{5.0f};
+	// Enemies
+	int	enemiesToSpawn;
+	float enemySpawnRate;
+	float enemySpawnTimer;
+	int	enemiesSpawned;
+	int	enemiesRemaining;
+	int currentWave;
 
 	// TEXT TEST
 	UI::UI_TextArea endTurnHoverText;
@@ -93,6 +94,7 @@ namespace
 	void SetPlayerGoal();
 	void PlayerReachGoalCheck();
 	void SpawnEnemies();
+	void NextWaveCheck();
 	void TempTestUpdateFunctions();
 
 	void NexusEnemyUpdate(GameObject* gameObj);
@@ -175,10 +177,8 @@ void Alwintest_Update()
 
 		TempTestUpdateFunctions();
 
-		if (enemy_init)
-		{
-			SpawnEnemies();
-		}
+		SpawnEnemies();
+		NextWaveCheck();
 	}
 
 	// Quit Game
@@ -222,6 +222,8 @@ void Alwintest_Update()
 						{
 							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 							{
+								std::cout << "Remain: " << enemiesRemaining << std::endl;
+								enemiesRemaining--;
 								go->active = false;
 							}
 						}
@@ -253,6 +255,8 @@ void Alwintest_Update()
 						{
 							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 							{
+								std::cout << "Remain: " << enemiesRemaining << std::endl;
+								enemiesRemaining--;
 								go->active = false;
 								gameObj->active = false;
 							}
@@ -532,6 +536,8 @@ namespace
 					continue;
 				if (AEVec2Distance(&gameObj->position, &hoverStructure->position) <= (gameObj->scale.x * 0.5f + hoverStructure->scale.x * 0.5f))
 				{
+					if (gameObj->type == GameObject::GO_DANGER_SIGN)
+						return;
 					gameObj->active = false;
 					if (gameObj->type == GameObject::GO_WALL)
 						buildResource += WALL_COST;
@@ -657,21 +663,28 @@ namespace
 
 	void SpawnEnemies()
 	{
-		enemy_timer += AEFrameRateControllerGetFrameTime();
+		enemySpawnTimer += AEFrameRateControllerGetFrameTime();
 
-		if (enemy_it < MAX_ENEMY)
+		if (enemiesSpawned < enemiesToSpawn)
 		{
-			if (enemy_timer > ENEMY_SPAWN_RATE)
+			if (enemySpawnTimer > enemySpawnRate)
 			{
 				GameObject* temp = FetchGO(GameObject::GO_ENEMY);
 
-				for (int j = 0; j < test_map->map_size; ++j)
+				switch (rand() % 4)
 				{
-					if (!test_map->IsOccupied(j)) // if the tile is not occupied
-					{
-						temp->position = test_map->GetWorldPos(j);
-						break;
-					}
+				case 0:
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->width + test_map->tile_offset, 0));
+					break;
+				case 1:
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->width + test_map->tile_offset, test_map->height - 1));
+					break;
+				case 2:
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->height + test_map->tile_offset, 0));
+					break;
+				case 3:
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->height + test_map->tile_offset, test_map->width - 1));
+					break;
 				}
 
 				temp->scale.x = test_map->GetTileSize();
@@ -691,12 +704,39 @@ namespace
 					temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_PLAYER;
 				}
 
-				++enemy_it;
-				enemy_timer = 0.0f;
+				++enemiesRemaining;
+				++enemiesSpawned;
+				enemySpawnTimer = 0.0f;
+				std::cout << enemiesSpawned << "/" << enemiesToSpawn << std::endl;
 			}
 		}
-		else
-			enemy_init = false;
+	}
+
+	void NextWaveCheck()
+	{
+		//std::cout << "Remain: " << enemiesRemaining << std::endl;
+		if (enemiesRemaining == 0 && enemiesSpawned == enemiesToSpawn)
+		{
+			enemiesToSpawn += 5;
+			if(enemySpawnRate >= 0.1f)
+				enemySpawnRate -= 0.05f;
+			currentWave++;
+			enemiesSpawned = 0;
+			buildPhase = true;
+			buildResource += 500;
+			for (GameObject* tile : go_list)
+			{
+				if (tile->type == GameObject::GO_TILE)
+					tile->tex = grassTex;
+			}
+			hoverStructure->active = true;
+			EnableDangerSigns();
+			playerPlaced = false;
+			playerButton->texID = UI::TEX_PLAYER;
+			playerButton->hoverText = &buildPlayerHoverText;
+			player->active = 0;
+			player->Path.clear();
+		}
 	}
 
 	void TempTestUpdateFunctions()
@@ -1027,6 +1067,12 @@ namespace
 		buildPhase = true;
 		nexusPlaced = false;
 		buildResource = 3000;
+		enemiesToSpawn = 10;
+		enemySpawnRate = 0.5f;
+		enemiesSpawned = 0;
+		enemiesRemaining = 0;
+		currentWave = 1;
+		enemySpawnTimer = 0.f;
 	}
 
 #pragma region UI_CALLBACK_DEFINITIONS
@@ -1049,7 +1095,7 @@ namespace
 		}
 		else
 		{
-			//FEEDBACK IF PLAYER TRIES TO END TURN WITHOUT PLACING NEXUS
+			//TODO: FEEDBACK IF PLAYER TRIES TO END TURN WITHOUT PLACING NEXUS
 		}
 	}
 
