@@ -526,7 +526,7 @@ std::vector<AEVec2> PathManager::GetPath(AEVec2 const& startPos, AEVec2 const& g
 					{
 						gNew = cellData.at(VectorToString(StringToVector(curr.second))).g + 1.0;
 						hNew = calculateHValue(NewPos, goalPos);
-						fNew = gNew + hNew;
+						fNew = gNew + 1.5f * hNew;
 
 						// If it isn’t on the open list, add it to
 						// the open list. Make the current square

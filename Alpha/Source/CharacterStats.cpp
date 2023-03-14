@@ -10,7 +10,7 @@ std::array<const float, STAT_TOTAL> STAT_MULT
 	1.f //STAT_ATTACK_SPEED
 };
 
-CharacterStats::CharacterStats() : m_rawStats{}, m_subRawStat{}, m_stats{}, m_dirty{}
+CharacterStats::CharacterStats() : m_rawStats{}, m_subRawStat{}, m_stats{}, m_dirty{}, currState(STATE::STATE_NONE), currInnerState(INNER_STATE::ISTATE_NONE)
 {
 
 }
@@ -53,4 +53,24 @@ void CharacterStats::SetStat(STAT_TYPE stat, float val)
 {
 	m_dirty = false;
 	m_stats.at(stat) = val;
+}
+
+void CharacterStats::SetNextInnerState(INNER_STATE st)
+{
+	nextInnerState = st;
+}
+
+INNER_STATE CharacterStats::GetCurrInnerState()
+{
+	return currInnerState;
+}
+
+void CharacterStats::SetNextState(STATE st)
+{
+	nextState = st;
+}
+
+STATE CharacterStats::GetCurrState()
+{
+	return currState;
 }

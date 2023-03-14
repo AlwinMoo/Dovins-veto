@@ -208,7 +208,7 @@ void Alwintest_Update()
 
 					UpdateEnemyPath(gameObj);
 					UpdateEnemyRotation(gameObj);
-					UpdateEnemyPosition(gameObj);
+					//UpdateEnemyPosition(gameObj);
 
 					break;
 				}
@@ -814,30 +814,6 @@ namespace
 			AEVec2 result{ 0,0 };
 			AEVec2Sub(&result, &player->position, &gameObj->position);
 			gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
-		}
-	}
-
-	void UpdateEnemyPosition(GameObject* gameObj)
-	{
-		if (!gameObj->Path.empty()) // applying pathfinding to movement
-		{
-			AEVec2 out{};
-			AEVec2 norm{};
-			AEVec2Set(&norm, (gameObj->Path[0].x - gameObj->position.x), (gameObj->Path[0].y - gameObj->position.y));
-			AEVec2Normalize(&out, &norm);
-
-			gameObj->position.x += out.x * AEFrameRateControllerGetFrameTime() * 100;
-			gameObj->position.y += out.y * AEFrameRateControllerGetFrameTime() * 100;
-
-
-			AEVec2 leng{};
-			leng.x = gameObj->position.x - gameObj->Path[0].x;
-			leng.y = gameObj->position.y - gameObj->Path[0].y;
-
-			if (AEVec2Length(&leng) <= 5)
-			{
-				gameObj->Path.erase(gameObj->Path.begin());
-			}
 		}
 	}
 
