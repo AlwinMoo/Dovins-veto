@@ -786,6 +786,8 @@ namespace
 		{
 			PathManager pathmaker(test_map);
 			gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->Stats.target)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->Stats.target)) });
+			gameObj->Path.erase(gameObj->Path.begin());
+			
 			if (!gameObj->Path.empty())
 			{
 				gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
