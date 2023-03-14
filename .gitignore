@@ -406,3 +406,15 @@ FodyWeavers.xsd
 *.pdb
 Alpha/.vs/Alpha/v17/.suo
 *.db
+Alpha/bin/Debug-x64/Alpha.pdb
+Alpha/.vs/Alpha/v17/Browse.VC.db
+Alpha/.vs/Alpha/v17/.suo
+Alpha/.tmp/Debug-x64/Alpha.tlog/link.write.1.tlog
+Alpha/.tmp/Debug-x64/Alpha.tlog/link.read.1.tlog
+Alpha/.tmp/Debug-x64/Alpha.tlog/link.command.1.tlog
+Alpha/.tmp/Debug-x64/Alpha.tlog/CL.write.1.tlog
+Alpha/.tmp/Debug-x64/Alpha.tlog/CL.read.1.tlog
+Alpha/.tmp/Debug-x64/Alpha.tlog/CL.command.1.tlog
+Alpha/.tmp/Debug-x64/Alpha.tlog/Alpha.lastbuildstate
+Alpha/.tmp/Debug-x64/Alpha.log
+Alpha/.tmp/Debug-x64/Alpha.exe.recipe

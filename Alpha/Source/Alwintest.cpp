@@ -376,6 +376,8 @@ void Alwintest_Update()
 				PathManager pathingObj(test_map);
 				player->Path = pathingObj.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absMousePos)), (float)test_map->GetY(test_map->WorldToIndex(absMousePos)) });
 
+				//std::vector<AEVec2> temp = pathingObj.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absMousePos)), (float)test_map->GetY(test_map->WorldToIndex(absMousePos)) });
+
 				if (!player->Path.empty())
 				{
 					for (auto& pos : player->Path)
@@ -445,6 +447,7 @@ void Alwintest_Update()
 			temp->scale.y = test_map->GetTileSize();
 			temp->tex = enemyTex;
 			temp->active = true;
+			temp->Path = std::vector<AEVec2>();
 
 		}
 
@@ -484,6 +487,9 @@ void Alwintest_Update()
 						temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_PLAYER;
 					}
 
+					//PathManager pathmaker(test_map);
+					//temp->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(temp->position)), (float)test_map->GetY(test_map->WorldToIndex(temp->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(temp->Stats.target)), (float)test_map->GetY(test_map->WorldToIndex(temp->Stats.target)) });
+
 					++enemy_it;
 					enemy_timer = 0.0f;
 				}
@@ -512,7 +518,7 @@ void Alwintest_Update()
 			case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
 			{
 				gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
-				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0 || isnan(gameObj->position.x) || isnan(gameObj->position.y))
 					gameObj->active = false;
 
 				if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
@@ -531,10 +537,12 @@ void Alwintest_Update()
 				{
 					PathManager pathmaker(test_map);
 					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->Stats.target)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->Stats.target)) });
+					gameObj->Path.erase(gameObj->Path.begin());
+
 					if (!gameObj->Path.empty())
 					{
-						gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
-						for (auto& pos : gameObj->Path) // converting grid pos to world pos
+						//gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
+						for (auto& pos : gameObj->Path)
 						{
 							pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
 						}
@@ -565,7 +573,6 @@ void Alwintest_Update()
 
 					gameObj->position.x += out.x * AEFrameRateControllerGetFrameTime() * 100;
 					gameObj->position.y += out.y * AEFrameRateControllerGetFrameTime() * 100;
-
 
 					AEVec2 leng{};
 					leng.x = gameObj->position.x - gameObj->Path[0].x;
