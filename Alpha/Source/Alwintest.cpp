@@ -4,6 +4,7 @@
 #include "GameStateList.h"
 #include "GameStateManager.h"
 #include "Pathfinding/pathfinder.h"
+#include "CharacterStats.h"
 
 namespace
 {
@@ -71,6 +72,7 @@ namespace
 	UI::UI_TextArea elementTestText;
 
 	//Helper Functions
+#pragma region Helper functions
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value);
 
 	void LoadTextures();
@@ -100,13 +102,15 @@ namespace
 	void NexusEnemyUpdate(GameObject* gameObj);
 	void PlayerEnemyUpdate(GameObject* gameObj);
 	void UpdateEnemyPath(GameObject* gameObj);
-	void UpdateEnemyRotation(GameObject* gameObj);
-	void UpdateEnemyPosition(GameObject* gameObj);
+	void UpdateEnemyState(GameObject* gameObj);
+	/*void UpdateEnemyRotation(GameObject* gameObj);
+	void UpdateEnemyPosition(GameObject* gameObj);*/
 
 	void UpdatePlayerPosition(GameObject* gameObj);
 	
 	AEVec2 FindClosestEnemy(GameObject* gameObj);
 	void UpdateTurretShooting(AEVec2 target, GameObject* gameObj);
+#pragma endregion
 
 #pragma region UI_CALLBACK_DECLARATIONS
 	void EndTurnButton();
@@ -202,12 +206,18 @@ void Alwintest_Update()
 						gameObj->active = false;
 
 					if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
+					{
 						NexusEnemyUpdate(gameObj);
+						gameObj->target_pos = Nexus->position;
+					}
 					else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
+					{
 						PlayerEnemyUpdate(gameObj);
+						gameObj->target_pos = player->position;
+					}
 
 					UpdateEnemyPath(gameObj);
-					UpdateEnemyRotation(gameObj);
+					//UpdateEnemyRotation(gameObj);
 					//UpdateEnemyPosition(gameObj);
 
 					break;
@@ -801,21 +811,53 @@ namespace
 		}
 	}
 
-	void UpdateEnemyRotation(GameObject* gameObj)
+	//void UpdateEnemyRotation(GameObject* gameObj)
+	//{
+	//	if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
+	//	{
+	//		AEVec2 result{ 0,0 };
+	//		AEVec2Sub(&result, &Nexus->position, &gameObj->position);
+	//		gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
+	//	}
+	//	else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
+	//	{
+	//		AEVec2 result{ 0,0 };
+	//		AEVec2Sub(&result, &player->position, &gameObj->position);
+	//		gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
+	//	}
+	//}
+
+	void UpdateEnemyState(GameObject* gameObj)
 	{
-		if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
+		switch (gameObj->Stats.GetCurrState())
 		{
-			AEVec2 result{ 0,0 };
-			AEVec2Sub(&result, &Nexus->position, &gameObj->position);
-			gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
-		}
-		else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
-		{
-			AEVec2 result{ 0,0 };
-			AEVec2Sub(&result, &player->position, &gameObj->position);
-			gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
+			case (STATE::STATE_ENEMY_ATTACK):
+			{
+				switch (gameObj->Stats.GetCurrInnerState())
+				{
+					case (INNER_STATE::ISTATE_ENTER):
+					{
+						// init
+					}
+					break;
+					case (INNER_STATE::ISTATE_UPDATE):
+					{
+						// whack target if near target
+						// if far from target, move to target,
+						// if target down, choose next target
+					}
+					break;
+					case (INNER_STATE::ISTATE_EXIT):
+					{
+						// clean up
+					}
+					break;
+				}
+			}
+			break;
 		}
 	}
+
 
 	void UpdatePlayerPosition(GameObject* gameObj)
 	{

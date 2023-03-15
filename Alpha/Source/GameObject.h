@@ -48,7 +48,10 @@ public:
 	double rotation;
 
 	std::vector<AEVec2> Path;
+
+	//user only by enemy/turrets
 	CharacterStats Stats;
+	AEVec2 target_pos;
 
 	AEGfxTexture* tex;
 	AEGfxVertexList* mesh;

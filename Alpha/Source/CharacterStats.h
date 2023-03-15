@@ -15,6 +15,7 @@ enum class STATE
 	STATE_NONE,
 
 	STATE_ENEMY_IDLE,
+	STATE_ENEMY_MOVE,
 	STATE_ENEMY_ATTACK,
 	
 	STATE_TURRET_IDLE,
@@ -25,6 +26,9 @@ enum class STATE
 enum class INNER_STATE
 {
 	ISTATE_NONE,
+	ISTATE_ENTER,
+	ISTATE_UPDATE,
+	ISTATE_EXIT,
 };
 
 //!< info to add stat
