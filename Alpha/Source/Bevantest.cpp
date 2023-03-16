@@ -330,7 +330,7 @@ void Bevantest_Update()
 		{
 			playermove = true;
 			//player_goal = test_map->SnapCoordinates(mousePos);
-			PathManager pathingObj(test_map);
+			PathManager pathingObj(test_map, true);
 			player->Path = pathingObj.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absmousepos)), (float)test_map->GetY(test_map->WorldToIndex(absmousepos)) });
 
 			if (!player->Path.empty())

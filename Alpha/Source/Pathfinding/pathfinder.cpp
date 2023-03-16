@@ -2,7 +2,7 @@
 
 constexpr static unsigned int MAX_ITER{ 10000 };
 
-PathManager::PathManager(game_map* Map) : Map(Map)
+PathManager::PathManager(game_map* Map, bool player) : Map(Map), is_player(player)
 {
 	closedList.clear();
 	for (int i = 0; i < Map->height; ++i)
@@ -68,10 +68,16 @@ bool PathManager::IsPositionValid(AEVec2 coord)
 		return false;
 	coord.x += Map->tile_offset;
 
-	return 
-		Map->map_arr[Map->GetIndex(coord.x, coord.y)] != game_map::TILE_TYPE::TILE_NONE ||
-		Map->map_arr[Map->GetIndex(coord.x, coord.y)] < game_map::TILE_TYPE::NUM_TYPES_TILE ||
-		static_cast<int>(Map->map_arr[Map->GetIndex(coord.x, coord.y)]) < 0; // is it ground
+	if (!is_player)
+		return 
+			Map->map_arr[Map->GetIndex(coord.x, coord.y)] != game_map::TILE_TYPE::TILE_NONE ||
+			Map->map_arr[Map->GetIndex(coord.x, coord.y)] < game_map::TILE_TYPE::NUM_TYPES_TILE ||
+			static_cast<int>(Map->map_arr[Map->GetIndex(coord.x, coord.y)]) < 0; // is it ground
+	else
+		return
+			Map->map_arr[Map->GetIndex(coord.x, coord.y)] == game_map::TILE_TYPE::TILE_NONE ||
+			Map->map_arr[Map->GetIndex(coord.x, coord.y)] >= game_map::TILE_TYPE::NUM_TYPES_TILE ||
+			static_cast<int>(Map->map_arr[Map->GetIndex(coord.x, coord.y)]) < 0; // is it ground
 }
 
 // A Utility Function to calculate the 'h' heuristics.

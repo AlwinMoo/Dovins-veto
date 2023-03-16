@@ -319,7 +319,7 @@ void TestScene_Update()
 				{
 					player_moving = true;
 					//player_goal = test_map->snap_coordinates(mousePos);
-					PathManager pathingObj(test_map);
+					PathManager pathingObj(test_map, true);
 					player->Path = pathingObj.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(absMousePos)), (float)test_map->GetY(test_map->WorldToIndex(absMousePos)) });
 
 					if (!player->Path.empty())
@@ -421,7 +421,7 @@ void TestScene_Update()
 				{
 					debounce = 0.0f;
 					std::cout << "Hit" << std::endl;
-					PathManager pathmaker(test_map);
+					PathManager pathmaker(test_map, false);
 					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(player->position)), (float)test_map->GetY(test_map->WorldToIndex(player->position)) });
 					if (!gameObj->Path.empty())
 					{
