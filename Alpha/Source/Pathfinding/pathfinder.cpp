@@ -67,9 +67,10 @@ bool PathManager::IsPositionValid(AEVec2 coord)
 	if (coord.x < 0 || coord.y < 0 || coord.x >= Map->width || coord.y >= Map->height)
 		return false;
 	coord.x += Map->tile_offset;
-	return Map->map_arr[Map->GetIndex(coord.x, coord.y)] == game_map::TILE_TYPE::TILE_NEXUS ||
-		Map->map_arr[Map->GetIndex(coord.x, coord.y)] == game_map::TILE_TYPE::TILE_NONE ||
-		Map->map_arr[Map->GetIndex(coord.x, coord.y)] >= game_map::TILE_TYPE::NUM_TYPES_TILE ||
+
+	return 
+		Map->map_arr[Map->GetIndex(coord.x, coord.y)] != game_map::TILE_TYPE::TILE_NONE ||
+		Map->map_arr[Map->GetIndex(coord.x, coord.y)] < game_map::TILE_TYPE::NUM_TYPES_TILE ||
 		static_cast<int>(Map->map_arr[Map->GetIndex(coord.x, coord.y)]) < 0; // is it ground
 }
 
@@ -80,370 +81,370 @@ double calculateHValue(AEVec2 coord, AEVec2 goal)
 	return AEVec2Distance(&coord, &goal);
 }
 
-bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
-{
-	AEVec2 NewPos{ 0,0 };	
-	std::string sPos{};
-	double fNew, gNew, hNew;
-
-	// @TODO make sure path exists
-
-#pragma region NORTH
-	// x, y + 1
-	NewPos = AEVec2{ parent.x, parent.y + 1};
-	sPos = VectorToString(NewPos);
-
-	if (IsPositionValid(NewPos))
-	{
-		// if destination is same as current
-		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
-		{
-			// set parent of goal cell
-			cellData.at(sPos).parent = parent;
-			result = tracePath(cellData, goalPos);
-			return true;
-		}
-		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
-		{
-			gNew = cellData.at(VectorToString(parent)).g + 1.0;
-			hNew = calculateHValue(NewPos, goalPos);
-			fNew = gNew + hNew;
-
-			// If it isn’t on the open list, add it to
-			// the open list. Make the current square
-			// the parent of this square. Record the
-			// f, g, and h costs of the square cell
-			//                OR
-			// If it is on the open list already, check
-			// to see if this path to that square is
-			// better, using 'f' cost as the measure.
-
-			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
-			{
-				openList.insert(std::make_pair(fNew, sPos));
-
-				// update details
-				cellData.at(sPos).f = fNew;
-				cellData.at(sPos).g = gNew;
-				cellData.at(sPos).h = hNew;
-				cellData.at(sPos).parent = parent;
-			}
-		}
-
-	}
-#pragma endregion
-
-#pragma region SOUTH
-	NewPos = AEVec2{ parent.x, parent.y - 1};
-	sPos = VectorToString(NewPos);
-
-	if (IsPositionValid(NewPos))
-	{
-		// if destination is same as current
-		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
-		{
-			// set parent of goal cell
-			cellData.at(sPos).parent = parent;
-			result = tracePath(cellData, goalPos);
-			return true;
-		}
-		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
-		{
-			gNew = cellData.at(VectorToString(parent)).g + 1.0;
-			hNew = calculateHValue(NewPos, goalPos);
-			fNew = gNew + hNew;
-
-			// If it isn’t on the open list, add it to
-			// the open list. Make the current square
-			// the parent of this square. Record the
-			// f, g, and h costs of the square cell
-			//                OR
-			// If it is on the open list already, check
-			// to see if this path to that square is
-			// better, using 'f' cost as the measure.
-
-			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
-			{
-				openList.insert(std::make_pair(fNew, sPos));
-
-				// update details
-				cellData.at(sPos).f = fNew;
-				cellData.at(sPos).g = gNew;
-				cellData.at(sPos).h = hNew;
-				cellData.at(sPos).parent = parent;
-			}
-		}
-
-	}
-#pragma endregion
-
-#pragma region EAST
-	NewPos = AEVec2{ parent.x + 1, parent.y };
-	sPos = VectorToString(NewPos);
-
-	if (IsPositionValid(NewPos))
-	{
-		// if destination is same as current
-		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
-		{
-			// set parent of goal cell
-			cellData.at(sPos).parent = parent;
-			result = tracePath(cellData, goalPos);
-			return true;
-		}
-		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
-		{
-			gNew = cellData.at(VectorToString(parent)).g + 1.0;
-			hNew = calculateHValue(NewPos, goalPos);
-			fNew = gNew + hNew;
-
-			// If it isn’t on the open list, add it to
-			// the open list. Make the current square
-			// the parent of this square. Record the
-			// f, g, and h costs of the square cell
-			//                OR
-			// If it is on the open list already, check
-			// to see if this path to that square is
-			// better, using 'f' cost as the measure.
-
-			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
-			{
-				openList.insert(std::make_pair(fNew, sPos));
-
-				// update details
-				cellData.at(sPos).f = fNew;
-				cellData.at(sPos).g = gNew;
-				cellData.at(sPos).h = hNew;
-				cellData.at(sPos).parent = parent;
-			}
-		}
-
-	}
-#pragma endregion
-
-#pragma region WEST
-	// x-1, y
-	NewPos = AEVec2{ parent.x - 1, parent.y };
-	sPos = VectorToString(NewPos);
-
-	if (IsPositionValid(NewPos))
-	{
-		// if destination is same as current
-		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
-		{
-			// set parent of goal cell
-			cellData.at(sPos).parent = parent;
-			result = tracePath(cellData, goalPos);
-			return true;
-		}
-		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
-		{
-			gNew = cellData.at(VectorToString(parent)).g + 1.0;
-			hNew = calculateHValue(NewPos, goalPos);
-			fNew = gNew + hNew;
-
-			// If it isn’t on the open list, add it to
-			// the open list. Make the current square
-			// the parent of this square. Record the
-			// f, g, and h costs of the square cell
-			//                OR
-			// If it is on the open list already, check
-			// to see if this path to that square is
-			// better, using 'f' cost as the measure.
-
-			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
-			{
-				openList.insert(std::make_pair(fNew, sPos));
-
-				// update details
-				cellData.at(sPos).f = fNew;
-				cellData.at(sPos).g = gNew;
-				cellData.at(sPos).h = hNew;
-				cellData.at(sPos).parent = parent;
-			}
-		}
-
-	}
-#pragma endregion
-
-#pragma region NORTHWEST
-	NewPos = AEVec2{ parent.x - 1, parent.y + 1};
-	sPos = VectorToString(NewPos);
-
-	if (IsPositionValid(NewPos))
-	{
-		// if destination is same as current
-		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
-		{
-			// set parent of goal cell
-			cellData.at(sPos).parent = parent;
-			result = tracePath(cellData, goalPos);
-			return true;
-		}
-		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
-		{
-			gNew = cellData.at(VectorToString(parent)).g + 1.414;
-			hNew = calculateHValue(NewPos, goalPos);
-			fNew = gNew + hNew;
-
-			// If it isn’t on the open list, add it to
-			// the open list. Make the current square
-			// the parent of this square. Record the
-			// f, g, and h costs of the square cell
-			//                OR
-			// If it is on the open list already, check
-			// to see if this path to that square is
-			// better, using 'f' cost as the measure.
-
-			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
-			{
-				openList.insert(std::make_pair(fNew, sPos));
-
-				// update details
-				cellData.at(sPos).f = fNew;
-				cellData.at(sPos).g = gNew;
-				cellData.at(sPos).h = hNew;
-				cellData.at(sPos).parent = parent;
-			}
-		}
-
-	}
-#pragma endregion
-
-#pragma region NORTHEAST
-	NewPos = AEVec2{ parent.x + 1, parent.y + 1};
-	sPos = VectorToString(NewPos);
-
-	if (IsPositionValid(NewPos))
-	{
-		// if destination is same as current
-		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
-		{
-			// set parent of goal cell
-			cellData.at(sPos).parent = parent;
-			result = tracePath(cellData, goalPos);
-			return true;
-		}
-		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
-		{
-			gNew = cellData.at(VectorToString(parent)).g + 1.414;
-			hNew = calculateHValue(NewPos, goalPos);
-			fNew = gNew + hNew;
-
-			// If it isn’t on the open list, add it to
-			// the open list. Make the current square
-			// the parent of this square. Record the
-			// f, g, and h costs of the square cell
-			//                OR
-			// If it is on the open list already, check
-			// to see if this path to that square is
-			// better, using 'f' cost as the measure.
-
-			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
-			{
-				openList.insert(std::make_pair(fNew, sPos));
-
-				// update details
-				cellData.at(sPos).f = fNew;
-				cellData.at(sPos).g = gNew;
-				cellData.at(sPos).h = hNew;
-				cellData.at(sPos).parent = parent;
-			}
-		}
-
-	}
-#pragma endregion
-
-#pragma region SOUTHWEST
-	NewPos = AEVec2{ parent.x - 1, parent.y - 1 };
-	sPos = VectorToString(NewPos);
-
-	if (IsPositionValid(NewPos))
-	{
-		// if destination is same as current
-		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
-		{
-			// set parent of goal cell
-			cellData.at(sPos).parent = parent;
-			result = tracePath(cellData, goalPos);
-			return true;
-		}
-		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
-		{
-			gNew = cellData.at(VectorToString(parent)).g + 1.414;
-			hNew = calculateHValue(NewPos, goalPos);
-			fNew = gNew + hNew;
-
-			// If it isn’t on the open list, add it to
-			// the open list. Make the current square
-			// the parent of this square. Record the
-			// f, g, and h costs of the square cell
-			//                OR
-			// If it is on the open list already, check
-			// to see if this path to that square is
-			// better, using 'f' cost as the measure.
-
-			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
-			{
-				openList.insert(std::make_pair(fNew, sPos));
-
-				// update details
-				cellData.at(sPos).f = fNew;
-				cellData.at(sPos).g = gNew;
-				cellData.at(sPos).h = hNew;
-				cellData.at(sPos).parent = parent;
-			}
-		}
-
-	}
-#pragma endregion
-
-#pragma region SOUTHEAST
-	NewPos = AEVec2{ parent.x + 1, parent.y - 1 };
-	sPos = VectorToString(NewPos);
-
-	if (IsPositionValid(NewPos))
-	{
-		// if destination is same as current
-		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
-		{
-			// set parent of goal cell
-			cellData.at(sPos).parent = parent;
-			result = tracePath(cellData, goalPos);
-			return true;
-		}
-		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
-		{
-			gNew = cellData.at(VectorToString(parent)).g + 1.414;
-			hNew = calculateHValue(NewPos, goalPos);
-			fNew = gNew + hNew;
-
-			// If it isn’t on the open list, add it to
-			// the open list. Make the current square
-			// the parent of this square. Record the
-			// f, g, and h costs of the square cell
-			//                OR
-			// If it is on the open list already, check
-			// to see if this path to that square is
-			// better, using 'f' cost as the measure.
-
-			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
-			{
-				openList.insert(std::make_pair(fNew, sPos));
-
-				// update details
-				cellData.at(sPos).f = fNew;
-				cellData.at(sPos).g = gNew;
-				cellData.at(sPos).h = hNew;
-				cellData.at(sPos).parent = parent;
-			}
-		}
-
-	}
-#pragma endregion
-
-	return false;
-}
+//bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
+//{
+//	AEVec2 NewPos{ 0,0 };	
+//	std::string sPos{};
+//	double fNew, gNew, hNew;
+//
+//	// @TODO make sure path exists
+//
+//#pragma region NORTH
+//	// x, y + 1
+//	NewPos = AEVec2{ parent.x, parent.y + 1};
+//	sPos = VectorToString(NewPos);
+//
+//	if (IsPositionValid(NewPos))
+//	{
+//		// if destination is same as current
+//		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
+//		{
+//			// set parent of goal cell
+//			cellData.at(sPos).parent = parent;
+//			result = tracePath(cellData, goalPos);
+//			return true;
+//		}
+//		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
+//		{
+//			gNew = cellData.at(VectorToString(parent)).g + 1.0;
+//			hNew = calculateHValue(NewPos, goalPos);
+//			fNew = gNew + hNew;
+//
+//			// If it isn’t on the open list, add it to
+//			// the open list. Make the current square
+//			// the parent of this square. Record the
+//			// f, g, and h costs of the square cell
+//			//                OR
+//			// If it is on the open list already, check
+//			// to see if this path to that square is
+//			// better, using 'f' cost as the measure.
+//
+//			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
+//			{
+//				openList.insert(std::make_pair(fNew, sPos));
+//
+//				// update details
+//				cellData.at(sPos).f = fNew;
+//				cellData.at(sPos).g = gNew;
+//				cellData.at(sPos).h = hNew;
+//				cellData.at(sPos).parent = parent;
+//			}
+//		}
+//
+//	}
+//#pragma endregion
+//
+//#pragma region SOUTH
+//	NewPos = AEVec2{ parent.x, parent.y - 1};
+//	sPos = VectorToString(NewPos);
+//
+//	if (IsPositionValid(NewPos))
+//	{
+//		// if destination is same as current
+//		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
+//		{
+//			// set parent of goal cell
+//			cellData.at(sPos).parent = parent;
+//			result = tracePath(cellData, goalPos);
+//			return true;
+//		}
+//		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
+//		{
+//			gNew = cellData.at(VectorToString(parent)).g + 1.0;
+//			hNew = calculateHValue(NewPos, goalPos);
+//			fNew = gNew + hNew;
+//
+//			// If it isn’t on the open list, add it to
+//			// the open list. Make the current square
+//			// the parent of this square. Record the
+//			// f, g, and h costs of the square cell
+//			//                OR
+//			// If it is on the open list already, check
+//			// to see if this path to that square is
+//			// better, using 'f' cost as the measure.
+//
+//			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
+//			{
+//				openList.insert(std::make_pair(fNew, sPos));
+//
+//				// update details
+//				cellData.at(sPos).f = fNew;
+//				cellData.at(sPos).g = gNew;
+//				cellData.at(sPos).h = hNew;
+//				cellData.at(sPos).parent = parent;
+//			}
+//		}
+//
+//	}
+//#pragma endregion
+//
+//#pragma region EAST
+//	NewPos = AEVec2{ parent.x + 1, parent.y };
+//	sPos = VectorToString(NewPos);
+//
+//	if (IsPositionValid(NewPos))
+//	{
+//		// if destination is same as current
+//		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
+//		{
+//			// set parent of goal cell
+//			cellData.at(sPos).parent = parent;
+//			result = tracePath(cellData, goalPos);
+//			return true;
+//		}
+//		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
+//		{
+//			gNew = cellData.at(VectorToString(parent)).g + 1.0;
+//			hNew = calculateHValue(NewPos, goalPos);
+//			fNew = gNew + hNew;
+//
+//			// If it isn’t on the open list, add it to
+//			// the open list. Make the current square
+//			// the parent of this square. Record the
+//			// f, g, and h costs of the square cell
+//			//                OR
+//			// If it is on the open list already, check
+//			// to see if this path to that square is
+//			// better, using 'f' cost as the measure.
+//
+//			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
+//			{
+//				openList.insert(std::make_pair(fNew, sPos));
+//
+//				// update details
+//				cellData.at(sPos).f = fNew;
+//				cellData.at(sPos).g = gNew;
+//				cellData.at(sPos).h = hNew;
+//				cellData.at(sPos).parent = parent;
+//			}
+//		}
+//
+//	}
+//#pragma endregion
+//
+//#pragma region WEST
+//	// x-1, y
+//	NewPos = AEVec2{ parent.x - 1, parent.y };
+//	sPos = VectorToString(NewPos);
+//
+//	if (IsPositionValid(NewPos))
+//	{
+//		// if destination is same as current
+//		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
+//		{
+//			// set parent of goal cell
+//			cellData.at(sPos).parent = parent;
+//			result = tracePath(cellData, goalPos);
+//			return true;
+//		}
+//		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
+//		{
+//			gNew = cellData.at(VectorToString(parent)).g + 1.0;
+//			hNew = calculateHValue(NewPos, goalPos);
+//			fNew = gNew + hNew;
+//
+//			// If it isn’t on the open list, add it to
+//			// the open list. Make the current square
+//			// the parent of this square. Record the
+//			// f, g, and h costs of the square cell
+//			//                OR
+//			// If it is on the open list already, check
+//			// to see if this path to that square is
+//			// better, using 'f' cost as the measure.
+//
+//			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
+//			{
+//				openList.insert(std::make_pair(fNew, sPos));
+//
+//				// update details
+//				cellData.at(sPos).f = fNew;
+//				cellData.at(sPos).g = gNew;
+//				cellData.at(sPos).h = hNew;
+//				cellData.at(sPos).parent = parent;
+//			}
+//		}
+//
+//	}
+//#pragma endregion
+//
+//#pragma region NORTHWEST
+//	NewPos = AEVec2{ parent.x - 1, parent.y + 1};
+//	sPos = VectorToString(NewPos);
+//
+//	if (IsPositionValid(NewPos))
+//	{
+//		// if destination is same as current
+//		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
+//		{
+//			// set parent of goal cell
+//			cellData.at(sPos).parent = parent;
+//			result = tracePath(cellData, goalPos);
+//			return true;
+//		}
+//		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
+//		{
+//			gNew = cellData.at(VectorToString(parent)).g + 1.414;
+//			hNew = calculateHValue(NewPos, goalPos);
+//			fNew = gNew + hNew;
+//
+//			// If it isn’t on the open list, add it to
+//			// the open list. Make the current square
+//			// the parent of this square. Record the
+//			// f, g, and h costs of the square cell
+//			//                OR
+//			// If it is on the open list already, check
+//			// to see if this path to that square is
+//			// better, using 'f' cost as the measure.
+//
+//			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
+//			{
+//				openList.insert(std::make_pair(fNew, sPos));
+//
+//				// update details
+//				cellData.at(sPos).f = fNew;
+//				cellData.at(sPos).g = gNew;
+//				cellData.at(sPos).h = hNew;
+//				cellData.at(sPos).parent = parent;
+//			}
+//		}
+//
+//	}
+//#pragma endregion
+//
+//#pragma region NORTHEAST
+//	NewPos = AEVec2{ parent.x + 1, parent.y + 1};
+//	sPos = VectorToString(NewPos);
+//
+//	if (IsPositionValid(NewPos))
+//	{
+//		// if destination is same as current
+//		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
+//		{
+//			// set parent of goal cell
+//			cellData.at(sPos).parent = parent;
+//			result = tracePath(cellData, goalPos);
+//			return true;
+//		}
+//		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
+//		{
+//			gNew = cellData.at(VectorToString(parent)).g + 1.414;
+//			hNew = calculateHValue(NewPos, goalPos);
+//			fNew = gNew + hNew;
+//
+//			// If it isn’t on the open list, add it to
+//			// the open list. Make the current square
+//			// the parent of this square. Record the
+//			// f, g, and h costs of the square cell
+//			//                OR
+//			// If it is on the open list already, check
+//			// to see if this path to that square is
+//			// better, using 'f' cost as the measure.
+//
+//			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
+//			{
+//				openList.insert(std::make_pair(fNew, sPos));
+//
+//				// update details
+//				cellData.at(sPos).f = fNew;
+//				cellData.at(sPos).g = gNew;
+//				cellData.at(sPos).h = hNew;
+//				cellData.at(sPos).parent = parent;
+//			}
+//		}
+//
+//	}
+//#pragma endregion
+//
+//#pragma region SOUTHWEST
+//	NewPos = AEVec2{ parent.x - 1, parent.y - 1 };
+//	sPos = VectorToString(NewPos);
+//
+//	if (IsPositionValid(NewPos))
+//	{
+//		// if destination is same as current
+//		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
+//		{
+//			// set parent of goal cell
+//			cellData.at(sPos).parent = parent;
+//			result = tracePath(cellData, goalPos);
+//			return true;
+//		}
+//		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
+//		{
+//			gNew = cellData.at(VectorToString(parent)).g + 1.414;
+//			hNew = calculateHValue(NewPos, goalPos);
+//			fNew = gNew + hNew;
+//
+//			// If it isn’t on the open list, add it to
+//			// the open list. Make the current square
+//			// the parent of this square. Record the
+//			// f, g, and h costs of the square cell
+//			//                OR
+//			// If it is on the open list already, check
+//			// to see if this path to that square is
+//			// better, using 'f' cost as the measure.
+//
+//			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
+//			{
+//				openList.insert(std::make_pair(fNew, sPos));
+//
+//				// update details
+//				cellData.at(sPos).f = fNew;
+//				cellData.at(sPos).g = gNew;
+//				cellData.at(sPos).h = hNew;
+//				cellData.at(sPos).parent = parent;
+//			}
+//		}
+//
+//	}
+//#pragma endregion
+//
+//#pragma region SOUTHEAST
+//	NewPos = AEVec2{ parent.x + 1, parent.y - 1 };
+//	sPos = VectorToString(NewPos);
+//
+//	if (IsPositionValid(NewPos))
+//	{
+//		// if destination is same as current
+//		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
+//		{
+//			// set parent of goal cell
+//			cellData.at(sPos).parent = parent;
+//			result = tracePath(cellData, goalPos);
+//			return true;
+//		}
+//		else if (!closedList.at(sPos)) // if already on the closed list, or if not possible
+//		{
+//			gNew = cellData.at(VectorToString(parent)).g + 1.414;
+//			hNew = calculateHValue(NewPos, goalPos);
+//			fNew = gNew + hNew;
+//
+//			// If it isn’t on the open list, add it to
+//			// the open list. Make the current square
+//			// the parent of this square. Record the
+//			// f, g, and h costs of the square cell
+//			//                OR
+//			// If it is on the open list already, check
+//			// to see if this path to that square is
+//			// better, using 'f' cost as the measure.
+//
+//			if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
+//			{
+//				openList.insert(std::make_pair(fNew, sPos));
+//
+//				// update details
+//				cellData.at(sPos).f = fNew;
+//				cellData.at(sPos).g = gNew;
+//				cellData.at(sPos).h = hNew;
+//				cellData.at(sPos).parent = parent;
+//			}
+//		}
+//
+//	}
+//#pragma endregion
+//
+//	return false;
+//}
 
 std::vector<AEVec2> PathManager::tracePath(std::map<std::string, cell> cellData, AEVec2 goalPos)
 {
@@ -524,9 +525,9 @@ std::vector<AEVec2> PathManager::GetPath(AEVec2 const& startPos, AEVec2 const& g
 					}
 					else if (closedList.at(sPos) == false) // if already on the closed list, or if not possible
 					{
-						gNew = cellData.at(VectorToString(StringToVector(curr.second))).g + 1.0;
+						gNew = cellData.at(curr.second).g + sqrt(newX * newX + newY * newY) + (*Map)(NewPos);
 						hNew = calculateHValue(NewPos, goalPos);
-						fNew = gNew + 1.5f * hNew;
+						fNew = gNew + 2.f * hNew;
 
 						// If it isn’t on the open list, add it to
 						// the open list. Make the current square

@@ -49,6 +49,9 @@ public:
 
 	std::vector<AEVec2> Path;
 
+	GameObject* target;
+	GameObject* smallTarget;
+
 	//user only by enemy/turrets
 	CharacterStats Stats;
 	AEVec2 target_pos;
