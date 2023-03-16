@@ -197,7 +197,10 @@ void Alwintest_Initialize()
 	{
 		elementTestText = { .2f, 0.f, "HEALTH:" };
 		AEVec2 healthBarPos{ 0.f, 0.f }, healthBarScale{ 5.f, 2.f };
-		uiManager->CreateUIStat(healthBarPos, healthBarScale, &elementTestText);
+		//auto tempPtr = uiManager->CreateUIStat(healthBarPos, healthBarScale, &elementTestText);
+		//tempPtr->SetValue(1.f);
+		//tempPtr->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, .0f });
+		//
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
