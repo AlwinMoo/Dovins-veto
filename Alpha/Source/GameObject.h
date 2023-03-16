@@ -32,6 +32,7 @@ public:
 		GO_BULLET,
 		GO_AOE,
 		GO_ENEMY,
+		GO_DANGER_SIGN,
 		GO_TOTAL,
 	};
 

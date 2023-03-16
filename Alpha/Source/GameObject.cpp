@@ -5,6 +5,36 @@
 
 void GameObject::Update()
 {
+	if (active)
+	{
+		switch (type)
+		{
+			case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
+			{
+				if (!Path.empty()) // applying pathfinding to movement
+				{
+					AEVec2 out{};
+					AEVec2 norm{};
+					AEVec2Set(&norm, (Path[0].x - position.x), (Path[0].y - position.y));
+					AEVec2Normalize(&out, &norm);
+
+					position.x += out.x * AEFrameRateControllerGetFrameTime() * 100;
+					position.y += out.y * AEFrameRateControllerGetFrameTime() * 100;
+
+
+					AEVec2 leng{};
+					leng.x = position.x - Path[0].x;
+					leng.y = position.y - Path[0].y;
+
+					if (AEVec2Length(&leng) <= 5)
+					{
+						Path.erase(Path.begin());
+					}
+				}
+			}
+			break;
+		}
+	}
 }
 
 void GameObject::Render()

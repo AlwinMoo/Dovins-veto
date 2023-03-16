@@ -10,6 +10,23 @@ enum STAT_TYPE : size_t
 	STAT_TOTAL
 };
 
+enum class STATE
+{
+	STATE_NONE,
+
+	STATE_ENEMY_IDLE,
+	STATE_ENEMY_ATTACK,
+	
+	STATE_TURRET_IDLE,
+	STATE_TURRET_SHOOT,
+	STATE_TURRET_SENTRY
+};
+
+enum class INNER_STATE
+{
+	ISTATE_NONE,
+};
+
 //!< info to add stat
 struct AddStatInfo
 {
@@ -24,6 +41,13 @@ private:
 	std::array<int, STAT_TOTAL> m_subRawStat; //!< stats to add to raw stats
 	std::array<float, STAT_TOTAL>m_stats;
 	bool m_dirty;
+
+	STATE currState;
+	STATE nextState;
+
+	INNER_STATE currInnerState;
+	INNER_STATE nextInnerState;
+
 public:
 	CharacterStats();
 	~CharacterStats() = default;
@@ -36,6 +60,12 @@ public:
 	// Setters
 	void	SetRawStat(STAT_TYPE stat, int val);
 	void SetStat(STAT_TYPE stat, float val);
+
+	void SetNextInnerState(INNER_STATE);
+	INNER_STATE GetCurrInnerState();
+
+	void SetNextState(STATE);
+	STATE GetCurrState();
 
 	AEVec2 target;
 	bool at_goal;

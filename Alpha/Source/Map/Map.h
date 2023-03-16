@@ -105,6 +105,14 @@ class game_map
 	int WorldToIndex(AEVec2 pos);
 
 	/*!
+	 * @brief Converts world pos to PRE OFFSET index, returns -1 if invalid position
+	 *
+	 * @param pos	- World pos
+	 * @return		- Pre X offset index in grid
+	*/
+	int WorldToPreOffsetIndex(AEVec2 pos);
+
+	/*!
 	 * @brief Adds an item into the map based on index
 	 * 
 	 * @param tile			- Type of tile to put in the map
