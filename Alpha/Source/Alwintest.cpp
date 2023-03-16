@@ -856,7 +856,7 @@ namespace
 					if (!gameObj->Path.empty())
 					{
 						//gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
-						
+
 						std::vector<AEVec2>::iterator it = gameObj->Path.begin();
 						for (auto& pos : gameObj->Path) // converting grid pos to world pos
 						{
@@ -865,22 +865,22 @@ namespace
 
 							pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
 							++it;
-						
 
-						gameObj->Path.erase(it, gameObj->Path.end());
+
+							gameObj->Path.erase(it, gameObj->Path.end());
+						}
+
+						gameObj->Stats.path_timer = 0.0f;
 					}
 
-					gameObj->Stats.path_timer = 0.0f;
+					// @TODO CHANGE MELEE RANGE
+					if (AEVec2Distance(&gameObj->target->position, &gameObj->position) <= test_map->GetTileSize() * 1.5f)
+					{
+						gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
+						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
+					}
 				}
-
-				// @TODO CHANGE MELEE RANGE
-				if (AEVec2Distance(&gameObj->target->position, &gameObj->position) <= test_map->GetTileSize() * 1.5f)
-				{
-					gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
-					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
-				}
-			}
-			break;
+				break;
 			case (INNER_STATE::ISTATE_EXIT):
 			{
 				// clean up
@@ -890,8 +890,8 @@ namespace
 			}
 			break;
 			}
-		}
-		break;
+			}
+			break;
 		case (STATE::STATE_ENEMY_ATTACK):
 		{
 			switch (gameObj->Stats.GetCurrInnerState())
@@ -925,7 +925,7 @@ namespace
 				{
 					gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
 					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
-					
+
 				}*/
 			}
 			break;
@@ -941,8 +941,8 @@ namespace
 		}
 		break;
 		}
+		}
 	}
-
 
 	void UpdatePlayerPosition(GameObject* gameObj)
 	{
