@@ -31,7 +31,8 @@ namespace
 	AEGfxTexture* playerTex;
 	AEGfxTexture* enemyTex;
 	AEGfxTexture* dangerTex;
-	AEGfxVertexList* meshTest;
+	AEGfxTexture* targetedTex;
+	AEGfxVertexList* squareMesh;
 
 	UI::UI_Button* nexusButton;
 	UI::UI_Button* playerButton;
@@ -43,6 +44,10 @@ namespace
 
 	static const int WALL_COST = 50;
 	static const int TOWER_COST = 500;
+
+	static const int NEXUS_HEALTH = 15;
+	static const int WALL_HEALTH = 5;
+	static const int TURRET_HEALTH = 10;
 
 	//player
 	GameObject* player;
@@ -82,6 +87,8 @@ namespace
 
 	void UpdateMousePos();
 	void UpdateUIManager();
+	void UpdateGOGridIndex(GameObject* gameObj, int index);
+	GameObject* IndexToGO(int index);
 	void PlaceStructure();
 	void EraseBuiltStructure();
 	void UpdateHoverStructure();
@@ -92,14 +99,10 @@ namespace
 	void NextWaveCheck();
 	void TempTestUpdateFunctions();
 
-	//void NexusEnemyUpdate(GameObject* gameObj);
-	//void PlayerEnemyUpdate(GameObject* gameObj);
-	//void UpdateEnemyPath(GameObject* gameObj);
 	void UpdateEnemyState(GameObject* gameObj);
-	/*void UpdateEnemyRotation(GameObject* gameObj);
-	void UpdateEnemyPosition(GameObject* gameObj);*/
-
 	void UpdatePlayerPosition(GameObject* gameObj);
+
+	void RenderTexture(AEGfxTexture* texture, AEVec2 pos_, AEVec2 scale_, float rotation_);
 	
 	AEVec2 FindClosestEnemy(GameObject* gameObj);
 	void UpdateTurretShooting(AEVec2 target, GameObject* gameObj);
@@ -118,6 +121,7 @@ namespace
 void Alwintest_Load()
 {
 	LoadTextures();
+	squareMesh = render::GenerateQuad();
 }
 
 void Alwintest_Initialize()
@@ -328,13 +332,21 @@ void Alwintest_Draw()
 	for (GameObject* gameObj : go_list)
 	{
 		//Gameobjects Render
-		if (gameObj->active)
-			gameObj->Render();
+		if (!gameObj->active)
+			continue;
+
+		gameObj->Render();
+
+		//
+		if (gameObj->type == GameObject::GO_ENEMY && gameObj->Stats.GetCurrState() == STATE::STATE_ENEMY_ATTACK)
+			RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);
 	}
 
 	// Render above
 	if (hoverStructure->active)
 		hoverStructure->Render();
+
+
 
 	{
 #ifdef CURSOR_TEST
@@ -396,6 +408,8 @@ void Alwintest_Unload()
 	AEGfxTextureUnload(nexusTex);
 	AEGfxTextureUnload(eraseTex);
 	AEGfxTextureUnload(dangerTex);
+	AEGfxTextureUnload(targetedTex);
+	AEGfxMeshFree(squareMesh);
 }
 
 namespace
@@ -463,6 +477,35 @@ namespace
 		::gameUiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 	}
 
+	GameObject* IndexToGO(int index)
+	{
+		for (auto go : go_list)
+		{
+			if (!go->active)
+				continue;
+			for (auto index_ : go->gridIndex)
+			{
+				if (index_ == index)
+					return go;
+			}
+		}
+		return nullptr;
+	}
+
+	void UpdateGOGridIndex(GameObject* gameObj, int index)
+	{
+		int minXIndex = test_map->GetX(index);
+		int minYIndex = test_map->GetY(index);
+		int maxXIndex = minXIndex + gameObj->gridScale.x - 1;
+		int maxYIndex = minYIndex + gameObj->gridScale.y - 1;
+
+		for (int i = minXIndex; i <= maxXIndex; i++)
+		{
+			for (int j = minYIndex; j <= maxYIndex; j++)
+				gameObj->gridIndex.push_back(test_map->GetIndex(i, j));
+		}
+	}
+
 	void PlaceStructure()
 	{
 		GameObject* temp = nullptr;
@@ -499,12 +542,14 @@ namespace
 
 			//duplicate with nexus object below
 			Nexus = temp;
+
 			test_map->AddItem(game_map::TILE_TYPE::TILE_NEXUS, test_map->WorldToPreOffsetIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 		}
 		else if (hoverStructure->tex == playerTex)
 		{
 			player->active = true;
 			temp = player;
+
 			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 		}
 
@@ -513,6 +558,8 @@ namespace
 		temp->scale = hoverStructure->scale;
 		temp->tex = hoverStructure->tex;
 		temp->gridScale = hoverStructure->gridScale;
+
+		UpdateGOGridIndex(temp, test_map->WorldToPreOffsetIndex(hoverTopLeftPos));
 
 		if (temp->type == GameObject::GO_NEXUS)
 		{
@@ -534,46 +581,36 @@ namespace
 	{
 		AEVec2 topRightPos;
 		AEVec2 deleteGridScale;
-		for (GameObject* gameObj : go_list)
+		GameObject* gameObj = IndexToGO(test_map->WorldToIndex(hoverStructure->position));
+		if (!gameObj)
+			return;
+		gameObj->active = false;
+		if (gameObj->type == GameObject::GO_WALL)
+			buildResource += WALL_COST;
+		else if (gameObj->type == GameObject::GO_TURRET)
+			buildResource += TOWER_COST;
+
+		gameObj->gridIndex.clear();
+		topRightPos = gameObj->position;
+		topRightPos.x -= (gameObj->gridScale.x - 1) * 0.5 * test_map->GetTileSize();
+		topRightPos.y -= (gameObj->gridScale.y - 1) * 0.5 * test_map->GetTileSize();
+		deleteGridScale = gameObj->gridScale;
+
+		if (gameObj->type == GameObject::GO_NEXUS)
 		{
-			if (gameObj->active)
-			{
-				if (gameObj->type == GameObject::GO_TILE || gameObj == hoverStructure)
-					continue;
-				if (AEVec2Distance(&gameObj->position, &hoverStructure->position) <= (gameObj->scale.x * 0.5f + hoverStructure->scale.x * 0.5f))
-				{
-					if (gameObj->type == GameObject::GO_DANGER_SIGN)
-						return;
-					gameObj->active = false;
-					if (gameObj->type == GameObject::GO_WALL)
-						buildResource += WALL_COST;
-					else if (gameObj->type == GameObject::GO_TURRET)
-						buildResource += TOWER_COST;
+			nexusPlaced = false;
+			nexusButton->texID = UI::TEX_NEXUS;
+			nexusButton->hoverText = &textTable->buildNexusHoverText;
 
-					topRightPos = gameObj->position;
-					topRightPos.x -= (gameObj->gridScale.x - 1) * 0.5 * test_map->GetTileSize();
-					topRightPos.y -= (gameObj->gridScale.y - 1) * 0.5 * test_map->GetTileSize();
-					deleteGridScale = gameObj->gridScale;
-
-					if (gameObj->type == GameObject::GO_NEXUS)
-					{
-						nexusPlaced = false;
-						nexusButton->texID = UI::TEX_NEXUS;
-						nexusButton->hoverText = &textTable->buildNexusHoverText;
-
-						Nexus = nullptr;
-					}
-					else if (gameObj->type == GameObject::GO_PLAYER)
-					{
-						playerPlaced = false;
-						playerButton->texID = UI::TEX_PLAYER;
-						playerButton->hoverText = &textTable->buildPlayerHoverText;
-					}
-
-					break;
-				}
-			}
+			Nexus = nullptr;
 		}
+		else if (gameObj->type == GameObject::GO_PLAYER)
+		{
+			playerPlaced = false;
+			playerButton->texID = UI::TEX_PLAYER;
+			playerButton->hoverText = &textTable->buildPlayerHoverText;
+		}
+
 		test_map->RemoveItem(test_map->WorldToPreOffsetIndex(topRightPos), deleteGridScale.x, deleteGridScale.y);
 	}
 
@@ -699,6 +736,7 @@ namespace
 				temp->active = true;
 				temp->Stats.path_timer = 5.0f;
 				temp->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
+				temp->Stats.SetCurrInnerState(INNER_STATE::ISTATE_NONE);
 				temp->Stats.SetCurrStateFromNext();
 
 				if (rand() % 2)
@@ -743,6 +781,7 @@ namespace
 			playerButton->texID = UI::TEX_PLAYER;
 			playerButton->hoverText = &textTable->buildPlayerHoverText;
 			player->active = 0;
+			player->gridIndex.clear();
 			player->Path.clear();
 		}
 	}
@@ -774,173 +813,127 @@ namespace
 		}
 	}
 
-	/*void NexusEnemyUpdate(GameObject* gameObj)
-	{
-		if (AEVec2Distance(&gameObj->position, &gameObj->Stats.target) <= Nexus->scale.x)
-		{
-			Nexus->active = false;
-		}
-	}*/
-
-	/*void PlayerEnemyUpdate(GameObject* gameObj)
-	{
-		gameObj->target = player;
-	}*/
-
-	//void UpdateEnemyPath(GameObject* gameObj)
-	//{
-	//	gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
-	//	if (gameObj->Stats.path_timer >= 2.0f)
-	//	{
-	//		PathManager pathmaker(test_map);
-	//		gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
-	//		gameObj->Path.erase(gameObj->Path.begin());
-	//		
-	//		if (!gameObj->Path.empty())
-	//		{
-	//			gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
-	//			for (auto& pos : gameObj->Path) // converting grid pos to world pos
-	//			{
-	//				pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
-	//			}
-	//		}
-
-	//		gameObj->Stats.path_timer = 0.0f;
-	//	}
-	//}
-
-	//void UpdateEnemyRotation(GameObject* gameObj)
-	//{
-	//	if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
-	//	{
-	//		AEVec2 result{ 0,0 };
-	//		AEVec2Sub(&result, &Nexus->position, &gameObj->position);
-	//		gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
-	//	}
-	//	else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
-	//	{
-	//		AEVec2 result{ 0,0 };
-	//		AEVec2Sub(&result, &player->position, &gameObj->position);
-	//		gameObj->rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
-	//	}
-	//}
-
 	void UpdateEnemyState(GameObject* gameObj)
 	{
 		switch (gameObj->Stats.GetCurrState())
 		{
-		case (STATE::STATE_ENEMY_MOVE):
-		{
-			switch (gameObj->Stats.GetCurrInnerState())
+			case (STATE::STATE_ENEMY_MOVE):
 			{
-			case (INNER_STATE::ISTATE_ENTER):
-			{
-				// init
+				switch (gameObj->Stats.GetCurrInnerState())
+				{
+					case (INNER_STATE::ISTATE_ENTER):
+					{
+						// init
 				// always set next state
-				gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
-			}
-			break;
-			case (INNER_STATE::ISTATE_UPDATE):
-			{
-				// whack target if near target
+						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
+					}
+					break;
+					case (INNER_STATE::ISTATE_UPDATE):
+					{
+						// whack target if near target
 				// if far from target, move to target,
 				// if target down, choose next target
-				gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
+						gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
 
-				if (gameObj->Stats.path_timer >= 1.0f)
-				{
-					PathManager pathmaker(test_map);
-					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
-					gameObj->Path.erase(gameObj->Path.begin());
-
-					if (!gameObj->Path.empty())
-					{
-						//gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
-
-						std::vector<AEVec2>::iterator it = gameObj->Path.begin();
-						for (auto& pos : gameObj->Path) // converting grid pos to world pos
+						if (gameObj->Stats.path_timer >= 1.0f)
 						{
-							if (test_map->map_arr[test_map->GetIndex(pos.x + test_map->tile_offset, pos.y)] != game_map::TILE_TYPE::TILE_NONE)
-								break;
+							PathManager pathmaker(test_map);
+							gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
+							gameObj->Path.erase(gameObj->Path.begin());
 
-							pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
-							++it;
+							if (!gameObj->Path.empty())
+							{
+								//gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
 
+								std::vector<AEVec2>::iterator it = gameObj->Path.begin();
+								for (auto& pos : gameObj->Path) // converting grid pos to world pos
+								{
+									if (test_map->map_arr[test_map->GetIndex(pos.x + test_map->tile_offset, pos.y)] != game_map::TILE_TYPE::TILE_NONE)
+									{
+										gameObj->smallTarget = IndexToGO(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
+										break;
+									}
 
-							gameObj->Path.erase(it, gameObj->Path.end());
+									pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
+									++it;
+								}
+
+								gameObj->Path.erase(it, gameObj->Path.end());
+								
+								gameObj->Stats.path_timer = 0.0f;
+							}
+
+							// @TODO CHANGE MELEE RANGE
+							if (gameObj->smallTarget == nullptr)
+								gameObj->smallTarget = gameObj->target;
+							if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= test_map->GetTileSize() * 1.8f)
+							{
+								gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
+								gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
+							}
 						}
-
-						gameObj->Stats.path_timer = 0.0f;
-					}
-
-					// @TODO CHANGE MELEE RANGE
-					if (AEVec2Distance(&gameObj->target->position, &gameObj->position) <= test_map->GetTileSize() * 1.5f)
+						break;
+					case (INNER_STATE::ISTATE_EXIT):
 					{
-						gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
-						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
+						// clean up
+				// always set next state
+				// if next state is the same, as curr then we will just run as usual
+						gameObj->Stats.SetCurrStateFromNext();
+					}
+					break;
 					}
 				}
 				break;
-			case (INNER_STATE::ISTATE_EXIT):
+			case (STATE::STATE_ENEMY_ATTACK):
 			{
-				// clean up
+				switch (gameObj->Stats.GetCurrInnerState())
+				{
+					case (INNER_STATE::ISTATE_ENTER):
+					{
+						// init
 				// always set next state
-				// if next state is the same, as curr then we will just run as usual
-				gameObj->Stats.SetCurrStateFromNext();
-			}
-			break;
-			}
-			}
-			break;
-		case (STATE::STATE_ENEMY_ATTACK):
-		{
-			switch (gameObj->Stats.GetCurrInnerState())
-			{
-			case (INNER_STATE::ISTATE_ENTER):
-			{
-				// init
-				// always set next state
-				gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
-			}
-			break;
-			case (INNER_STATE::ISTATE_UPDATE):
-			{
-				// whack target if near target
+						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
+						std::cout << "attack enter" << std::endl;
+					}
+					break;
+					case (INNER_STATE::ISTATE_UPDATE):
+					{
+						// whack target if near target
 				// if far from target, move to target,
 				// if target down, choose next target
-				if (gameObj->target->Stats.GetStat(STAT_HEALTH) <= 0.0f || !gameObj->target->active)
-				{
-					if (gameObj->target == Nexus)
-					{
-						Nexus->active = false;
-					}
-
-					gameObj->target = player;
-					gameObj->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
-					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
-					break;
-				}
-
-				/*if (AEVec2Distance(&gameObj->target->position, &gameObj->position) <= test_map->GetTileSize() * 1.5f)
+						if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f || !gameObj->smallTarget->active)
+						{
+							if (gameObj->smallTarget == Nexus)
+							{
+								Nexus->active = false;
+							}
+					
+							gameObj->target = player;
+							gameObj->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
+							gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
+							break;
+						}
+					
+						/*if (AEVec2Distance(&gameObj->target->position, &gameObj->position) <= test_map->GetTileSize() * 1.5f)
 				{
 					gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
 					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
 
 				}*/
-			}
-			break;
-			case (INNER_STATE::ISTATE_EXIT):
-			{
-				// clean up
+					}
+					break;
+					case (INNER_STATE::ISTATE_EXIT):
+					{
+						// clean up
 				// always set next state
 				// if next state is the same, as curr then we will just run as usual
-				gameObj->Stats.SetCurrStateFromNext();
+						gameObj->Stats.SetCurrStateFromNext();
+					}
+					break;
+				}
 			}
 			break;
 			}
-		}
-		break;
-		}
 		}
 	}
 
@@ -1009,6 +1002,30 @@ namespace
 		enemyTex = AEGfxTextureLoad("Assets/EnemyTexture.png");
 		eraseTex = AEGfxTextureLoad("Assets/Eraser.png");
 		dangerTex = AEGfxTextureLoad("Assets/Danger.png");
+		targetedTex = AEGfxTextureLoad("Assets/Targeted.png");
+	}
+
+	void RenderTexture(AEGfxTexture* texture, AEVec2 pos_, AEVec2 scale_, float rotation_)
+	{
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxTextureSet(texture, 0, 0);
+
+		AEMtx33 scale = { 0 };
+		AEMtx33Scale(&scale, scale_.x, scale_.x);
+
+		AEMtx33 rotate = { 0 };
+		AEMtx33Rot(&rotate, AEDegToRad(rotation_ + 180.f));
+
+		AEMtx33 translate = { 0 };
+		AEMtx33Trans(&translate, pos_.x - AEGetWindowWidth() / 2.f, -pos_.y + AEGetWindowHeight() / 2.f);
+
+		AEMtx33 transform = { 0 };
+		AEMtx33Concat(&transform, &rotate, &scale);
+		AEMtx33Concat(&transform, &translate, &transform);
+
+		AEGfxSetTransform(transform.m);
+		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
 	}
 
 	void InitializeUIManager()
@@ -1196,6 +1213,18 @@ namespace
 			test_map->RemoveItem(test_map->WorldToPreOffsetIndex(player->position));
 
 			DisableDangerSigns();
+
+			for (auto go : go_list)
+			{
+				if (!go->active)
+					continue;
+				if (go->type == GameObject::GO_WALL)
+					go->Stats.SetStat(STAT_HEALTH, WALL_HEALTH);
+				else if (go->type == GameObject::GO_TURRET)
+					go->Stats.SetStat(STAT_HEALTH, TURRET_HEALTH);
+				else if (go->type == GameObject::GO_NEXUS)
+					go->Stats.SetStat(STAT_HEALTH, NEXUS_HEALTH);
+			}
 		}
 		else
 		{

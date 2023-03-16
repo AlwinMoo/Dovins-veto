@@ -47,6 +47,8 @@ public:
 	AEVec2 direction;
 	double rotation;
 
+	std::vector<int> gridIndex;
+
 	std::vector<AEVec2> Path;
 
 	GameObject* target;

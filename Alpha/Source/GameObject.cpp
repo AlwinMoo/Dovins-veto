@@ -80,6 +80,7 @@ GameObject::GameObject(GAMEOBJECT_TYPE default_type) :
 	position = { 0, 0 };
 	scale = { 1, 1 };
 	gridScale = { 1, 1 };
+	
 }
 
 GameObject::~GameObject()
