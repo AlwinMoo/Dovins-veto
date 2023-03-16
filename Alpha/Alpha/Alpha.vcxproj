@@ -75,7 +75,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_EngineD.dll" "$(OutDir)"
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -112,6 +112,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="..\Source\TestScene.cpp" />
     <ClCompile Include="..\Source\UI_Def.cpp" />
     <ClCompile Include="..\Source\UI_TextArea.cpp" />
+    <ClCompile Include="..\Source\UI_TextAreaTable.cpp" />
     <ClCompile Include="..\Source\UI_TextLineInfo.cpp" />
     <ClCompile Include="..\Source\Turret\Turret.cpp" />
     <ClCompile Include="..\Source\UI_Manager.cpp" />
@@ -137,6 +138,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClInclude Include="..\Source\Skills.h" />
     <ClInclude Include="..\Source\TestScene.h" />
     <ClInclude Include="..\Source\UI_TextArea.h" />
+    <ClInclude Include="..\Source\UI_TextAreaTable.h" />
     <ClInclude Include="..\Source\UI_TextLineInfo.h" />
     <ClInclude Include="..\Source\Turret\Turret.h" />
     <ClInclude Include="..\Source\UI_Def.h" />

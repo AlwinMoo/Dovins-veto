@@ -61,6 +61,9 @@
     <ClCompile Include="..\Source\UI_Def.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\UI_TextAreaTable.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h">
@@ -136,6 +139,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\UI_StatElement.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\UI_TextAreaTable.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

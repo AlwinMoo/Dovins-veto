@@ -12,7 +12,8 @@ namespace
 	int object_count;
 	GameObject* hoverStructure;
 	bool validPlacement;
-	UI::UI_Manager* uiManager;
+	UI::UI_Manager* gameUiManager;
+	UI::UI_Manager* skillTreeManager;
 
 	// Input
 	AEVec2 mouse_pos{};
@@ -60,15 +61,7 @@ namespace
 	int currentWave;
 
 	// TEXT TEST
-	UI::UI_TextArea endTurnHoverText;
-	UI::UI_TextArea buildTowerHoverText;
-	UI::UI_TextArea buildNexusHoverText;
-	UI::UI_TextArea buildPlayerHoverText;
-	UI::UI_TextArea buildWallHoverText;
-	UI::UI_TextArea buildNexusPlacedHoverText;
-	UI::UI_TextArea buildPlayerPlacedHoverText;
-	UI::UI_TextArea eraseHoverText;
-	UI::UI_TextArea elementTestText;
+	UI::UI_TextAreaTable* textTable;
 
 	//Helper Functions
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value);
@@ -359,7 +352,7 @@ void Alwintest_Draw()
 		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
 #endif
 		// Render UI
-		uiManager->Draw(cursorX, cursorY);
+		gameUiManager->Draw(cursorX, cursorY);
 
 		char buff[30]{};
 		sprintf_s(buff, "Resources Left: %d", buildResource);
@@ -374,7 +367,9 @@ void Alwintest_Free()
 	{
 		delete i;
 	}
-	delete uiManager;
+	delete textTable;
+	delete skillTreeManager;
+	delete gameUiManager;
 	delete test_map;
 }
 
@@ -453,8 +448,8 @@ namespace
 	void UpdateUIManager()
 	{
 		AEVec2 invert_mouse = mouse_pos;
-		invert_mouse.y = ::uiManager->m_winDim.y - mouse_pos.y;
-		::uiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+		invert_mouse.y = ::gameUiManager->m_winDim.y - mouse_pos.y;
+		::gameUiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 	}
 
 	void PlaceStructure()
@@ -512,14 +507,14 @@ namespace
 		{
 			nexusPlaced = true;
 			nexusButton->texID = UI::TEX_NEXUS_PLACED;
-			nexusButton->hoverText = &buildNexusPlacedHoverText;
+			nexusButton->hoverText = &textTable->buildNexusPlacedHoverText;
 			PlaceWallButton();
 		}
 		else if (temp->type == GameObject::GO_PLAYER)
 		{
 			playerPlaced = true;
 			playerButton->texID = UI::TEX_PLAYER_PLACED;
-			playerButton->hoverText = &buildPlayerPlacedHoverText;
+			playerButton->hoverText = &textTable->buildPlayerPlacedHoverText;
 			PlaceWallButton();
 		}
 	}
@@ -553,7 +548,7 @@ namespace
 					{
 						nexusPlaced = false;
 						nexusButton->texID = UI::TEX_NEXUS;
-						nexusButton->hoverText = &buildNexusHoverText;
+						nexusButton->hoverText = &textTable->buildNexusHoverText;
 
 						Nexus = nullptr;
 					}
@@ -561,7 +556,7 @@ namespace
 					{
 						playerPlaced = false;
 						playerButton->texID = UI::TEX_PLAYER;
-						playerButton->hoverText = &buildPlayerHoverText;
+						playerButton->hoverText = &textTable->buildPlayerHoverText;
 					}
 
 					break;
@@ -733,7 +728,7 @@ namespace
 			EnableDangerSigns();
 			playerPlaced = false;
 			playerButton->texID = UI::TEX_PLAYER;
-			playerButton->hoverText = &buildPlayerHoverText;
+			playerButton->hoverText = &textTable->buildPlayerHoverText;
 			player->active = 0;
 			player->Path.clear();
 		}
@@ -888,51 +883,47 @@ namespace
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-		::uiManager = new UI::UI_Manager();
-		::uiManager->SetWinDim(screenWidthX, screenHeightY);
+		::gameUiManager = new UI::UI_Manager{};	// New ui manager
+		::gameUiManager->SetWinDim(screenWidthX, screenHeightY);
+		::skillTreeManager = new UI::UI_Manager{};
+		textTable = new UI::UI_TextAreaTable{};
 	}
 
 	void InitializeUIButtons()
 	{
-		endTurnHoverText = { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE" };
-		buildTowerHoverText = { .3f, 1.f, "Builds a tower. Automatically attacks enemies from range." };
-		buildWallHoverText = { .3f, 1.f, "Builds a wall. Most enemies walk around them." };
-		buildNexusHoverText = { .3f, 1.f, "Builds the nexus. Protect it with your life." };
-		buildPlayerHoverText = { .3f, 1.f, "Place the player. Defend your base." };
-		buildNexusPlacedHoverText = { .3f, 1.f, "Nexus already built. You only get one." };
-		buildPlayerPlacedHoverText = { .3f, 1.f, "Player already placed. You only get one." };
-		eraseHoverText = { .3f, 1.f, "Erase your building. No shame in mistakes." };
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 
 		AEVec2 const endButtonPos{ screenWidthX * .115f, screenWidthY * .2f };
 		AEVec2 const endButtonSize{ screenWidthX * .2f, screenWidthY * .15f };
-		::uiManager->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
+		::gameUiManager->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &textTable->endTurnHoverText);
 
 		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenWidthY * .9f };
 		AEVec2 const buildButtonSize{ screenWidthY * .12f, screenWidthY * .12f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
 		buildButtonPos.x -= buildButtonSize.y * 0.75f;
-		nexusButton = ::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
+		nexusButton = ::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &textTable->buildNexusHoverText);
 		buildButtonPos.x += buildButtonSize.y * 1.5f;
-		playerButton = ::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_PLAYER_BUTTON, nullptr, PlacePlayerButton, &buildPlayerHoverText);
+		playerButton = ::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_PLAYER_BUTTON, nullptr, PlacePlayerButton, &textTable->buildPlayerHoverText);
 		buildButtonPos.x -= buildButtonSize.y * 0.75f;
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &buildWallHoverText);
+		::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &textTable->buildWallHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &buildTowerHoverText);
+		::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &textTable->buildTowerHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		::uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &eraseHoverText);
+		::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &textTable->eraseHoverText);
+
+		// Initialize skill tree buttons
 	}
 
 	void InitializeUIElements()
 	{
-		elementTestText = { .2f, 0.f, "HEALTH:" };
-		AEVec2 healthBarPos{ 0.f, 0.f }, healthBarScale{ 5.f, 2.f };
-		uiManager->CreateUIStat(healthBarPos, healthBarScale, &elementTestText);
-		//auto tempPtr = uiManager->CreateUIStat(healthBarPos, healthBarScale, &elementTestText);
+		textTable->elementTestText = { .2f, 0.f, "HEALTH:" };
+		AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 50.f, 50.f };
+		//uiManager->CreateUIStat(healthBarPos, healthBarScale, &elementTestText);
+		//auto tempPtr = gameUiManager->CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
 		//tempPtr->SetValue(1.f);
-		//tempPtr->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, .0f });
+		//tempPtr->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, 1.f });
 	}
 
 	void InitializeTestMap()
