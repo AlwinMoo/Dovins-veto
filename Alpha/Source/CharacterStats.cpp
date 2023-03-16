@@ -55,9 +55,9 @@ void CharacterStats::SetStat(STAT_TYPE stat, float val)
 	m_stats.at(stat) = val;
 }
 
-void CharacterStats::SetNextInnerState(INNER_STATE st)
+void CharacterStats::SetCurrInnerState(INNER_STATE st)
 {
-	nextInnerState = st;
+	currInnerState = st;
 }
 
 INNER_STATE CharacterStats::GetCurrInnerState()
@@ -68,6 +68,18 @@ INNER_STATE CharacterStats::GetCurrInnerState()
 void CharacterStats::SetNextState(STATE st)
 {
 	nextState = st;
+}
+
+void CharacterStats::SetCurrStateFromNext()
+{
+	// whenever we change states we want to be called at exit
+	if (currInnerState != INNER_STATE::ISTATE_EXIT && currInnerState != INNER_STATE::ISTATE_NONE)
+		return;
+
+	currState = nextState;
+
+	// whenever we change states we want to restart at enter
+	currInnerState = INNER_STATE::ISTATE_ENTER;
 }
 
 STATE CharacterStats::GetCurrState()

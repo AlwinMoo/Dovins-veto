@@ -15,6 +15,7 @@ enum class STATE
 	STATE_NONE,
 
 	STATE_ENEMY_IDLE,
+	STATE_ENEMY_MOVE,
 	STATE_ENEMY_ATTACK,
 	
 	STATE_TURRET_IDLE,
@@ -25,6 +26,9 @@ enum class STATE
 enum class INNER_STATE
 {
 	ISTATE_NONE,
+	ISTATE_ENTER,
+	ISTATE_UPDATE,
+	ISTATE_EXIT,
 };
 
 //!< info to add stat
@@ -46,7 +50,7 @@ private:
 	STATE nextState;
 
 	INNER_STATE currInnerState;
-	INNER_STATE nextInnerState;
+	//INNER_STATE nextInnerState;
 
 public:
 	CharacterStats();
@@ -54,20 +58,23 @@ public:
 
 	void	CalculateStats(); //!< recalculate stats
 	void	AddStat(AddStatInfo const* info); //!< adds to a raw stat and dirty = true
-	int		GetRawStat(STAT_TYPE stat); //!< get raw stat
 	float	GetStat(STAT_TYPE stat); //!< get stat. Automatically calculates if fields are dirty
-	
-	// Setters
-	void	SetRawStat(STAT_TYPE stat, int val);
 	void SetStat(STAT_TYPE stat, float val);
 
-	void SetNextInnerState(INNER_STATE);
+	// NEVER USE THIS UNLESS IT'S FOR NPC
+	int		GetRawStat(STAT_TYPE stat); //!< get raw stat
+	void	SetRawStat(STAT_TYPE stat, int val);
+
+	
+
+	void SetCurrInnerState(INNER_STATE);
 	INNER_STATE GetCurrInnerState();
 
 	void SetNextState(STATE);
+	// NEVER USE THIS UNLESS ITS IN EXIT
+	void SetCurrStateFromNext();
 	STATE GetCurrState();
 
-	AEVec2 target;
 	bool at_goal;
 	f32 path_timer;
 

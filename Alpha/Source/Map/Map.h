@@ -11,7 +11,7 @@ class game_map
 	~game_map();
 	game_map();
 
-	enum class TILE_TYPE
+	enum class TILE_TYPE : int
 	{
 		TILE_NONE = 0, // THIS REPRESENTS EMPTY SPACE
 		TILE_PLANET,
@@ -142,6 +142,10 @@ class game_map
 	 * @param gridScaleY	- Y scale to check
 	*/
 	bool IsOccupied(int index, int gridScalex=1, int gridScaleY=1);
+
+	int operator()(unsigned int const&, unsigned int const&);
+	int operator()(AEVec2 const&);
+	//AEVec2 operator[](unsigned int const&);
 
 };
 
