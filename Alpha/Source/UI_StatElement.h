@@ -19,9 +19,7 @@ namespace UI {
 		UI_Color colorTint;		//!< color (including alpha) of image
 
 		// textures
-		UI_TEX m_tex;
-		// Mesh
-		UI_MESH m_mesh;
+		UI_TEX m_tex{TEX_NEXUS};
 	};
 
 
@@ -47,10 +45,14 @@ namespace UI {
 
 		// Private Methods
 	public:
-		UI_StatElement(UI_TextArea* text = nullptr);
+		UI_StatElement(UI_TextArea* text = nullptr, AEVec2 const& meshDims = {});
 		~UI_StatElement() = default;
 		UI_StatElement& operator=(const UI_StatElement&) = delete;
-		void CalculatePositions();
+		void SetElementPos(AEVec2 const& pos);		//!< Set element position and calculate text/mesh pos
+		void CalculatePositions();					//!< Calculate positions of mesh offset from text
+		void SetValue(double val);					//!< Set value of double (for bars)
+		double GetValue()const;
+		void SetColor(UI_Color const& color);
 
 		void Update(double dt);
 		void Draw();

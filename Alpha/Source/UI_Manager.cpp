@@ -72,7 +72,7 @@ namespace UI
 
 	UI_StatElement* UI_Manager::CreateUIStat(AEVec2 pos, AEVec2 meshDim, UI_TextArea* text)
 	{
-		UI_StatElement* newStat{ new UI_StatElement{text} };
+		UI_StatElement* newStat{ new UI_StatElement{text, meshDim} };
 		newStat->CalculatePositions();
 		m_statElements.push_back(newStat);
 		return newStat;
@@ -142,7 +142,6 @@ namespace UI
 			AEGfxSetBlendColor(1.f, 1.f, 1.f, (curr->bHovering ? BUTTON_HOVER_ALPHA: 0.f));
 			DrawMesh(curr->posWS, curr->scale, curr->texID); // Render the mesh
 		}
-		AEGfxSetBlendColor(0.f, 0.f, 0.f, 0.f);
 
 		// NOW DRAW DESCRIPTIONS (IF ANY)
 		for (UI_Button* curr : m_buttons) {
@@ -159,14 +158,12 @@ namespace UI
 
 				// NOW DRAW THE TEXT
 				curr->hoverText->Draw(mouseXN, mouseYN, 0.f, 0.f, 0.f);
-				AEGfxSetBlendColor(0.f, 0.f, 0.f, 0.f);
 			}
 		}
 
 		// NOW DRAW EVERY UI ELEMENT EVER
 		for (UI_StatElement* curr : m_statElements)
 		{
-			// NOW DRAW THE TEXT
 			curr->Draw();
 		}
 	}

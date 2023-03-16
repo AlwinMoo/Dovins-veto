@@ -74,5 +74,6 @@ namespace UI
 	{
 		AEGfxSetBlendColor(color.r, color.g, color.b, color.a);
 		DrawMesh(pos, meshScale, texID);
+		AEGfxSetBlendColor(0.f, 0.f, 0.f, 0.f);
 	}
 }
