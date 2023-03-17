@@ -84,8 +84,8 @@ GameObject::GameObject(GAMEOBJECT_TYPE default_type) :
 }
 
 GameObject::~GameObject()
-{
-	AEGfxMeshFree(mesh);
+{	
+	if(mesh) AEGfxMeshFree(mesh);
 }
 
 void Color::Set(float r, float g, float b)

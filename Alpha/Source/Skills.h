@@ -14,14 +14,16 @@
 #include "Pathfinding/pathfinder.h"
 #include <cmath>
 
-
-enum Bullet_Flag
+enum which_skill
 {
-	no_upgrades = 0,
-	upgrade1,
-	upgrade2
+	shooting = 0,
+	AOEing,
+	TOTAL_SKILLS
 };
 
-void shoot_bullet(GameObject*, GameObject*, f32, f32, int);
-void AOE_move(GameObject*, double, double);
+using skill_func = void (*)(GameObject*, std::vector<GameObject*>&, AEGfxTexture*);
+void skills_upgrade_check(GameObject*);
+void shoot_bullet(GameObject*, std::vector<GameObject*>&, AEGfxTexture*);
+void AOE_move(GameObject*, std::vector<GameObject*>&, AEGfxTexture*);
 void player_blink(GameObject*, f32, f32);
+int skill_input_check(GameObject*);

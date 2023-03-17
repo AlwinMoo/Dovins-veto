@@ -49,14 +49,17 @@ namespace
 	const float BULLET_VEL{ 20.0f };
 	const double my_PI{ 3.14159265359 };
 	const int MAX_BULLET_INST{ 50 };
+	const float BULLET_SIZE{ 10.0f };
 	int bullet_flag{};
-	int shoot_flag{};
+	const u32 shoot_flag{ 0b0000'0010 };
 	f64 bullet_cooldown {};
 	f32 burst_fire_x;
 	f32 burst_fire_y;
+	//AEGfxVertexList* bull_mesh{nullptr};
 
 	//AOE
 	int AOE_flag{};
+	const float AOE_SIZE{ 200.0f };
 	bool AOE_begincd{ false };
 	//bool AOE_active{ false };
 	f64 AOE_cooldown{};
@@ -67,6 +70,11 @@ namespace
 	//blink
 	bool blink_ok{ false };
 	f64 blink_cd{};
+
+	//skill stuff
+	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move };
+	int skill_input{};
+
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
 	{
 		for (auto it : go_list)
@@ -75,6 +83,7 @@ namespace
 			if (!go->active)
 			{
 				go->active = true;
+				go->alpha = 1.0f;
 				++object_count;
 				return go;
 			}
@@ -96,6 +105,7 @@ void Bevantest_Load()
 	Player = AEGfxTextureLoad("Assets/PlayerTexture.png");
 	Enemy = AEGfxTextureLoad("Assets/EnemyTexture.png");
 	Bullet = AEGfxTextureLoad("Assets/YellowTexture.png");
+
 }
 
 void Bevantest_Initialize()
@@ -129,6 +139,7 @@ void Bevantest_Initialize()
 	player->tex = Player;
 	player->active = true;
 	playermove = false;
+	player->skill_flag = 0b0000'0000;
 
 	//enemy init
 	enemy = FetchGO(GameObject::GO_ENEMY);
@@ -137,6 +148,20 @@ void Bevantest_Initialize()
 	enemy->scale.y = enemy->scale.x;
 	enemy->tex = Enemy;
 	enemy->active = true;
+
+	//instantiate 50 bullets?
+	for (int i{}; i < MAX_BULLET_INST; ++i)
+	{
+		GameObject* bull_inst = FetchGO(GameObject::GO_BULLET);
+		bull_inst->tex = Bullet;
+		bull_inst->active = false;
+	}
+
+	//AOE init
+	GameObject* AOE_inst = FetchGO(GameObject::GO_AOE);
+
+	AOE_inst->tex = Bullet;
+	AOE_inst->active = false;
 }
 
 void Bevantest_Update()
@@ -172,75 +197,36 @@ void Bevantest_Update()
 	}
 	
 
+	skills_upgrade_check(player);
+	skill_input = skill_input_check(player);
+
+	if (skill_input >= 0)
+	{
+		skill_func to_exec{ skills_array[skill_input] };
+
+		switch (skill_input)
+		{
+			GameObject* skill_inst;
+		case (shooting):
+			to_exec(player, go_list, Bullet);
+			break;
+		case(AOEing):
+			to_exec(player, go_list, Bullet);
+			break;
+		default:
+			break;
+		}
+	}
+
+
+
 	//L-shift muscle to blink
 	if (AEInputCheckTriggered(AEVK_LSHIFT) && !blink_ok) //cant blink while blinking
 	{
 		player_blink(player, mouseX, mouseY);
 		blink_ok = true;
 	}
-	
-	//z-muscle to shoot
-	if (AEInputCheckTriggered(AEVK_Z) && shoot_flag == 0)
-	{
-		shoot_flag = 1;
-		bullet_cooldown = 0;
-		GameObject* bullet = FetchGO(GameObject::GO_BULLET);
 
-		bullet->tex = Bullet;
-		shoot_bullet(bullet, player, static_cast<f32>(mouseX), static_cast<f32>(mouseY), bullet_flag);
-		if (bullet_flag == upgrade2)
-		{
-			burst_fire_x = static_cast<f32> (mouseX);
-			burst_fire_y = static_cast<f32> (mouseY);
-		}
-	}
-
-	bullet_cooldown += AEFrameRateControllerGetFrameTime();
-
-	if (shoot_flag == 1)
-	{
-		if (bullet_flag == upgrade2)
-		{
-			if (bullet_cooldown == 3 * AEFrameRateControllerGetFrameTime() || bullet_cooldown == 5 * AEFrameRateControllerGetFrameTime())
-			{
-				GameObject* bullet = FetchGO(GameObject::GO_BULLET);
-				bullet->tex = Bullet;
-				shoot_bullet(bullet, player, burst_fire_x, burst_fire_y, bullet_flag);
-			}
-		}
-	}
-
-	if (bullet_cooldown >= static_cast<f64> (1))
-	{
-		shoot_flag = 0;
-		bullet_cooldown = 0;
-	}
-	//end shoot
-	
-	//x muscle to AOE
-	if (AEInputCheckTriggered(AEVK_X) && AOE_flag >= 1 && AOE_begincd == false)
-	{
-		if (AOE_flag == 1)
-		{
-			GameObject* AOE = FetchGO(GameObject::GO_AOE);
-			AOE->tex = Bullet;
-			AOE_move(AOE, static_cast<double> (player->position.x), static_cast<double> (player->position.y));
-			AOE_posx = player->position.x;
-			AOE_posy = player->position.y;
-			AOE_begincd = true;
-		}
-	}
-	
-	if (AOE_begincd)
-	{
-		AOE_cooldown += AEFrameRateControllerGetFrameTime();
-		if (AOE_cooldown > static_cast<f64> (2.0f))
-		{
-			AOE_cooldown = 0;
-			AOE_begincd = false;
-		}
-	}
-	//end AOE
 	// GameObject Update
 	if (len_check <= 75) enemy->active = false;
 
@@ -275,24 +261,31 @@ void Bevantest_Update()
 			case (GameObject::GAMEOBJECT_TYPE::GO_BULLET) :
 				gameObj->position.x += gameObj->direction.x * BULLET_VEL;
 				gameObj->position.y += gameObj->direction.y * BULLET_VEL;
+
 				if (gameObj->position.x > winSizeX || gameObj->position.x < 0 || gameObj->position.y > winSizeY || gameObj->position.y < 0)
 				{
 					gameObj->active = false;
+					std::cout << "bullet destoryed";
 				}
 				break;
 
 			case (GameObject::GAMEOBJECT_TYPE::GO_AOE) :
-				gameObj->position.x = AOE_posx;
-				gameObj->position.y = AOE_posy;
-				AOE_timer += AEFrameRateControllerGetFrameTime();
+				gameObj->position.x = player->position.x;
+				gameObj->position.y = player->position.y;
+				player->AOE.timer += AEFrameRateControllerGetFrameTime();
 
-				if (AOE_timer > static_cast<f64> (0.2f))
+				if (player->AOE.timer > static_cast<f64> (0.2f))
 				{
 					gameObj->alpha -= 0.10f;
-					AOE_timer = 0;
+					player->AOE.timer = 0;
 				}
 
-				if (gameObj->alpha <= 0) gameObj->active = false;
+				if (gameObj->alpha < 0)
+				{
+					gameObj->active = false;
+					player->AOE.on_cd = true;
+					//delete gameObj;
+				}
 				break;
 
 			}
@@ -303,19 +296,6 @@ void Bevantest_Update()
 	if(AEInputCheckTriggered(AEVK_Q)) next = GS_QUIT;
 	if (AEInputCheckTriggered(AEVK_K)) next = GS_LEVEL3;
 
-	//m muscle for bullet upgrades
-	if (AEInputCheckTriggered(AEVK_M))
-	{
-		if (bullet_flag == 1) bullet_flag = 2;
-		else bullet_flag = 1;
-	}
-	
-	//n muscle for AOE upgrades
-	if (AEInputCheckTriggered(AEVK_N))
-	{
-		if (AOE_flag == 0) AOE_flag = 1;
-		else if (AOE_flag == 1) AOE_flag = 2;
-	}
 
 
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
@@ -445,12 +425,15 @@ void Bevantest_Free()
 	//AEGfxMeshFree(pMesh);
 	for (GameObject* curr : go_list) 
 	{
+		//if (curr->type == GameObject::GO_BULLET || curr->type == GameObject::GO_AOE) curr->mesh = nullptr;
 		delete curr;
 	}
+
 }
 
 void Bevantest_Unload()
 {
+	//AEGfxMeshFree(bull_mesh);
 	delete uiManager;
 	delete test_map;
 	AEGfxTextureUnload(Bullet);

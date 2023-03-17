@@ -15,6 +15,15 @@ struct Color
 	void Set(float r, float g, float b);
 };
 
+struct skill_stuff
+{
+	f32 cooldown;
+	f32 timer;
+	u32 skill_bit;
+	f32 damage;
+	int on_cd;
+};
+
 class GameObject
 {
 public:
@@ -36,10 +45,18 @@ public:
 		GO_TOTAL,
 	};
 
+
+
 	GAMEOBJECT_TYPE type;
 	bool active;
 	float alpha;
 	Color color;
+	f64	  timer;
+	u32	  skill_flag;
+
+	skill_stuff AOE;
+	skill_stuff Range;
+	skill_stuff Melee;
 
 	AEVec2 position;
 	AEVec2 scale;

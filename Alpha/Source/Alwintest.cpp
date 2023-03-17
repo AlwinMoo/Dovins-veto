@@ -5,7 +5,7 @@
 #include "GameStateManager.h"
 #include "Pathfinding/pathfinder.h"
 #include "CharacterStats.h"
-
+#include "Skills.h"
 namespace
 {
 	std::vector<GameObject*> go_list;
@@ -65,6 +65,10 @@ namespace
 	int	enemiesSpawned;
 	int	enemiesRemaining;
 	int currentWave;
+
+	//Skills
+	int skill_input;
+	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move };
 
 	// TEXT TEST
 	UI::UI_TextAreaTable* textTable;
@@ -162,7 +166,7 @@ void Alwintest_Update()
 				PlaceStructure();
 			}
 		}
-
+		skills_upgrade_check(player);
 		UpdateHoverStructure();
 	}
 	else
@@ -180,6 +184,26 @@ void Alwintest_Update()
 
 		SpawnEnemies();
 		NextWaveCheck();
+
+		skill_input = skill_input_check(player);
+
+		if (skill_input >= 0)
+		{
+			skill_func to_exec{ skills_array[skill_input] };
+
+			switch (skill_input)
+			{
+				GameObject* skill_inst;
+			case (shooting):
+				to_exec(player, go_list, bulletTex);
+				break;
+			case(AOEing):
+				to_exec(player, go_list, bulletTex);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	// Quit Game
@@ -272,6 +296,25 @@ void Alwintest_Update()
 					}
 
 					break;
+				}
+				case (GameObject::GAMEOBJECT_TYPE::GO_AOE) :
+				{
+					gameObj->position.x = player->position.x;
+					gameObj->position.y = player->position.y;
+					player->AOE.timer += AEFrameRateControllerGetFrameTime();
+
+					if (player->AOE.timer > static_cast<f64> (0.2f))
+					{
+						gameObj->alpha -= 0.10f;
+						player->AOE.timer = 0;
+					}
+					if (gameObj->alpha < 0)
+					{
+						gameObj->active = false;
+						player->AOE.on_cd = true;
+					}
+					break;
+
 				}
 			}
 		}
