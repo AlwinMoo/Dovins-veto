@@ -66,13 +66,14 @@ namespace
 	f64 AOE_timer{};
 	f32 AOE_posx;
 	f32 AOE_posy;
-
+	//car stuff
+	const float CAR_VEL{ 5.0f };
 	//blink
 	bool blink_ok{ false };
 	f64 blink_cd{};
 
 	//skill stuff
-	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move };
+	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move };
 	int skill_input{};
 
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
@@ -166,8 +167,6 @@ void Bevantest_Initialize()
 
 void Bevantest_Update()
 {
-	
-
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
 
 	// Player Input
@@ -213,11 +212,13 @@ void Bevantest_Update()
 		case(AOEing):
 			to_exec(player, go_list, Bullet);
 			break;
+		case(car) :
+			to_exec(player, go_list, Bullet);
+			break;
 		default:
 			break;
 		}
 	}
-
 
 
 	//L-shift muscle to blink
@@ -267,6 +268,24 @@ void Bevantest_Update()
 					gameObj->active = false;
 					std::cout << "bullet destoryed";
 				}
+
+				for (GameObject* go : go_list)
+				{
+					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					{
+						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+						{
+							go->active = false;
+							gameObj->active = false;
+
+							if (gameObj->Range.skill_bit & tier1)
+							{
+								//implement spread shot function here
+								spreadshot(gameObj, go_list, Bullet);
+							}
+						}
+					}
+				}
 				break;
 
 			case (GameObject::GAMEOBJECT_TYPE::GO_AOE) :
@@ -284,10 +303,21 @@ void Bevantest_Update()
 				{
 					gameObj->active = false;
 					player->AOE.on_cd = true;
-					//delete gameObj;
 				}
 				break;
 
+			case (GameObject::GAMEOBJECT_TYPE::GO_CAR) : 
+				gameObj->position.x += gameObj->direction.x * CAR_VEL;
+				gameObj->position.y += gameObj->direction.y * CAR_VEL;
+
+				if (gameObj->position.x > winSizeX || gameObj->position.x < 0 || gameObj->position.y > winSizeY || gameObj->position.y < 0)
+				{
+					gameObj->active = false;
+					std::cout << "car destroyed";
+				}
+				break;
+			default :
+				break;
 			}
 		}
 	}
@@ -389,7 +419,11 @@ void Bevantest_Draw()
 				case GameObject:: GO_AOE	:
 												gameObj->Render();
 												break;
-				default: break;
+				case GameObject:: GO_CAR	:
+												gameObj->Render();
+												break;
+				default: 
+												break;
 
 			}
 		}

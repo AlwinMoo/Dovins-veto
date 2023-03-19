@@ -40,6 +40,7 @@ public:
 		GO_NEXUS,
 		GO_BULLET,
 		GO_AOE,
+		GO_CAR,
 		GO_ENEMY,
 		GO_DANGER_SIGN,
 		GO_TOTAL,
