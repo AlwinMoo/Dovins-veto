@@ -66,153 +66,115 @@ void skills_upgrade_check(GameObject* player)
 	}
 }
 
-void shoot_bullet(GameObject* Player, std::vector<GameObject*>& go_list, AEGfxTexture* pTex)
+void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 {
 	double bullet_ang;
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 
-	for (GameObject* pInst : go_list)
-	{
-		if (pInst->active) continue;
+	//for (GameObject* pInst : go_list)
+	//{
+	//	if (pInst->active) continue;
 
-		pInst->type = GameObject::GO_BULLET;
-		pInst->tex = pTex;
-		pInst->position.x = Player->position.x;
-		pInst->position.y = Player->position.y;
-		pInst->scale.x = BULLET_SIZE;
-		pInst->scale.y = BULLET_SIZE;
-		bullet_ang = atan2(static_cast<double> (pInst->position.y - mouseY), static_cast<double> (pInst->position.x - mouseX));
-		AEVec2Set(&pInst->direction, -cos(bullet_ang), -sin(bullet_ang));
-		pInst->alpha = 1.0f;
-		pInst->active = true;
-
+	//	pInst->type = GameObject::GO_BULLET;
+	//	pInst->tex = pTex;
+	//	pInst->position.x = Player->position.x;
+	//	pInst->position.y = Player->position.y;
+	//	pInst->scale.x = BULLET_SIZE;
+	//	pInst->scale.y = BULLET_SIZE;
+	//	bullet_ang = atan2(static_cast<double> (pInst->position.y - mouseY), static_cast<double> (pInst->position.x - mouseX));
+	//	AEVec2Set(&pInst->direction, -cos(bullet_ang), -sin(bullet_ang));
+	//	pInst->alpha = 1.0f;
+	//	pInst->active = true;
+		
+	skill_inst->position.x = Player->position.x;
+	skill_inst->position.y = Player->position.y;
+	skill_inst->scale.x = BULLET_SIZE;
+	skill_inst->scale.y = BULLET_SIZE;
+	bullet_ang = atan2(static_cast<double> (skill_inst->position.y - mouseY), static_cast<double> (skill_inst->position.x - mouseX));
+	AEVec2Set(&skill_inst->direction, -cos(bullet_ang), -sin(bullet_ang));
 		switch (Player->Range.skill_bit)
 		{
 			case(base):
-				pInst->Range.skill_bit = base;
+				skill_inst->Range.skill_bit = base;
 				//can update damage numbers here
 				break;
 			case(tier1):
-				pInst->Range.skill_bit = tier1;
+				skill_inst->Range.skill_bit = tier1;
 				//here too
 				break;
 			case(tier2):
-				pInst->Range.skill_bit = tier2;
+				skill_inst->Range.skill_bit = tier2;
 			default:
 				break;
 		}
-		break;
-	}
+	//	break;
+	//}
 }
 
-void spreadshot(GameObject* parent, std::vector<GameObject*>& go_list, AEGfxTexture* pTex)
+void spreadshot(GameObject* parent, GameObject* skill_inst)
 {
-		for (GameObject* spread : go_list)
-		{
-			if (spread->active) continue;
-
-			spread->type = GameObject::GO_BULLET;
-			spread->tex = pTex;
-			spread->scale.x = BULLET_SIZE;
-			spread->scale.y = BULLET_SIZE;
-			spread->alpha = 1.0f;
-			spread->position.x = parent->position.x;
-			spread->position.y = parent->position.y;
-			spread->active = true;
-			AEVec2Set(&spread->direction, -cos(2 * PI), -sin(PI));
-			break;
-		}
-
-		for (GameObject* spread : go_list)
-		{
-			if (spread->active) continue;
-
-			spread->type = GameObject::GO_BULLET;
-			spread->tex = pTex;
-			spread->scale.x = BULLET_SIZE;
-			spread->scale.y = BULLET_SIZE;
-			spread->alpha = 1.0f;
-			spread->position.x = parent->position.x;
-			spread->position.y = parent->position.y;
-			spread->active = true;
-			AEVec2Set(&spread->direction, cos(2 * PI), -sin(PI));
-			break;
-		}
-
-		for (GameObject* spread : go_list)
-		{
-			if (spread->active) continue;
-
-			spread->type = GameObject::GO_BULLET;
-			spread->tex = pTex;
-			spread->scale.x = BULLET_SIZE;
-			spread->scale.y = BULLET_SIZE;
-			spread->alpha = 1.0f;
-			spread->position.x = parent->position.x;
-			spread->position.y = parent->position.y;
-			spread->active = true;
-			AEVec2Set(&spread->direction, cos(0.5 * PI), -sin(0.5 * PI));
-			break;
-		}
-
-		for (GameObject* spread : go_list)
-		{
-			if (spread->active) continue;
-
-			spread->type = GameObject::GO_BULLET;
-			spread->tex = pTex;
-			spread->scale.x = BULLET_SIZE;
-			spread->scale.y = BULLET_SIZE;
-			spread->alpha = 1.0f;
-			spread->position.x = parent->position.x;
-			spread->position.y = parent->position.y;
-			spread->active = true;
-			AEVec2Set(&spread->direction, cos(0.5 * PI), sin(0.5 * PI));
-			break;
-		}
+	skill_inst->position.x = parent->position.x;
+	skill_inst->position.y = parent->position.y;
+	skill_inst->scale.x = BULLET_SIZE;
+	skill_inst->scale.y = BULLET_SIZE;
+	AEVec2Set(&skill_inst->direction, cos(PI), sin(PI));
 }
 
-void car_move(GameObject* Player, std::vector<GameObject*>& go_list, AEGfxTexture* pTex)
+void car_move(GameObject* Player, GameObject* skill_inst)
 {
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 	double car_ang;
+	
+	skill_inst->position.x = Player->position.x;
+	skill_inst->position.y = Player->position.y;
+	skill_inst->scale.x = CAR_SIZE;
+	skill_inst->scale.y = CAR_SIZE;
+	skill_inst->alpha = 1.0f;
+	car_ang = atan2(static_cast<double>(skill_inst->position.y - mouseY), static_cast<double> (skill_inst->position.x - mouseX));
+	AEVec2Set(&skill_inst->direction, -cos(car_ang), -sin(car_ang));
+	//for (GameObject* car : go_list)
+	//{
+	//	if (car->active) continue;
 
-	for (GameObject* car : go_list)
-	{
-		if (car->active) continue;
-
-		car->type = GameObject::GO_CAR;
-		car->tex = pTex;
-		car->scale.x = CAR_SIZE;
-		car->scale.y = CAR_SIZE;
-		car->alpha = 1.0f;
-		car->position.x = Player->position.x;
-		car->position.y = Player->position.y;
-		car_ang = atan2(static_cast<double> (car->position.y - mouseY), static_cast<double> (car->position.x - mouseX));
-		AEVec2Set(&car->direction, -cos(car_ang), -sin(car_ang));
-		car->active = true;
-	}
+	//	car->type = GameObject::GO_CAR;
+	//	car->tex = pTex;
+	//	car->scale.x = CAR_SIZE;
+	//	car->scale.y = CAR_SIZE;
+	//	car->alpha = 1.0f;
+	//	car->position.x = Player->position.x;
+	//	car->position.y = Player->position.y;
+	//	car_ang = atan2(static_cast<double> (car->position.y - mouseY), static_cast<double> (car->position.x - mouseX));
+	//	AEVec2Set(&car->direction, -cos(car_ang), -sin(car_ang));
+	//	car->active = true;
+	//}
 }
 
-void AOE_move(GameObject* Player, std::vector<GameObject*>& go_list, AEGfxTexture* pTex)
+void AOE_move(GameObject* Player, GameObject* skill_inst)
 {
-	for (GameObject* pInst : go_list)
-	{
-		if (pInst->active) continue;
-		
-		pInst->type = GameObject::GO_AOE;
-		pInst->tex = pTex;
-		pInst->position.x = Player->position.x;
-		pInst->position.y = Player->position.y;
-		pInst->scale.x = AOE_SIZE;
-		pInst->scale.y = AOE_SIZE;
-		pInst->alpha = AOE_ALPHA;
-		AEVec2Set(&pInst->direction, 0.0f, 0.0f);
-		pInst->active = true;
-		break;
-	}
+	skill_inst->type = GameObject::GO_AOE;
+	skill_inst->position.x = Player->position.x;
+	skill_inst->position.y = Player->position.y;
+	skill_inst->scale.x = AOE_SIZE;
+	skill_inst->scale.y = AOE_SIZE;
+	skill_inst->alpha = AOE_ALPHA;
+	AEVec2Set(&skill_inst->direction, 0, 0);
+	//for (GameObject* pInst : go_list)
+	//{
+	//	if (pInst->active) continue;
+	//	
+	//	pInst->type = GameObject::GO_AOE;
+	//	pInst->tex = pTex;
+	//	pInst->position.x = Player->position.x;
+	//	pInst->position.y = Player->position.y;
+	//	pInst->scale.x = AOE_SIZE;
+	//	pInst->scale.y = AOE_SIZE;
+	//	pInst->alpha = AOE_ALPHA;
+	//	AEVec2Set(&pInst->direction, 0.0f, 0.0f);
+	//	pInst->active = true;
+	//	break;
+	//}
 }
 
 void player_blink(GameObject* player, f32 mousex, f32 mousey)
@@ -227,17 +189,22 @@ int skill_input_check(GameObject* player)
 	if (player->AOE.on_cd) //AOE cooldown
 	{
 		player->AOE.cooldown += AEFrameRateControllerGetFrameTime();
-		if (player->AOE.cooldown >= static_cast<f64> (5.0f)) player->AOE.on_cd = false;
+		if (player->AOE.cooldown >= static_cast<f64> (5.0f))
+		{
+			player->AOE.cooldown = 0;
+			player->AOE.on_cd = false;
+		}
 	}
 
 
-	if (AEInputCheckTriggered(AEVK_Z) && (player->skill_flag & shoot_flag))
+	if (AEInputCheckTriggered(AEVK_Z) && (player->skill_flag & shoot_flag) == shoot_flag)
 	{
 		return 0;
 	}
 
-	if (AEInputCheckTriggered(AEVK_X) && (player->skill_flag & AOE_flag) && !player->AOE.on_cd) 
+	if (AEInputCheckTriggered(AEVK_X) && (player->skill_flag & AOE_flag) == AOE_flag && !player->AOE.on_cd) 
 	{
+		player->AOE.on_cd = true;
 		return 1;
 	}
 

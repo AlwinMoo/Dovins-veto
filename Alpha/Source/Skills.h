@@ -29,12 +29,12 @@ enum upgrade_level : u32
 	tier2 = 0b0000'0010
 };
 
-using skill_func = void (*)(GameObject*, std::vector<GameObject*>&, AEGfxTexture*);
+using skill_func = void (*)(GameObject*, GameObject*);
 void skills_upgrade_check(GameObject*);
-void shoot_bullet(GameObject*, std::vector<GameObject*>&, AEGfxTexture*);
-void spreadshot(GameObject*, std::vector<GameObject*>&, AEGfxTexture*);
-void car_move(GameObject*, std::vector<GameObject*>&, AEGfxTexture*);
-void AOE_move(GameObject*, std::vector<GameObject*>&, AEGfxTexture*);
+void shoot_bullet(GameObject*, GameObject*);
+void spreadshot(GameObject*, GameObject*);
+void car_move(GameObject*, GameObject*);
+void AOE_move(GameObject*, GameObject*);
 void player_blink(GameObject*, f32, f32);
 int skill_input_check(GameObject*);
 void car_shoot_bullet(GameObject*, std::vector<GameObject*>&, AEGfxTexture*);

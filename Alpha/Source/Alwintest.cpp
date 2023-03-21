@@ -195,10 +195,12 @@ void Alwintest_Update()
 			{
 				GameObject* skill_inst;
 			case (shooting):
-				to_exec(player, go_list, bulletTex);
+				skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+				to_exec(player, skill_inst);
 				break;
 			case(AOEing):
-				to_exec(player, go_list, bulletTex);
+				skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_AOE);
+				to_exec(player, skill_inst);
 				break;
 			default:
 				break;
@@ -303,6 +305,16 @@ void Alwintest_Update()
 					gameObj->position.y = player->position.y;
 					player->AOE.timer += AEFrameRateControllerGetFrameTime();
 
+					//check collision
+					for (GameObject* go : go_list)
+					{
+						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+						{
+							if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
+								go->active = false;
+						}
+					}
+
 					if (player->AOE.timer > static_cast<f64> (0.2f))
 					{
 						gameObj->alpha -= 0.10f;
@@ -311,7 +323,7 @@ void Alwintest_Update()
 					if (gameObj->alpha < 0)
 					{
 						gameObj->active = false;
-						player->AOE.on_cd = true;
+						//player->AOE.on_cd = true;
 					}
 					break;
 

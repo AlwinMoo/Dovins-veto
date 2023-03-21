@@ -207,13 +207,18 @@ void Bevantest_Update()
 		{
 			GameObject* skill_inst;
 		case (shooting):
-			to_exec(player, go_list, Bullet);
+			skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+			skill_inst->tex = Bullet;
+			to_exec(player, skill_inst);
 			break;
 		case(AOEing):
-			to_exec(player, go_list, Bullet);
+			skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_AOE);
+			skill_inst->tex = Bullet;
+			to_exec(player, skill_inst);
 			break;
-		case(car) :
-			to_exec(player, go_list, Bullet);
+		case(car):
+			skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CAR);
+			to_exec(player, skill_inst);
 			break;
 		default:
 			break;
@@ -257,9 +262,9 @@ void Bevantest_Update()
 						blink_cd = 0;
 					}
 				}
-				
+
 				break;
-			case (GameObject::GAMEOBJECT_TYPE::GO_BULLET) :
+			case (GameObject::GAMEOBJECT_TYPE::GO_BULLET):
 				gameObj->position.x += gameObj->direction.x * BULLET_VEL;
 				gameObj->position.y += gameObj->direction.y * BULLET_VEL;
 
@@ -278,20 +283,32 @@ void Bevantest_Update()
 							go->active = false;
 							gameObj->active = false;
 
-							if (gameObj->Range.skill_bit & tier1)
+							if ((gameObj->Range.skill_bit & tier1) == tier1)
 							{
 								//implement spread shot function here
-								spreadshot(gameObj, go_list, Bullet);
+								GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+								spreadshot(gameObj, skill_inst);
 							}
 						}
 					}
 				}
 				break;
 
-			case (GameObject::GAMEOBJECT_TYPE::GO_AOE) :
+			case (GameObject::GAMEOBJECT_TYPE::GO_AOE):
+				//update positions
 				gameObj->position.x = player->position.x;
 				gameObj->position.y = player->position.y;
 				player->AOE.timer += AEFrameRateControllerGetFrameTime();
+
+				//check collision
+				for (GameObject* go : go_list)
+				{
+					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					{
+						if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5)) go->active = false;
+						break;
+					}
+				}
 
 				if (player->AOE.timer > static_cast<f64> (0.2f))
 				{
@@ -302,7 +319,6 @@ void Bevantest_Update()
 				if (gameObj->alpha < 0)
 				{
 					gameObj->active = false;
-					player->AOE.on_cd = true;
 				}
 				break;
 
