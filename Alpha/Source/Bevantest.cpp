@@ -236,6 +236,19 @@ void Bevantest_Update()
 	// GameObject Update
 	if (len_check <= 75) enemy->active = false;
 
+	if (player->Range.active)
+	{
+		GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+		for (GameObject* go : go_list)
+		{
+			if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_CAR)
+			{
+				skill_inst->tex = Bullet;
+				random_shoot(go, skill_inst);
+				break;
+			}
+		}
+	}
 	for (GameObject* gameObj : go_list)
 	{
 		if (gameObj->active)
@@ -323,15 +336,18 @@ void Bevantest_Update()
 				break;
 
 			case (GameObject::GAMEOBJECT_TYPE::GO_CAR) : 
+			{
 				gameObj->position.x += gameObj->direction.x * CAR_VEL;
 				gameObj->position.y += gameObj->direction.y * CAR_VEL;
 
 				if (gameObj->position.x > winSizeX || gameObj->position.x < 0 || gameObj->position.y > winSizeY || gameObj->position.y < 0)
 				{
 					gameObj->active = false;
+					player->Range.active = false;
 					std::cout << "car destroyed";
 				}
 				break;
+			}
 			default :
 				break;
 			}

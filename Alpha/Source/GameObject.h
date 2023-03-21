@@ -22,6 +22,7 @@ struct skill_stuff
 	u32 skill_bit;
 	f32 damage;
 	int on_cd;
+	bool active;
 };
 
 class GameObject
