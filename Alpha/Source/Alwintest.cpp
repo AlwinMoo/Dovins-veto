@@ -16,6 +16,7 @@ namespace
 	GameObject* hoverStructure;
 	bool validPlacement;
 
+	UI::UI_TYPE		UICurrLayer;
 	UI::UI_Manager* uiManagers[UI::NUM_UI_TYPE];
 
 	UI::UI_Manager* gameUiManager;
@@ -124,6 +125,7 @@ namespace
 	void PlaceTowerButton(UI::UI_Button*);
 	void PlaceWallButton(UI::UI_Button*);
 	void EraseButton(UI::UI_Button*);
+	void SkillTreeButton(UI::UI_Button*);
 #pragma endregion
 }
 
@@ -435,7 +437,7 @@ void Alwintest_Draw()
 		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
 #endif
 		// Render UI
-		gameUiManager->Draw(cursorX, cursorY);
+		uiManagers[UICurrLayer]->Draw(cursorX, cursorY);
 
 		char buff[30]{};
 		sprintf_s(buff, "Resources Left: %d", buildResource);
@@ -451,8 +453,8 @@ void Alwintest_Free()
 		delete i;
 	}
 	delete textTable;
-	delete skillTreeManager;
-	delete gameUiManager;
+	delete uiManagers[UI::UI_TYPE_GAME];
+	delete uiManagers[UI::UI_TYPE_SKILL];
 	delete test_map;
 }
 
@@ -532,9 +534,9 @@ namespace
 
 	void UpdateUIManager()
 	{
-		AEVec2 invert_mouse = mouse_pos;
-		invert_mouse.y = ::gameUiManager->m_winDim.y - mouse_pos.y;
-		::gameUiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+		AEVec2 invert_mouse = mouse_pos; // Getting inverted mouse pos to match world space
+		invert_mouse.y = uiManagers[UI::UI_TYPE_GAME]->m_winDim.y - mouse_pos.y;
+		uiManagers[UICurrLayer]->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 	}
 
 	GameObject* IndexToGO(int index)
@@ -1092,35 +1094,52 @@ namespace
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-		::gameUiManager = new UI::UI_Manager{};	// New ui manager
-		::gameUiManager->SetWinDim(screenWidthX, screenHeightY);
-		::skillTreeManager = new UI::UI_Manager{};
-		textTable = new UI::UI_TextAreaTable{};
+		uiManagers[UI::UI_TYPE_GAME] = new UI::UI_Manager{};	// New ui manager for gameplay
+		uiManagers[UI::UI_TYPE_GAME]->SetWinDim(screenWidthX, screenHeightY);
+		uiManagers[UI::UI_TYPE_SKILL] = new UI::UI_Manager{};	// New ui manager for skill tree
+		uiManagers[UI::UI_TYPE_SKILL]->SetWinDim(screenWidthX, screenHeightY);
+		textTable = new UI::UI_TextAreaTable{};	// Set up all UI button text description info
+		UICurrLayer = UI::UI_TYPE_GAME;							// Display gameplay UI first
 	}
 
 	void InitializeUIButtons()
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-
 		AEVec2 const endButtonPos{ screenWidthX * .115f, screenWidthY * .2f };
 		AEVec2 const endButtonSize{ screenWidthX * .2f, screenWidthY * .15f };
-		::gameUiManager->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &textTable->endTurnHoverText);
+
+		UI::UI_Manager& gameUIManager{ *uiManagers[UI::UI_TYPE_GAME] };
+		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
+
+		uiManagers[UI::UI_TYPE_GAME]->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &textTable->endTurnHoverText);
 
 		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenWidthY * .9f };
 		AEVec2 const buildButtonSize{ screenWidthY * .12f, screenWidthY * .12f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
 		buildButtonPos.x -= buildButtonSize.y * 0.75f;
-		nexusButton = ::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &textTable->buildNexusHoverText);
+		nexusButton = gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, 
+			nullptr, PlaceNexusButton, &textTable->buildNexusHoverText);
 		buildButtonPos.x += buildButtonSize.y * 1.5f;
-		playerButton = ::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_PLAYER_BUTTON, nullptr, PlacePlayerButton, &textTable->buildPlayerHoverText);
+		playerButton = gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_PLAYER_BUTTON,
+			nullptr, PlacePlayerButton, &textTable->buildPlayerHoverText);
 		buildButtonPos.x -= buildButtonSize.y * 0.75f;
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &textTable->buildWallHoverText);
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, 
+			nullptr, PlaceWallButton, &textTable->buildWallHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &textTable->buildTowerHoverText);
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, 
+			nullptr, PlaceTowerButton, &textTable->buildTowerHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &textTable->eraseHoverText);
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, 
+			nullptr, EraseButton, &textTable->eraseHoverText);
+		
+		// Both skill tree and gameplay layers share same button pos
+		buildButtonPos.x = screenWidthX - buildButtonSize.x;
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::SKILL_TREE_BUTTON, 
+			nullptr, SkillTreeButton, &textTable->eraseHoverText);
+		skillUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::CLOSE_BUTTON,
+			nullptr, SkillTreeButton, &textTable->eraseHoverText);
 
 		// Initialize skill tree buttons
 	}
@@ -1341,6 +1360,11 @@ namespace
 		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
 		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 		hoverStructure->tex = eraseTex;
+	}
+
+	void SkillTreeButton(UI::UI_Button* button) 
+	{
+		UICurrLayer = (UICurrLayer == UI::UI_TYPE_SKILL? UI::UI_TYPE_GAME : UI::UI_TYPE_SKILL);
 	}
 #pragma endregion
 }

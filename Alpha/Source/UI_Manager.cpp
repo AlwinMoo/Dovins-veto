@@ -63,6 +63,14 @@ namespace UI
 			newButton->texID = TEX_PLAYER;
 			newButton->meshID = MESH_BOX;
 			break;
+		case SKILL_TREE_BUTTON:
+			newButton->texID = TEX_SKILL_MENU;
+			newButton->meshID = MESH_BOX;
+			break;
+		case CLOSE_BUTTON:
+			newButton->texID = TEX_CLOSE;
+			newButton->meshID = MESH_BOX;
+			break;
 		default:
 			break;
 		}

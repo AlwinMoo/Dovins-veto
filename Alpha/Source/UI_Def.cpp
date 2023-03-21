@@ -7,16 +7,18 @@ namespace UI
 	std::array<AEGfxVertexList*, NUM_MESH> MeshList;
 	void InitUI()
 	{
-		TextureList.at(TEX_BUTTON) = AEGfxTextureLoad("Assets/SquareButton.png");
-		TextureList.at(TEX_END_PHASE) = AEGfxTextureLoad("Assets/Hourglass.png");
-		TextureList.at(TEX_TOWER) = AEGfxTextureLoad("Assets/Tower.png");
-		TextureList.at(TEX_NEXUS) = AEGfxTextureLoad("Assets/Nexus.png");
-		TextureList.at(TEX_WALL) = AEGfxTextureLoad("Assets/Wall.png");
-		TextureList.at(TEX_NEXUS_PLACED) = AEGfxTextureLoad("Assets/NexusPlaced.png");
-		TextureList.at(TEX_ERASE) = AEGfxTextureLoad("Assets/Eraser.png");
-		TextureList.at(TEX_PLAYER) = AEGfxTextureLoad("Assets/PlayerTexture.png");
-		TextureList.at(TEX_PLAYER_PLACED) = AEGfxTextureLoad("Assets/PlayerPlaced.png");
-		MeshList.at(MESH_BOX) = render::GenerateQuad();
+		TextureList[TEX_BUTTON]			= AEGfxTextureLoad("Assets/SquareButton.png");
+		TextureList[TEX_END_PHASE]		= AEGfxTextureLoad("Assets/Hourglass.png");
+		TextureList[TEX_TOWER]			= AEGfxTextureLoad("Assets/Tower.png");
+		TextureList[TEX_NEXUS]			= AEGfxTextureLoad("Assets/Nexus.png");
+		TextureList[TEX_WALL]			= AEGfxTextureLoad("Assets/Wall.png");
+		TextureList[TEX_NEXUS_PLACED]	= AEGfxTextureLoad("Assets/NexusPlaced.png");
+		TextureList[TEX_ERASE]			= AEGfxTextureLoad("Assets/Eraser.png");
+		TextureList[TEX_PLAYER]			= AEGfxTextureLoad("Assets/PlayerTexture.png");
+		TextureList[TEX_PLAYER_PLACED]	= AEGfxTextureLoad("Assets/PlayerPlaced.png");
+		TextureList[TEX_SKILL_MENU]		= AEGfxTextureLoad("Assets/UpgradeIcon.png");
+		TextureList[TEX_CLOSE]			= AEGfxTextureLoad("Assets/Close.png");
+		MeshList[MESH_BOX] = render::GenerateQuad();
 	}
 
 	void UnloadUI()
