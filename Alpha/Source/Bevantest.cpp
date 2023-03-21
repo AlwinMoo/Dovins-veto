@@ -24,7 +24,7 @@ namespace
 	int object_count;
 	f32 len_check;
 
-	UI::UI_Manager* uiManager;
+	UI::UI_Manager* gameUiManager;
 	//textures
 	AEGfxTexture* pTex;
 	AEGfxTexture* Grass;
@@ -106,8 +106,8 @@ void Bevantest_Initialize()
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		//auto meshTest = render::GenerateQuad();
-		uiManager = new UI::UI_Manager();
-		uiManager->SetWinDim(screenWidthX, screenHeightY);
+		gameUiManager = new UI::UI_Manager();
+		gameUiManager->SetWinDim(screenWidthX, screenHeightY);
 	}
 
 	test_map = new game_map(10, 10, (float)AEGetWindowWidth(), (float)AEGetWindowHeight(), true); // automatically destroyed in deconstructor
@@ -154,8 +154,8 @@ void Bevantest_Update()
 	AEVec2Set(&absmousepos, mouseX, mouseY);
 	{
 		AEVec2 invert_mouse = mousepos;
-		invert_mouse.y = uiManager->m_winDim.y - mousepos.y;
-		uiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+		invert_mouse.y = gameUiManager->m_winDim.y - mousepos.y;
+		gameUiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 	}
 	mousepos = test_map->SnapCoordinates(mousepos);
 
@@ -424,7 +424,7 @@ void Bevantest_Draw()
 	//{
 	//	enemy->Render();
 	//}
-	uiManager->Draw();
+	gameUiManager->Draw();
 
 	// IMPORTANT SNIPPET:
 	/***********************************************************************/
@@ -451,7 +451,7 @@ void Bevantest_Free()
 
 void Bevantest_Unload()
 {
-	delete uiManager;
+	delete gameUiManager;
 	delete test_map;
 	AEGfxTextureUnload(Bullet);
 	AEGfxTextureUnload(Enemy);

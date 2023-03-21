@@ -7,11 +7,16 @@
 
 namespace
 {
+
+
 	std::vector<GameObject*> go_list;
 	game_map* test_map;
 	int object_count;
 	GameObject* hoverStructure;
 	bool validPlacement;
+
+	UI::UI_Manager* uiManagers[UI::NUM_UI_TYPE];
+
 	UI::UI_Manager* gameUiManager;
 	UI::UI_Manager* skillTreeManager;
 
@@ -62,7 +67,7 @@ namespace
 
 	// TEXT TEST
 	UI::UI_TextAreaTable* textTable;
-
+	
 	//Helper Functions
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value);
 
@@ -102,12 +107,12 @@ namespace
 	void UpdateTurretShooting(AEVec2 target, GameObject* gameObj);
 
 #pragma region UI_CALLBACK_DECLARATIONS
-	void EndTurnButton();
-	void PlaceNexusButton();
-	void PlacePlayerButton();
-	void PlaceTowerButton();
-	void PlaceWallButton();
-	void EraseButton();
+	void EndTurnButton(UI::UI_Button*);
+	void PlaceNexusButton(UI::UI_Button*);
+	void PlacePlayerButton(UI::UI_Button*);
+	void PlaceTowerButton(UI::UI_Button*);
+	void PlaceWallButton(UI::UI_Button*);
+	void EraseButton(UI::UI_Button*);
 #pragma endregion
 }
 
@@ -508,14 +513,14 @@ namespace
 			nexusPlaced = true;
 			nexusButton->texID = UI::TEX_NEXUS_PLACED;
 			nexusButton->hoverText = &textTable->buildNexusPlacedHoverText;
-			PlaceWallButton();
+			PlaceWallButton(nullptr);
 		}
 		else if (temp->type == GameObject::GO_PLAYER)
 		{
 			playerPlaced = true;
 			playerButton->texID = UI::TEX_PLAYER_PLACED;
 			playerButton->hoverText = &textTable->buildPlayerPlacedHoverText;
-			PlaceWallButton();
+			PlaceWallButton(nullptr);
 		}
 	}
 
@@ -918,8 +923,8 @@ namespace
 
 	void InitializeUIElements()
 	{
-		textTable->elementTestText = { .2f, 0.f, "HEALTH:" };
-		AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 50.f, 50.f };
+		//elementTestText = { .2f, 0.f, "HEALTH:" };
+		//AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 50.f, 50.f };
 		//uiManager->CreateUIStat(healthBarPos, healthBarScale, &elementTestText);
 		//auto tempPtr = gameUiManager->CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
 		//tempPtr->SetValue(1.f);
@@ -1048,7 +1053,7 @@ namespace
 	}
 
 #pragma region UI_CALLBACK_DEFINITIONS
-	void EndTurnButton() {
+	void EndTurnButton(UI::UI_Button*) {
 		if (nexusPlaced && playerPlaced)
 		{
 			buildPhase = false;
@@ -1071,7 +1076,7 @@ namespace
 		}
 	}
 
-	void PlaceNexusButton()
+	void PlaceNexusButton(UI::UI_Button*)
 	{
 		if (!nexusPlaced)
 		{
@@ -1083,7 +1088,7 @@ namespace
 		}
 	}
 
-	void PlacePlayerButton()
+	void PlacePlayerButton(UI::UI_Button*)
 	{
 		if (!playerPlaced)
 		{
@@ -1095,7 +1100,7 @@ namespace
 		}
 	}
 
-	void PlaceTowerButton()
+	void PlaceTowerButton(UI::UI_Button*)
 	{
 		hoverStructure->gridScale = { 2, 2 };
 		hoverStructure->scale = { test_map->GetTileSize() * 2, test_map->GetTileSize() * 2 };
@@ -1104,7 +1109,7 @@ namespace
 		hoverStructure->tex = turretTex;
 	}
 
-	void PlaceWallButton()
+	void PlaceWallButton(UI::UI_Button*)
 	{
 		hoverStructure->gridScale = { 1, 1 };
 		hoverStructure->scale = { test_map->GetTileSize() * 1, test_map->GetTileSize() * 1 };
@@ -1113,7 +1118,7 @@ namespace
 		hoverStructure->tex = wallTex;
 	}
 
-	void EraseButton()
+	void EraseButton(UI::UI_Button*)
 	{
 		hoverStructure->gridScale = { 1, 1 };
 		hoverStructure->scale = { test_map->GetTileSize() * 1 - EPSILON, test_map->GetTileSize() * 1 - EPSILON };

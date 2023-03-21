@@ -20,7 +20,7 @@ namespace UI
 		newButton->minWS.y = newButton->min.y + m_winDim.y * 0.5f;
 		newButton->maxWS.y = newButton->max.y + m_winDim.y * 0.5f;
 	}
-	UI_Button* UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText, void(*callback)(), UI_TextArea* hoverText)
+	UI_Button* UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText, void(*callback)(UI_Button*), UI_TextArea* hoverText)
 	{
 		UI_Button* newButton = new UI_Button();
 		newButton->scale = size;
@@ -121,7 +121,7 @@ namespace UI
 			{
 				// Set any bools?
 				if (curr->callback)
-					curr->callback();
+					curr->callback(curr);
 			}
 			// HOVER LOGIC
 			else
@@ -151,7 +151,7 @@ namespace UI
 			if (curr->bHovering && curr->hoverText)
 			{
 				// RENDER THE BOX CONTAINING TEXT
-				AEVec2 pos{ static_cast<f32>(mouseX) + curr->hoverText->GetBoxWidth() * 0.25,
+				AEVec2 pos{ static_cast<f32>(mouseX) + curr->hoverText->GetBoxWidth() * 0.25f,
 						static_cast<f32>(-mouseY) - curr->hoverText->GetBoxHeight() * 0.25f };
 				AEVec2 scale{ curr->hoverText->GetBoxWidth() * 0.5f, curr->hoverText->GetBoxHeight() * 0.5f };
 				UI::DrawMesh(pos, scale, TEX_BUTTON, HOVER_RGBA);

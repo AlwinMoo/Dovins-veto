@@ -20,10 +20,10 @@ namespace UI
 		s8 font; // TODO: REMOVE THIS WHEN IMPLEMENTED TEXT FULLY
 
 		UI_TextArea* buttonText;
-		void(*callback)();
+		void(*callback)(UI_Button*);
 		UI_TextArea* hoverText;
 		bool bHovering;
-		float alpha;			//!< Alpha for rendering: CURRENTLY NOT BEING USED
+		float alpha;			//!< TODO: REMOVE
 		
 		UI_Button() = default;
 		~UI_Button() = default;

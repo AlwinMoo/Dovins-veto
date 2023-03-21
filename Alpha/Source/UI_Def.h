@@ -47,6 +47,13 @@ namespace UI
 		UI_STAT_ELEMENT_TOTAL
 	};
 
+	enum UI_TYPE
+	{
+		UI_TYPE_GAME,
+		UI_TYPE_SKILL,
+		NUM_UI_TYPE
+	};
+
 	struct UI_Color { f32 r, g, b, a; }; //!< simple color struct to work with AE engine. In order: [r]ed, [g]reen, [b]lue, [a]lpha
 }
 

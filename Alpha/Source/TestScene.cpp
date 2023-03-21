@@ -51,11 +51,11 @@ namespace
 }
 
 #pragma region UI_CALLBACK_DECLARATIONS
-void EndTurnButton();
-void PlaceNexusButton();
-void PlaceTowerButton();
-void PlaceWallButton();
-void EraseButton();
+void EndTurnButton(UI::UI_Button*);
+void PlaceNexusButton(UI::UI_Button*);
+void PlaceTowerButton(UI::UI_Button*);
+void PlaceWallButton(UI::UI_Button*);
+void EraseButton(UI::UI_Button*);
 #pragma endregion
 
 void TestScene_Load()
@@ -77,8 +77,8 @@ void TestScene_Initialize()
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-		uiManager = new UI::UI_Manager();
-		uiManager->SetWinDim(screenWidthX, screenHeightY);
+		gameUiManager = new UI::UI_Manager();
+		gameUiManager->SetWinDim(screenWidthX, screenHeightY);
 	}
 	srand(time(NULL));
 
@@ -133,18 +133,18 @@ void TestScene_Initialize()
 
 		AEVec2 const endButtonPos{ screenWidthX * .115f, screenWidthY * .2f };
 		AEVec2 const endButtonSize{ screenWidthX * .2f, screenWidthY * .15f };
-		uiManager->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
+		gameUiManager->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &endTurnHoverText);
 
 		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenWidthY * .9f };
 		AEVec2 const buildButtonSize{ screenWidthY * .12f, screenWidthY * .12f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
-		nexusButton = uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
+		nexusButton = gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &buildNexusHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;	// Offset button y pos downwards!
-		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &buildWallHoverText);
+		gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &buildWallHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;	// Offset button y pos downwards!
-		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &buildTowerHoverText);
+		gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &buildTowerHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;	// Offset button y pos downwards!
-		uiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &eraseHoverText);
+		gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &eraseHoverText);
 	}
 
 	player = FetchGO(GameObject::GO_PLAYER);
@@ -173,8 +173,8 @@ void TestScene_Update()
 	//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
 	{
 		AEVec2 invert_mouse = mouse_pos;
-		invert_mouse.y = uiManager->m_winDim.y - mouse_pos.y;
-		uiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+		invert_mouse.y = gameUiManager->m_winDim.y - mouse_pos.y;
+		gameUiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 	}
 	mouse_pos = test_map->SnapCoordinates(mouse_pos);
 
@@ -258,7 +258,7 @@ void TestScene_Update()
 					nexusPlaced = true;
 					nexusButton->texID = UI::TEX_NEXUS_PLACED;
 					nexusButton->hoverText = &buildNexusPlacedHoverText;
-					PlaceWallButton();
+					PlaceWallButton(nullptr);
 				}
 			}
 		}
@@ -299,7 +299,7 @@ void TestScene_Update()
 		// CHANGE TO DEFEND MODE
 		if (AEInputCheckTriggered(AEVK_0))
 		{
-			EndTurnButton();	// NOTE: Clicking button calls this
+			EndTurnButton(nullptr);	// NOTE: Clicking button calls this
 		}
 	}
 	else
@@ -611,7 +611,7 @@ void TestScene_Draw()
 		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
 #endif
 		// Render UI
-		uiManager->Draw(cursorX, cursorY);
+		gameUiManager->Draw(cursorX, cursorY);
 
 		char buff[30]{};
 		sprintf_s(buff, "Resources Left: %d", buildResource);
@@ -630,7 +630,7 @@ void TestScene_Free()
 
 void TestScene_Unload()
 {
-	delete uiManager;
+	delete gameUiManager;
 	delete test_map;
 	AEGfxTextureUnload(grassBorderlessTex); 
 	AEGfxTextureUnload(turretTex);
@@ -645,7 +645,7 @@ void TestScene_Unload()
  }
 
 #pragma region UI_CALLBACK_DEFINITIONS
-void EndTurnButton() {
+void EndTurnButton(UI::UI_Button*) {
 	if (nexusPlaced)
 	{
 		buildPhase = false;
@@ -662,7 +662,7 @@ void EndTurnButton() {
 	}
 }
 
-void PlaceNexusButton()
+void PlaceNexusButton(UI::UI_Button*)
 {
 	if (!nexusPlaced)
 	{
@@ -674,7 +674,7 @@ void PlaceNexusButton()
 	}
 }
 
-void PlaceTowerButton()
+void PlaceTowerButton(UI::UI_Button*)
 {
 	hoverStructure->gridScale = { 2, 2 };
 	hoverStructure->scale = { test_map->GetTileSize() * 2, test_map->GetTileSize() * 2 };
@@ -683,7 +683,7 @@ void PlaceTowerButton()
 	hoverStructure->tex = turretTex;
 }
 
-void PlaceWallButton()
+void PlaceWallButton(UI::UI_Button*)
 {
 	hoverStructure->gridScale = { 1, 1 };
 	hoverStructure->scale = { test_map->GetTileSize() * 1, test_map->GetTileSize() * 1 };
@@ -692,7 +692,7 @@ void PlaceWallButton()
 	hoverStructure->tex = wallTex;
 }
 
-void EraseButton()
+void EraseButton(UI::UI_Button*)
 {
 	hoverStructure->gridScale = { 1, 1 };
 	hoverStructure->scale = { test_map->GetTileSize() * 1 - EPSILON, test_map->GetTileSize() * 1 - EPSILON };

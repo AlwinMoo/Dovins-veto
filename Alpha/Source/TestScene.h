@@ -23,7 +23,7 @@ namespace
 	int object_count;
 	GameObject* hoverStructure;
 	bool validPlacement;
-	UI::UI_Manager* uiManager;
+	UI::UI_Manager* gameUiManager;
 
 	// Textures
 	AEGfxTexture*		turretTex;

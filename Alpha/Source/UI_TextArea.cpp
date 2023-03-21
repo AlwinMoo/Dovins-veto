@@ -24,7 +24,7 @@ namespace UI{
 			lineCpy.erase(lineCpy.end() - 1);
 			GetPrintSize(lineCpy, width, height);
 		} while (width >= m_boxWidthN);
-		return lineCpy.size();
+		return static_cast<u32>(lineCpy.size());
 	}
 
 	std::string UI_TextArea::SplitLine(std::string& line, u32 end)
