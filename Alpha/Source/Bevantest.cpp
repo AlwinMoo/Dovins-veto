@@ -500,7 +500,7 @@ void Bevantest_Free()
 void Bevantest_Unload()
 {
 	//AEGfxMeshFree(bull_mesh);
-	delete uiManager;
+	delete gameUiManager;
 	delete test_map;
 	AEGfxTextureUnload(Bullet);
 	AEGfxTextureUnload(Enemy);
