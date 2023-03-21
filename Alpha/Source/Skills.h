@@ -14,14 +14,31 @@
 #include "Pathfinding/pathfinder.h"
 #include <cmath>
 
-
-enum Bullet_Flag
+enum which_skill
 {
-	no_upgrades = 0,
-	upgrade1,
-	upgrade2
+	shooting = 0,
+	AOEing,
+	car,
+	TOTAL_SKILLS
 };
 
-void shoot_bullet(GameObject*, GameObject*, f32, f32, int);
-void AOE_move(GameObject*, double, double);
+enum upgrade_level : u32
+{
+	base  = 0b0000'0000,
+	tier1 = 0b0000'0001,
+	tier2 = 0b0000'0010
+};
+
+using skill_func = void (*)(GameObject*, GameObject*);
+void skills_upgrade_check(GameObject*);
+void skills_update(GameObject*, GameObject*);
+
+void shoot_bullet(GameObject*, GameObject*);
+void spreadshot(GameObject*, GameObject*);
+void car_move(GameObject*, GameObject*);
+void random_shoot(GameObject*, GameObject*);
+
+void AOE_move(GameObject*, GameObject*);
 void player_blink(GameObject*, f32, f32);
+
+int skill_input_check(GameObject*);

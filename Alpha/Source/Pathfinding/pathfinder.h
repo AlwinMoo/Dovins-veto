@@ -26,6 +26,7 @@ struct cell
 class PathManager
 {
 	game_map* Map;
+	bool is_player;
 	std::queue<std::pair<AEVec2, AEVec2>> frontier;
 	std::map < std::string, AEVec2 > visited;
 
@@ -47,7 +48,7 @@ class PathManager
 
 	std::vector<AEVec2> result;
 
-	bool calculate_neighbour(AEVec2, AEVec2);
+	//bool calculate_neighbour(AEVec2, AEVec2);
 	std::vector<AEVec2> tracePath(std::map < std::string , cell > , AEVec2);
 
 public:
@@ -55,6 +56,6 @@ public:
 	//std::vector<AEVec2> GetPath(AEVec2, AEVec2);
 	std::vector<AEVec2> GetPath(AEVec2 const&, AEVec2 const&);
 
-	PathManager(game_map* Map);
+	PathManager(game_map* Map, bool);
 	~PathManager();
 };

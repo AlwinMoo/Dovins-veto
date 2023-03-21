@@ -15,6 +15,16 @@ struct Color
 	void Set(float r, float g, float b);
 };
 
+struct skill_stuff
+{
+	f32 cooldown;
+	f32 timer;
+	u32 skill_bit;
+	f32 damage;
+	int on_cd;
+	bool active;
+};
+
 class GameObject
 {
 public:
@@ -31,15 +41,24 @@ public:
 		GO_NEXUS,
 		GO_BULLET,
 		GO_AOE,
+		GO_CAR,
 		GO_ENEMY,
 		GO_DANGER_SIGN,
 		GO_TOTAL,
 	};
 
+
+
 	GAMEOBJECT_TYPE type;
 	bool active;
 	float alpha;
 	Color color;
+	f64	  timer;
+	u32	  skill_flag;
+
+	skill_stuff AOE;
+	skill_stuff Range;
+	skill_stuff Melee;
 
 	AEVec2 position;
 	AEVec2 scale;
@@ -47,8 +66,16 @@ public:
 	AEVec2 direction;
 	double rotation;
 
+	std::vector<int> gridIndex;
+
 	std::vector<AEVec2> Path;
+
+	GameObject* target;
+	GameObject* smallTarget;
+
+	//user only by enemy/turrets
 	CharacterStats Stats;
+	AEVec2 target_pos;
 
 	AEGfxTexture* tex;
 	AEGfxVertexList* mesh;

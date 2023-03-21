@@ -11,6 +11,11 @@ void GameObject::Update()
 		{
 			case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
 			{
+
+				AEVec2 result{ 0,0 };
+				AEVec2Sub(&result, &target_pos, &position);
+				rotation = AERadToDeg(atan2f(result.x, result.y)); // rotate to face player
+
 				if (!Path.empty()) // applying pathfinding to movement
 				{
 					AEVec2 out{};
@@ -75,11 +80,12 @@ GameObject::GameObject(GAMEOBJECT_TYPE default_type) :
 	position = { 0, 0 };
 	scale = { 1, 1 };
 	gridScale = { 1, 1 };
+	
 }
 
 GameObject::~GameObject()
-{
-	AEGfxMeshFree(mesh);
+{	
+	if(mesh) AEGfxMeshFree(mesh);
 }
 
 void Color::Set(float r, float g, float b)

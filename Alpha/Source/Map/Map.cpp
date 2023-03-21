@@ -149,6 +149,51 @@ bool game_map::IsOccupied(int index, int gridScalex, int gridScaleY)
 	return false;
 }
 
+int game_map::operator()(unsigned int const& x, unsigned int const& y)
+{
+	if (x > width || x < 0 || y > height || y < 0)
+		return static_cast<int>(TILE_TYPE::TILE_NONE);
+
+	switch (map_arr[y * width + x])
+	{
+	case game_map::TILE_TYPE::TILE_PLANET:
+		return 10;
+		break;
+	/*case game_map::TILE_TYPE::TILE_NEXUS:
+		break;
+	case game_map::TILE_TYPE::NUM_TYPES_TILE:
+		break;*/
+	default:
+		return 0;
+		break;
+	}
+}
+
+int game_map::operator()(AEVec2 const& pos)
+{
+	if (pos.x > width || pos.x < 0 || pos.y > height || pos.y < 0)
+		return static_cast<int>(TILE_TYPE::TILE_NONE);
+
+	switch (map_arr[static_cast<int>(pos.y * width + pos.x)])
+	{
+	case game_map::TILE_TYPE::TILE_PLANET:
+		return 10;
+		break;
+		/*case game_map::TILE_TYPE::TILE_NEXUS:
+			break;
+		case game_map::TILE_TYPE::NUM_TYPES_TILE:
+			break;*/
+	default:
+		return 0;
+		break;
+	}
+}
+
+//AEVec2 game_map::operator[](unsigned int const& index)
+//{
+//	return AEVec2();
+//}
+
 game_map::~game_map()
 {
 	delete[] this->map_arr;
