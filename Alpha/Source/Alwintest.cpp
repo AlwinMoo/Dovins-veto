@@ -16,6 +16,7 @@ namespace
 	GameObject* hoverStructure;
 	bool validPlacement;
 
+	UI::UI_TYPE		UICurrLayer;
 	UI::UI_Manager* uiManagers[UI::NUM_UI_TYPE];
 
 	UI::UI_Manager* gameUiManager;
@@ -53,6 +54,9 @@ namespace
 	static const int NEXUS_HEALTH = 15;
 	static const int WALL_HEALTH = 5;
 	static const int TURRET_HEALTH = 10;
+	static const int ENEMY_HEALTH = 1;
+
+	static const int BULLET_DAMAGE = 1;
 
 	//player
 	GameObject* player;
@@ -124,6 +128,7 @@ namespace
 	void PlaceTowerButton(UI::UI_Button*);
 	void PlaceWallButton(UI::UI_Button*);
 	void EraseButton(UI::UI_Button*);
+	void SkillTreeButton(UI::UI_Button*);
 #pragma endregion
 }
 
@@ -176,7 +181,7 @@ void Alwintest_Update()
 	}
 	else
 	{
-		if (AEInputCheckTriggered(AEVK_RBUTTON) && !test_map->IsOccupied(test_map->WorldToPreOffsetIndex(mouse_pos)))
+		if (AEInputCheckTriggered(AEVK_RBUTTON) && !test_map->IsOccupied(test_map->WorldToIndex(mouse_pos)))
 		{
 			if (test_map->IsInGrid(absMousePos))
 				SetPlayerGoal();
@@ -246,8 +251,9 @@ void Alwintest_Update()
 	// GameObject Update
 	for (GameObject* gameObj : go_list)
 	{
-		if (gameObj->active)
-		{
+		if (!gameObj->active || gameObj->type == GameObject::GAMEOBJECT_TYPE::GO_TILE)
+			continue;
+		
 			gameObj->Update();
 
 			switch (gameObj->type)
@@ -314,15 +320,15 @@ void Alwintest_Update()
 
 					for (GameObject* go : go_list)
 					{
-						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+						if (!go->active)
+							continue;
+						if (go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
 						{
 							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 							{
-								std::cout << "Remain: " << enemiesRemaining << std::endl;
-								enemiesRemaining--;
-								go->active = false;
 								gameObj->active = false;
 
+								
 								if ((gameObj->Range.skill_bit & tier1) == tier1)
 								{
 									//implement spread shot function here
@@ -333,7 +339,20 @@ void Alwintest_Update()
 										spreadshot(gameObj, skill_inst, i);
 									}
 								}
+
+								go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - BULLET_DAMAGE);
+								if (go->Stats.GetStat(STAT_HEALTH) <= 0)
+								{
+									std::cout << "Remain: " << enemiesRemaining << std::endl;
+									enemiesRemaining--;
+									go->active = false;
+								}
 							}
+						}
+						else if (go->type == GameObject::GAMEOBJECT_TYPE::GO_WALL || go->type == GameObject::GAMEOBJECT_TYPE::GO_NEXUS)
+						{
+							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+								gameObj->active = false;
 						}
 					}
 
@@ -382,7 +401,7 @@ void Alwintest_Update()
 					break;
 				}
 			}
-		}
+		
 	}
 
 	// GameObject Collision (NON-GRID BASED, SHOULD CHANGE)
@@ -483,7 +502,7 @@ void Alwintest_Draw()
 		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
 #endif
 		// Render UI
-		gameUiManager->Draw(cursorX, cursorY);
+		uiManagers[UICurrLayer]->Draw(cursorX, cursorY);
 
 		char buff[30]{};
 		sprintf_s(buff, "Resources Left: %d", buildResource);
@@ -499,8 +518,8 @@ void Alwintest_Free()
 		delete i;
 	}
 	delete textTable;
-	delete skillTreeManager;
-	delete gameUiManager;
+	delete uiManagers[UI::UI_TYPE_GAME];
+	delete uiManagers[UI::UI_TYPE_SKILL];
 	delete test_map;
 }
 
@@ -551,7 +570,7 @@ namespace
 			if (go->type == GameObject::GO_DANGER_SIGN && !go->active)
 			{
 				go->active = true;
-				test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(go->position));
+				test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(go->position));
 			}
 		}
 	}
@@ -563,7 +582,7 @@ namespace
 			if (go->type == GameObject::GO_DANGER_SIGN && go->active)
 			{
 				go->active = false;
-				test_map->RemoveItem(test_map->WorldToPreOffsetIndex(go->position));
+				test_map->RemoveItem(test_map->WorldToIndex(go->position));
 			}
 		}
 	}
@@ -580,9 +599,9 @@ namespace
 
 	void UpdateUIManager()
 	{
-		AEVec2 invert_mouse = mouse_pos;
-		invert_mouse.y = ::gameUiManager->m_winDim.y - mouse_pos.y;
-		::gameUiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+		AEVec2 invert_mouse = mouse_pos; // Getting inverted mouse pos to match world space
+		invert_mouse.y = uiManagers[UI::UI_TYPE_GAME]->m_winDim.y - mouse_pos.y;
+		uiManagers[UICurrLayer]->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 	}
 
 	GameObject* IndexToGO(int index)
@@ -633,7 +652,7 @@ namespace
 			temp = FetchGO(GameObject::GO_WALL);
 			buildResource -= WALL_COST;
 
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 		}
 		else if (hoverStructure->tex == turretTex)
 		{
@@ -642,7 +661,7 @@ namespace
 			temp = FetchGO(GameObject::GO_TURRET);
 			buildResource -= TOWER_COST;
 
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 		}
 		else if (hoverStructure->tex == nexusTex)
 		{
@@ -651,14 +670,14 @@ namespace
 			//duplicate with nexus object below
 			Nexus = temp;
 
-			test_map->AddItem(game_map::TILE_TYPE::TILE_NEXUS, test_map->WorldToPreOffsetIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+			test_map->AddItem(game_map::TILE_TYPE::TILE_NEXUS, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 		}
 		else if (hoverStructure->tex == playerTex)
 		{
 			player->active = true;
 			temp = player;
 
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 		}
 
 		temp->position = hoverStructure->position;
@@ -667,7 +686,7 @@ namespace
 		temp->tex = hoverStructure->tex;
 		temp->gridScale = hoverStructure->gridScale;
 
-		UpdateGOGridIndex(temp, test_map->WorldToPreOffsetIndex(hoverTopLeftPos));
+		UpdateGOGridIndex(temp, test_map->WorldToIndex(hoverTopLeftPos));
 
 		if (temp->type == GameObject::GO_NEXUS)
 		{
@@ -719,7 +738,7 @@ namespace
 			playerButton->hoverText = &textTable->buildPlayerHoverText;
 		}
 
-		test_map->RemoveItem(test_map->WorldToPreOffsetIndex(topRightPos), deleteGridScale.x, deleteGridScale.y);
+		test_map->RemoveItem(test_map->WorldToIndex(topRightPos), deleteGridScale.x, deleteGridScale.y);
 	}
 
 	void UpdateHoverStructure()
@@ -746,7 +765,7 @@ namespace
 		}
 
 		// GameObject Collision (GRID BASED)
-		if (test_map->IsOccupied(test_map->WorldToPreOffsetIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y))
+		if (test_map->IsOccupied(test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y))
 		{
 			hoverStructure->color.Set(1.0f, 0.2f, 0.2f);
 			validPlacement = false;
@@ -769,7 +788,7 @@ namespace
 		{
 			for (auto& pos : player->Path)
 			{
-				pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
+				pos = test_map->GetWorldPos(test_map->GetIndex(pos.x, pos.y));
 			}
 
 			player->Path.erase(player->Path.end() - 1);
@@ -825,16 +844,16 @@ namespace
 				switch (rand() % 4)
 				{
 				case 0:
-					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->width + test_map->tile_offset, 0));
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->width, 0));
 					break;
 				case 1:
-					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->width + test_map->tile_offset, test_map->height - 1));
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->width, test_map->height - 1));
 					break;
 				case 2:
-					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->height + test_map->tile_offset, 0));
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->height, 0));
 					break;
 				case 3:
-					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->height + test_map->tile_offset, test_map->width - 1));
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->height, test_map->width - 1));
 					break;
 				}
 
@@ -846,6 +865,7 @@ namespace
 				temp->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
 				temp->Stats.SetCurrInnerState(INNER_STATE::ISTATE_NONE);
 				temp->Stats.SetCurrStateFromNext();
+				temp->Stats.SetRawStat(STAT_HEALTH, ENEMY_HEALTH);
 
 				if (rand() % 2)
 				{
@@ -869,8 +889,20 @@ namespace
 	void NextWaveCheck()
 	{
 		//std::cout << "Remain: " << enemiesRemaining << std::endl;
-		if (enemiesRemaining == 0 && enemiesSpawned == enemiesToSpawn)
+		if ((enemiesRemaining == 0 && enemiesSpawned == enemiesToSpawn) || !player->active || !Nexus->active)
 		{
+			for (GameObject* gameObj : go_list)
+			{
+				//Gameobjects Render
+				if (!gameObj->active || gameObj->type != GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					continue;
+
+				gameObj->Path.clear();
+				gameObj->active = false;
+			}
+
+			enemiesRemaining = 0;
+
 			enemiesToSpawn += 5;
 			if(enemySpawnRate >= 0.1f)
 				enemySpawnRate -= 0.05f;
@@ -885,12 +917,20 @@ namespace
 			}
 			hoverStructure->active = true;
 			EnableDangerSigns();
+
 			playerPlaced = false;
 			playerButton->texID = UI::TEX_PLAYER;
 			playerButton->hoverText = &textTable->buildPlayerHoverText;
 			player->active = 0;
 			player->gridIndex.clear();
 			player->Path.clear();
+
+			if (!Nexus->active)
+			{
+				nexusPlaced = false;
+				nexusButton->texID = UI::TEX_NEXUS;
+				nexusButton->hoverText = &textTable->buildNexusPlacedHoverText;
+			}
 		}
 	}
 
@@ -929,69 +969,70 @@ namespace
 			{
 				switch (gameObj->Stats.GetCurrInnerState())
 				{
-					case (INNER_STATE::ISTATE_ENTER):
-					{
-						// init
-				// always set next state
-						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
-					}
-					break;
-					case (INNER_STATE::ISTATE_UPDATE):
-					{
-						// whack target if near target
-				// if far from target, move to target,
-				// if target down, choose next target
-						gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
-
-						if (gameObj->Stats.path_timer >= 1.0f)
-						{
-							PathManager pathmaker(test_map, false);
-							gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
-							gameObj->Path.erase(gameObj->Path.begin());
-
-							if (!gameObj->Path.empty())
-							{
-								//gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
-
-								std::vector<AEVec2>::iterator it = gameObj->Path.begin();
-								for (auto& pos : gameObj->Path) // converting grid pos to world pos
-								{
-									if (test_map->map_arr[test_map->GetIndex(pos.x + test_map->tile_offset, pos.y)] != game_map::TILE_TYPE::TILE_NONE)
-									{
-										gameObj->smallTarget = IndexToGO(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
-										break;
-									}
-
-									pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
-									++it;
-								}
-
-								gameObj->Path.erase(it, gameObj->Path.end());
-								
-								gameObj->Stats.path_timer = 0.0f;
-							}
-
-							// @TODO CHANGE MELEE RANGE
-							if (gameObj->smallTarget == nullptr)
-								gameObj->smallTarget = gameObj->target;
-							if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= test_map->GetTileSize() * 1.8f)
-							{
-								gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
-								gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
-							}
-						}
-						break;
-					case (INNER_STATE::ISTATE_EXIT):
-					{
-						// clean up
-				// always set next state
-				// if next state is the same, as curr then we will just run as usual
-						gameObj->Stats.SetCurrStateFromNext();
-					}
-					break;
-					}
+				case (INNER_STATE::ISTATE_ENTER):
+				{
+					// init
+					// always set next state
+					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
 				}
 				break;
+				case (INNER_STATE::ISTATE_UPDATE):
+				{
+					// whack target if near target
+					// if far from target, move to target,
+					// if target down, choose next target
+					gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
+
+					if (gameObj->Stats.path_timer >= 1.0f)
+					{
+						PathManager pathmaker(test_map, false);
+						gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
+
+						if (!gameObj->Path.empty())
+						{
+							gameObj->Path.erase(gameObj->Path.begin());
+							std::vector<AEVec2>::iterator it = gameObj->Path.begin();
+							for (auto& pos : gameObj->Path) // converting grid pos to world pos
+							{
+								if (test_map->map_arr[test_map->GetIndex(pos.x, pos.y)] != game_map::TILE_TYPE::TILE_NONE)
+								{
+									gameObj->smallTarget = IndexToGO(test_map->GetIndex(pos.x, pos.y));
+									if (gameObj->smallTarget != nullptr) break;
+								}
+
+								pos = test_map->GetWorldPos(test_map->GetIndex(pos.x, pos.y));
+								++it;
+							}
+
+							gameObj->Path.erase(it, gameObj->Path.end()); // delete everything from small target onwards
+
+							gameObj->Stats.path_timer = 0.0f;
+						}
+
+						// @TODO CHANGE MELEE RANGE
+						if (gameObj->smallTarget == nullptr)
+							gameObj->smallTarget = gameObj->target;
+
+						if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= test_map->GetTileSize() * gameObj->smallTarget->scale.x * 0.5f)
+						{
+							gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
+							gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
+						}
+					}
+					break;
+				case (INNER_STATE::ISTATE_EXIT):
+				{
+					// clean up
+					// always set next state
+					// if next state is the same, as curr then we will just run as usual
+					gameObj->Stats.SetCurrStateFromNext();
+				}
+				break;
+				}
+				}
+			}
+			break;
+
 			case (STATE::STATE_ENEMY_ATTACK):
 			{
 				switch (gameObj->Stats.GetCurrInnerState())
@@ -999,35 +1040,48 @@ namespace
 					case (INNER_STATE::ISTATE_ENTER):
 					{
 						// init
-				// always set next state
+						// always set next state
 						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
 						std::cout << "attack enter" << std::endl;
 					}
 					break;
 					case (INNER_STATE::ISTATE_UPDATE):
 					{
-						// whack target if near target
-				// if far from target, move to target,
-				// if target down, choose next target
-						if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f || !gameObj->smallTarget->active)
+						if (!gameObj->Path.size() && gameObj->smallTarget != nullptr) // we are at our target
 						{
-							if (gameObj->smallTarget == Nexus)
+							// whack small target
+							gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - 10 * AEFrameRateControllerGetFrameTime());
+
+							if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f && gameObj->smallTarget->active)
 							{
-								Nexus->active = false;
+								gameObj->smallTarget->active = false;
+								if (gameObj->smallTarget != player)
+								{
+									test_map->RemoveItem(gameObj->smallTarget->gridIndex.front(), gameObj->smallTarget->gridScale.x, gameObj->smallTarget->gridScale.y);
+									gameObj->smallTarget->gridIndex.clear();
+								}
 							}
-					
-							gameObj->target = player;
+						}
+
+						// whack target if near target
+						// if far from target, move to target,
+						// if target down, choose next target
+						if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f || !gameObj->smallTarget->active) // target is down
+						{
+							switch (gameObj->Stats.target_type)
+							{
+								case (CharacterStats::TARGET_TYPE::TAR_PLAYER):
+									gameObj->target = player;
+									break;
+								case (CharacterStats::TARGET_TYPE::TAR_NEXUS):
+									gameObj->target = Nexus;
+									break;
+							}
+							
 							gameObj->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
 							gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
 							break;
 						}
-					
-						/*if (AEVec2Distance(&gameObj->target->position, &gameObj->position) <= test_map->GetTileSize() * 1.5f)
-				{
-					gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
-					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
-
-				}*/
 					}
 					break;
 					case (INNER_STATE::ISTATE_EXIT):
@@ -1041,7 +1095,6 @@ namespace
 				}
 			}
 			break;
-			}
 		}
 	}
 
@@ -1140,35 +1193,52 @@ namespace
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-		::gameUiManager = new UI::UI_Manager{};	// New ui manager
-		::gameUiManager->SetWinDim(screenWidthX, screenHeightY);
-		::skillTreeManager = new UI::UI_Manager{};
-		textTable = new UI::UI_TextAreaTable{};
+		uiManagers[UI::UI_TYPE_GAME] = new UI::UI_Manager{};	// New ui manager for gameplay
+		uiManagers[UI::UI_TYPE_GAME]->SetWinDim(screenWidthX, screenHeightY);
+		uiManagers[UI::UI_TYPE_SKILL] = new UI::UI_Manager{};	// New ui manager for skill tree
+		uiManagers[UI::UI_TYPE_SKILL]->SetWinDim(screenWidthX, screenHeightY);
+		textTable = new UI::UI_TextAreaTable{};	// Set up all UI button text description info
+		UICurrLayer = UI::UI_TYPE_GAME;							// Display gameplay UI first
 	}
 
 	void InitializeUIButtons()
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-
 		AEVec2 const endButtonPos{ screenWidthX * .115f, screenWidthY * .2f };
 		AEVec2 const endButtonSize{ screenWidthX * .2f, screenWidthY * .15f };
-		::gameUiManager->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &textTable->endTurnHoverText);
+
+		UI::UI_Manager& gameUIManager{ *uiManagers[UI::UI_TYPE_GAME] };
+		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
+
+		uiManagers[UI::UI_TYPE_GAME]->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &textTable->endTurnHoverText);
 
 		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenWidthY * .9f };
 		AEVec2 const buildButtonSize{ screenWidthY * .12f, screenWidthY * .12f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
 		buildButtonPos.x -= buildButtonSize.y * 0.75f;
-		nexusButton = ::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, nullptr, PlaceNexusButton, &textTable->buildNexusHoverText);
+		nexusButton = gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, 
+			nullptr, PlaceNexusButton, &textTable->buildNexusHoverText);
 		buildButtonPos.x += buildButtonSize.y * 1.5f;
-		playerButton = ::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_PLAYER_BUTTON, nullptr, PlacePlayerButton, &textTable->buildPlayerHoverText);
+		playerButton = gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_PLAYER_BUTTON,
+			nullptr, PlacePlayerButton, &textTable->buildPlayerHoverText);
 		buildButtonPos.x -= buildButtonSize.y * 0.75f;
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, nullptr, PlaceWallButton, &textTable->buildWallHoverText);
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, 
+			nullptr, PlaceWallButton, &textTable->buildWallHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, nullptr, PlaceTowerButton, &textTable->buildTowerHoverText);
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, 
+			nullptr, PlaceTowerButton, &textTable->buildTowerHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		::gameUiManager->CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, nullptr, EraseButton, &textTable->eraseHoverText);
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, 
+			nullptr, EraseButton, &textTable->eraseHoverText);
+		
+		// Both skill tree and gameplay layers share same button pos
+		buildButtonPos.x = screenWidthX - buildButtonSize.x;
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::SKILL_TREE_BUTTON, 
+			nullptr, SkillTreeButton, &textTable->eraseHoverText);
+		skillUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::CLOSE_BUTTON,
+			nullptr, SkillTreeButton, &textTable->eraseHoverText);
 
 		// Initialize skill tree buttons
 	}
@@ -1249,7 +1319,7 @@ namespace
 			temp->position.x = test_map->GetTileSize() * i + test_map->GetTileSize() / 2.f + test_map->world_offset;
 			temp->position.y = test_map->GetTileSize() / 2.f;
 			temp->active = true;
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(temp->position));
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(temp->position));
 		}
 		// Bottom
 		for (int i = 0; i < test_map->width; i++)
@@ -1261,7 +1331,7 @@ namespace
 			temp->position.x = test_map->GetTileSize() * i + test_map->GetTileSize() / 2.f + test_map->world_offset;
 			temp->position.y = test_map->GetTileSize() * test_map->height - test_map->GetTileSize() / 2.f;
 			temp->active = true;
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(temp->position));
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(temp->position));
 		}
 		// Left
 		for (int i = 1; i < test_map->height - 1; i++)
@@ -1273,7 +1343,7 @@ namespace
 			temp->position.y = test_map->GetTileSize() * i + test_map->GetTileSize() / 2.f;
 			temp->position.x = test_map->GetTileSize() / 2.f + test_map->world_offset;
 			temp->active = true;
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(temp->position));
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(temp->position));
 		}
 		// Right
 		for (int i = 1; i < test_map->height - 1; i++)
@@ -1285,7 +1355,7 @@ namespace
 			temp->position.y = test_map->GetTileSize() * i + test_map->GetTileSize() / 2.f;
 			temp->position.x = test_map->GetTileSize() * test_map->width - test_map->GetTileSize() / 2.f + test_map->world_offset;
 			temp->active = true;
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(temp->position));
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(temp->position));
 		}
 
 		EnableDangerSigns();
@@ -1318,7 +1388,7 @@ namespace
 			Nexus->active = true;
 
 			// Remove player from collision map
-			test_map->RemoveItem(test_map->WorldToPreOffsetIndex(player->position));
+			test_map->RemoveItem(test_map->WorldToIndex(player->position));
 
 			DisableDangerSigns();
 
@@ -1327,11 +1397,11 @@ namespace
 				if (!go->active)
 					continue;
 				if (go->type == GameObject::GO_WALL)
-					go->Stats.SetStat(STAT_HEALTH, WALL_HEALTH);
+					go->Stats.SetRawStat(STAT_HEALTH, WALL_HEALTH);
 				else if (go->type == GameObject::GO_TURRET)
-					go->Stats.SetStat(STAT_HEALTH, TURRET_HEALTH);
+					go->Stats.SetRawStat(STAT_HEALTH, TURRET_HEALTH);
 				else if (go->type == GameObject::GO_NEXUS)
-					go->Stats.SetStat(STAT_HEALTH, NEXUS_HEALTH);
+					go->Stats.SetRawStat(STAT_HEALTH, NEXUS_HEALTH);
 			}
 		}
 		else
@@ -1389,6 +1459,11 @@ namespace
 		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
 		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 		hoverStructure->tex = eraseTex;
+	}
+
+	void SkillTreeButton(UI::UI_Button* button) 
+	{
+		UICurrLayer = (UICurrLayer == UI::UI_TYPE_SKILL? UI::UI_TYPE_GAME : UI::UI_TYPE_SKILL);
 	}
 #pragma endregion
 }
