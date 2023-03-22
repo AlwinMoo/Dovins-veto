@@ -469,10 +469,16 @@ std::vector<AEVec2> PathManager::tracePath(std::map<std::string, cell> cellData,
 	std::stack<AEVec2> Path;
 	std::vector<AEVec2> usablePath;
 
+	unsigned int itr{};
+
 	while (!(cellData.at(VectorToString(temp)).parent.x == temp.x && cellData.at(VectorToString(temp)).parent.y == temp.y) && temp.x != -1.f && temp.y != -1.f)
 	{
 		Path.push(temp);
 		temp = cellData.at(VectorToString(temp)).parent;
+
+		++itr;
+		if (itr >= Map->map_size)
+			return std::vector<AEVec2>();
 	}
 
 	Path.push(temp);
