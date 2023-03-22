@@ -835,7 +835,7 @@ namespace
 				gameObj->Path.clear();
 				gameObj->active = false;
 			}
-
+			enemiesRemaining = 0;
 			enemiesToSpawn += 5;
 			if(enemySpawnRate >= 0.1f)
 				enemySpawnRate -= 0.05f;
@@ -983,11 +983,14 @@ namespace
 							// whack small target
 							gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - 10 * AEFrameRateControllerGetFrameTime());
 
-							if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f)
+							if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f && gameObj->smallTarget->active)
 							{
 								gameObj->smallTarget->active = false;
-								if(gameObj->smallTarget != player)
+								if (gameObj->smallTarget != player)
+								{
 									test_map->RemoveItem(gameObj->smallTarget->gridIndex.front(), gameObj->smallTarget->gridScale.x, gameObj->smallTarget->gridScale.y);
+									gameObj->smallTarget->gridIndex.clear();
+								}
 							}
 						}
 
