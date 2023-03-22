@@ -835,7 +835,7 @@ namespace
 				gameObj->Path.clear();
 				gameObj->active = false;
 			}
-
+			enemiesRemaining = 0;
 			enemiesToSpawn += 5;
 			if(enemySpawnRate >= 0.1f)
 				enemySpawnRate -= 0.05f;
