@@ -918,10 +918,10 @@ namespace
 					{
 						PathManager pathmaker(test_map, false);
 						gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
-						gameObj->Path.erase(gameObj->Path.begin());
 
 						if (!gameObj->Path.empty())
 						{
+							gameObj->Path.erase(gameObj->Path.begin());
 							std::vector<AEVec2>::iterator it = gameObj->Path.begin();
 							for (auto& pos : gameObj->Path) // converting grid pos to world pos
 							{
