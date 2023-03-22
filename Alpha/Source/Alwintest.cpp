@@ -984,7 +984,11 @@ namespace
 							gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - 10 * AEFrameRateControllerGetFrameTime());
 
 							if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f)
+							{
 								gameObj->smallTarget->active = false;
+								if(gameObj->smallTarget != player)
+									test_map->RemoveItem(gameObj->smallTarget->gridIndex.front(), gameObj->smallTarget->gridScale.x, gameObj->smallTarget->gridScale.y);
+							}
 						}
 
 						// whack target if near target
