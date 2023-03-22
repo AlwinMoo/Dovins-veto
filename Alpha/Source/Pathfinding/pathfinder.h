@@ -48,7 +48,7 @@ class PathManager
 
 	std::vector<AEVec2> result;
 
-	//bool calculate_neighbour(AEVec2, AEVec2);
+	bool calculate_neighbour(AEVec2, AEVec2);
 	std::vector<AEVec2> tracePath(std::map < std::string , cell > , AEVec2);
 
 public:

@@ -883,69 +883,70 @@ namespace
 			{
 				switch (gameObj->Stats.GetCurrInnerState())
 				{
-					case (INNER_STATE::ISTATE_ENTER):
-					{
-						// init
-				// always set next state
-						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
-					}
-					break;
-					case (INNER_STATE::ISTATE_UPDATE):
-					{
-						// whack target if near target
-				// if far from target, move to target,
-				// if target down, choose next target
-						gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
-
-						if (gameObj->Stats.path_timer >= 1.0f)
-						{
-							PathManager pathmaker(test_map, false);
-							gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
-							gameObj->Path.erase(gameObj->Path.begin());
-
-							if (!gameObj->Path.empty())
-							{
-								//gameObj->Path.erase(gameObj->Path.end() - 1); // remove last 2 check points so we're out of the nexus
-
-								std::vector<AEVec2>::iterator it = gameObj->Path.begin();
-								for (auto& pos : gameObj->Path) // converting grid pos to world pos
-								{
-									if (test_map->map_arr[test_map->GetIndex(pos.x, pos.y)] != game_map::TILE_TYPE::TILE_NONE)
-									{
-										gameObj->smallTarget = IndexToGO(test_map->GetIndex(pos.x, pos.y));
-										break;
-									}
-
-									pos = test_map->GetWorldPos(test_map->GetIndex(pos.x, pos.y));
-									++it;
-								}
-
-								gameObj->Path.erase(it, gameObj->Path.end());
-								
-								gameObj->Stats.path_timer = 0.0f;
-							}
-
-							// @TODO CHANGE MELEE RANGE
-							if (gameObj->smallTarget == nullptr)
-								gameObj->smallTarget = gameObj->target;
-							if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= test_map->GetTileSize() * 1.8f)
-							{
-								gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
-								gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
-							}
-						}
-						break;
-					case (INNER_STATE::ISTATE_EXIT):
-					{
-						// clean up
-				// always set next state
-				// if next state is the same, as curr then we will just run as usual
-						gameObj->Stats.SetCurrStateFromNext();
-					}
-					break;
-					}
+				case (INNER_STATE::ISTATE_ENTER):
+				{
+					// init
+					// always set next state
+					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
 				}
 				break;
+				case (INNER_STATE::ISTATE_UPDATE):
+				{
+					// whack target if near target
+					// if far from target, move to target,
+					// if target down, choose next target
+					gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
+
+					if (gameObj->Stats.path_timer >= 1.0f)
+					{
+						PathManager pathmaker(test_map, false);
+						gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
+						gameObj->Path.erase(gameObj->Path.begin());
+
+						if (!gameObj->Path.empty())
+						{
+							std::vector<AEVec2>::iterator it = gameObj->Path.begin();
+							for (auto& pos : gameObj->Path) // converting grid pos to world pos
+							{
+								if (test_map->map_arr[test_map->GetIndex(pos.x, pos.y)] != game_map::TILE_TYPE::TILE_NONE)
+								{
+									gameObj->smallTarget = IndexToGO(test_map->GetIndex(pos.x, pos.y));
+									if (gameObj->smallTarget != nullptr) break;
+								}
+
+								pos = test_map->GetWorldPos(test_map->GetIndex(pos.x, pos.y));
+								++it;
+							}
+
+							gameObj->Path.erase(it, gameObj->Path.end()); // delete everything from small target onwards
+
+							gameObj->Stats.path_timer = 0.0f;
+						}
+
+						// @TODO CHANGE MELEE RANGE
+						if (gameObj->smallTarget == nullptr)
+							gameObj->smallTarget = gameObj->target;
+
+						if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= test_map->GetTileSize() * 1.8f)
+						{
+							gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
+							gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
+						}
+					}
+					break;
+				case (INNER_STATE::ISTATE_EXIT):
+				{
+					// clean up
+					// always set next state
+					// if next state is the same, as curr then we will just run as usual
+					gameObj->Stats.SetCurrStateFromNext();
+				}
+				break;
+				}
+				}
+			}
+			break;
+
 			case (STATE::STATE_ENEMY_ATTACK):
 			{
 				switch (gameObj->Stats.GetCurrInnerState())
@@ -953,35 +954,41 @@ namespace
 					case (INNER_STATE::ISTATE_ENTER):
 					{
 						// init
-				// always set next state
+						// always set next state
 						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
 						std::cout << "attack enter" << std::endl;
 					}
 					break;
 					case (INNER_STATE::ISTATE_UPDATE):
 					{
-						// whack target if near target
-				// if far from target, move to target,
-				// if target down, choose next target
-						if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f || !gameObj->smallTarget->active)
+						if (!gameObj->Path.size() && gameObj->smallTarget != nullptr) // we are at our target
 						{
-							if (gameObj->smallTarget == Nexus)
+							// whack small target
+							gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - 10 * AEFrameRateControllerGetFrameTime());
+
+							if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f)
+								gameObj->smallTarget->active = false;
+						}
+
+						// whack target if near target
+						// if far from target, move to target,
+						// if target down, choose next target
+						if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f || !gameObj->smallTarget->active) // target is down
+						{
+							switch (gameObj->Stats.target_type)
 							{
-								Nexus->active = false;
+								case (CharacterStats::TARGET_TYPE::TAR_PLAYER):
+									gameObj->target = player;
+									break;
+								case (CharacterStats::TARGET_TYPE::TAR_NEXUS):
+									gameObj->target = Nexus;
+									break;
 							}
-					
-							gameObj->target = player;
+							
 							gameObj->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
 							gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
 							break;
 						}
-					
-						/*if (AEVec2Distance(&gameObj->target->position, &gameObj->position) <= test_map->GetTileSize() * 1.5f)
-				{
-					gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
-					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
-
-				}*/
 					}
 					break;
 					case (INNER_STATE::ISTATE_EXIT):
@@ -995,7 +1002,6 @@ namespace
 				}
 			}
 			break;
-			}
 		}
 	}
 
