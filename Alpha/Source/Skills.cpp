@@ -56,8 +56,15 @@ void skills_upgrade_check(GameObject* player)
 		player->AOE.cooldown = 0.0f;
 		player->AOE.damage = 1.0f;
 		player->AOE.skill_bit = 0000'0000;
-		player->Range.timer = 0.0f;
+		player->AOE.timer = 0.0f;
+		player->Melee.skill_bit = base;
 		std::cout << "AOE active\n";
+	}
+
+	if ((player->Melee.skill_bit & tier1) != tier1 && AEInputCheckTriggered(AEVK_U))
+	{
+		player->Melee.skill_bit |= tier1;
+		std::cout << "taunt active";
 	}
 
 	if ((player->skill_flag & blink_flag) != blink_flag && AEInputCheckTriggered(AEVK_K))
@@ -163,6 +170,12 @@ void AOE_move(GameObject* Player, GameObject* skill_inst)
 	AEVec2Set(&skill_inst->direction, 0, 0);
 }
 
+void taunt_move(GameObject* player, GameObject* enemy)
+{
+	enemy->target = player;
+	enemy->alpha = 0.5f;
+}
+
 void player_blink(GameObject* player, f32 mousex, f32 mousey)
 {
 	player->position.x = mousex;
@@ -209,6 +222,11 @@ int skill_input_check(GameObject* player)
 		player->Range.active = true;
 		player->Range.on_cd = true;
 		return 2;
+	}
+
+	if (AEInputCheckTriggered(AEVK_V) && (player->Melee.skill_bit & tier1))
+	{
+		return 3;
 	}
 
 	return -1;

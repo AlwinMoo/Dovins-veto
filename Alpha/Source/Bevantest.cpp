@@ -73,7 +73,7 @@ namespace
 	f64 blink_cd{};
 
 	//skill stuff
-	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move };
+	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move , taunt_move};
 	int skill_input{};
 
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
@@ -219,6 +219,18 @@ void Bevantest_Update()
 		case(car):
 			skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CAR);
 			to_exec(player, skill_inst);
+			break;
+		case(taunt):
+			for (int i{}; i < 5; ++i) // taunt nearest five
+			{
+				for (GameObject* gameobj : go_list)
+				{
+					if (!gameobj->active || (gameobj->target == player)) continue;
+
+					to_exec(player, gameobj);
+					break;
+				}
+			}
 			break;
 		default:
 			break;

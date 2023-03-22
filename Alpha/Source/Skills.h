@@ -22,6 +22,7 @@ enum which_skill
 	shooting = 0,
 	AOEing,
 	car,
+	taunt,
 	TOTAL_SKILLS
 };
 
@@ -42,6 +43,8 @@ void car_move(GameObject*, GameObject*);
 void random_shoot(GameObject*, GameObject*);
 
 void AOE_move(GameObject*, GameObject*);
+void taunt_move(GameObject*, GameObject*);
+
 void player_blink(GameObject*, f32, f32);
 
 int skill_input_check(GameObject*);

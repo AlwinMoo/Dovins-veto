@@ -77,7 +77,7 @@ namespace
 
 	//Skills
 	int skill_input;
-	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move };
+	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move, taunt_move};
 
 	// TEXT TEST
 	UI::UI_TextAreaTable* textTable;
@@ -219,6 +219,19 @@ void Alwintest_Update()
 				skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CAR);
 				skill_inst->tex = bulletTex;
 				to_exec(player, skill_inst);
+			case(taunt):
+				for (int i{}; i < 5; ++i) // taunt nearest five
+				{
+					for (GameObject* gameobj : go_list)
+					{
+						if (gameobj->active && (gameobj->target != player) && (gameobj->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY))
+						{
+							to_exec(player, gameobj);
+							break;
+						}
+					}
+				}
+				break;
 			default:
 				break;
 			}
