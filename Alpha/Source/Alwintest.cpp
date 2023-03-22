@@ -54,6 +54,9 @@ namespace
 	static const int NEXUS_HEALTH = 15;
 	static const int WALL_HEALTH = 5;
 	static const int TURRET_HEALTH = 10;
+	static const int ENEMY_HEALTH = 1;
+
+	static const int BULLET_DAMAGE = 1;
 
 	//player
 	GameObject* player;
@@ -293,15 +296,26 @@ void Alwintest_Update()
 
 					for (GameObject* go : go_list)
 					{
-						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+						if (!go->active)
+							continue;
+						if (go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
 						{
 							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 							{
-								std::cout << "Remain: " << enemiesRemaining << std::endl;
-								enemiesRemaining--;
-								go->active = false;
 								gameObj->active = false;
+								go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - BULLET_DAMAGE);
+								if (go->Stats.GetStat(STAT_HEALTH) <= 0)
+								{
+									std::cout << "Remain: " << enemiesRemaining << std::endl;
+									enemiesRemaining--;
+									go->active = false;
+								}
 							}
+						}
+						else if (go->type == GameObject::GAMEOBJECT_TYPE::GO_WALL || go->type == GameObject::GAMEOBJECT_TYPE::GO_NEXUS)
+						{
+							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+								gameObj->active = false;
 						}
 					}
 
@@ -801,6 +815,7 @@ namespace
 				temp->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
 				temp->Stats.SetCurrInnerState(INNER_STATE::ISTATE_NONE);
 				temp->Stats.SetCurrStateFromNext();
+				temp->Stats.SetRawStat(STAT_HEALTH, ENEMY_HEALTH);
 
 				if (rand() % 2)
 				{
@@ -835,7 +850,9 @@ namespace
 				gameObj->Path.clear();
 				gameObj->active = false;
 			}
+
 			enemiesRemaining = 0;
+
 			enemiesToSpawn += 5;
 			if(enemySpawnRate >= 0.1f)
 				enemySpawnRate -= 0.05f;
@@ -850,6 +867,7 @@ namespace
 			}
 			hoverStructure->active = true;
 			EnableDangerSigns();
+
 			playerPlaced = false;
 			playerButton->texID = UI::TEX_PLAYER;
 			playerButton->hoverText = &textTable->buildPlayerHoverText;
@@ -857,11 +875,12 @@ namespace
 			player->gridIndex.clear();
 			player->Path.clear();
 
-			nexusPlaced = false;
-			nexusButton->texID = UI::TEX_NEXUS;
-			nexusButton->hoverText = &textTable->buildNexusPlacedHoverText;
-			Nexus->active = 0;
-			Nexus->gridIndex.clear();
+			if (!Nexus->active)
+			{
+				nexusPlaced = false;
+				nexusButton->texID = UI::TEX_NEXUS;
+				nexusButton->hoverText = &textTable->buildNexusPlacedHoverText;
+			}
 		}
 	}
 
@@ -1328,11 +1347,11 @@ namespace
 				if (!go->active)
 					continue;
 				if (go->type == GameObject::GO_WALL)
-					go->Stats.SetStat(STAT_HEALTH, WALL_HEALTH);
+					go->Stats.SetRawStat(STAT_HEALTH, WALL_HEALTH);
 				else if (go->type == GameObject::GO_TURRET)
-					go->Stats.SetStat(STAT_HEALTH, TURRET_HEALTH);
+					go->Stats.SetRawStat(STAT_HEALTH, TURRET_HEALTH);
 				else if (go->type == GameObject::GO_NEXUS)
-					go->Stats.SetStat(STAT_HEALTH, NEXUS_HEALTH);
+					go->Stats.SetRawStat(STAT_HEALTH, NEXUS_HEALTH);
 			}
 		}
 		else
