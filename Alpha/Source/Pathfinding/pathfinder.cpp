@@ -2,7 +2,7 @@
 
 constexpr static unsigned int MAX_ITER{ 10000 };
 
-PathManager::PathManager(game_map* Map, bool player) : Map(Map), is_player(player)
+PathManager::PathManager(game_map* Map, bool player) : Map(Map), is_player(player), iterations(0)
 {
 	closedList.clear();
 	for (int i = 0; i < Map->height; ++i)
@@ -101,6 +101,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 
 	if (IsPositionValid(NewPos))
 	{
+		++iterations;
 		// if destination is same as current
 		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
 		{
@@ -145,6 +146,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 
 	if (IsPositionValid(NewPos))
 	{
+		++iterations;
 		// if destination is same as current
 		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
 		{
@@ -189,6 +191,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 
 	if (IsPositionValid(NewPos))
 	{
+		++iterations;
 		// if destination is same as current
 		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
 		{
@@ -234,6 +237,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 
 	if (IsPositionValid(NewPos))
 	{
+		++iterations;
 		// if destination is same as current
 		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
 		{
@@ -278,6 +282,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 
 	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(parent.x, parent.y + 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(parent.x - 1, parent.y)] == game_map::TILE_TYPE::TILE_NONE))
 	{
+		++iterations;
 		// if destination is same as current
 		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
 		{
@@ -322,7 +327,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 
 	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(parent.x, parent.y + 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(parent.x + 1, parent.y)] == game_map::TILE_TYPE::TILE_NONE))
 	{
-		//(Map->map_arr[Map->GetIndex(parent.x, parent.y + 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(parent.x + 1, parent.y)] == game_map::TILE_TYPE::TILE_NONE)
+		++iterations;
 		// if destination is same as current
 		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
 		{
@@ -367,6 +372,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 
 	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(parent.x, parent.y - 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(parent.x - 1, parent.y)] == game_map::TILE_TYPE::TILE_NONE))
 	{
+		++iterations;
 		// if destination is same as current
 		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
 		{
@@ -411,6 +417,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 
 	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(parent.x, parent.y - 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(parent.x + 1, parent.y)] == game_map::TILE_TYPE::TILE_NONE))
 	{
+		++iterations;
 		// if destination is same as current
 		if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
 		{
@@ -565,6 +572,10 @@ std::vector<AEVec2> PathManager::GetPath(AEVec2 const& startPos, AEVec2 const& g
 		//}
 
 		foundDest = calculate_neighbour(StringToVector(curr.second), goalPos);
+
+		if (iterations >= MAX_ITER)
+			break;
+
 		if (foundDest) // path is now valid
 			return result;
 	}

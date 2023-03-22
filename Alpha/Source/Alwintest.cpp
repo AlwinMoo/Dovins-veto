@@ -224,8 +224,9 @@ void Alwintest_Update()
 	// GameObject Update
 	for (GameObject* gameObj : go_list)
 	{
-		if (gameObj->active)
-		{
+		if (!gameObj->active || gameObj->type == GameObject::GAMEOBJECT_TYPE::GO_TILE)
+			continue;
+		
 			gameObj->Update();
 
 			switch (gameObj->type)
@@ -336,7 +337,7 @@ void Alwintest_Update()
 
 				}
 			}
-		}
+		
 	}
 
 	// GameObject Collision (NON-GRID BASED, SHOULD CHANGE)
@@ -823,8 +824,18 @@ namespace
 	void NextWaveCheck()
 	{
 		//std::cout << "Remain: " << enemiesRemaining << std::endl;
-		if (enemiesRemaining == 0 && enemiesSpawned == enemiesToSpawn)
+		if ((enemiesRemaining == 0 && enemiesSpawned == enemiesToSpawn) || !player->active || !Nexus->active)
 		{
+			for (GameObject* gameObj : go_list)
+			{
+				//Gameobjects Render
+				if (!gameObj->active || gameObj->type != GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					continue;
+
+				gameObj->Path.clear();
+				gameObj->active = false;
+			}
+
 			enemiesToSpawn += 5;
 			if(enemySpawnRate >= 0.1f)
 				enemySpawnRate -= 0.05f;
@@ -845,6 +856,12 @@ namespace
 			player->active = 0;
 			player->gridIndex.clear();
 			player->Path.clear();
+
+			nexusPlaced = false;
+			nexusButton->texID = UI::TEX_NEXUS;
+			nexusButton->hoverText = &textTable->buildNexusPlacedHoverText;
+			Nexus->active = 0;
+			Nexus->gridIndex.clear();
 		}
 	}
 
@@ -927,7 +944,7 @@ namespace
 						if (gameObj->smallTarget == nullptr)
 							gameObj->smallTarget = gameObj->target;
 
-						if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= test_map->GetTileSize() * 1.8f)
+						if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= test_map->GetTileSize() * gameObj->smallTarget->scale.x * 0.5f)
 						{
 							gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
 							gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
