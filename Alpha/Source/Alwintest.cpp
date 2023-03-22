@@ -73,7 +73,7 @@ namespace
 
 	//Skills
 	int skill_input;
-	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move };
+	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move };
 
 	// TEXT TEST
 	UI::UI_TextAreaTable* textTable;
@@ -190,6 +190,7 @@ void Alwintest_Update()
 		SpawnEnemies();
 		NextWaveCheck();
 
+		//skill stuff
 		skill_input = skill_input_check(player);
 
 		if (skill_input >= 0)
@@ -201,18 +202,41 @@ void Alwintest_Update()
 				GameObject* skill_inst;
 			case (shooting):
 				skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+				skill_inst->tex = bulletTex;
 				to_exec(player, skill_inst);
 				break;
 			case(AOEing):
 				skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_AOE);
+				skill_inst->tex = bulletTex;
 				to_exec(player, skill_inst);
 				break;
+			case(car):
+				skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CAR);
+				skill_inst->tex = bulletTex;
+				to_exec(player, skill_inst);
 			default:
 				break;
 			}
 		}
 	}
 
+	if (player->Range.active)
+	{
+		GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+		for (GameObject* go : go_list)
+		{
+			if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_CAR)
+			{
+				skill_inst->tex = bulletTex;
+				random_shoot(go, skill_inst);
+				break;
+			}
+		}
+	}
+
+	//AEGfxLine()
+	// end skill stuff
+	// 
 	// Quit Game
 	if (AEInputCheckTriggered(AEVK_Q))
 	{
@@ -298,6 +322,17 @@ void Alwintest_Update()
 								enemiesRemaining--;
 								go->active = false;
 								gameObj->active = false;
+
+								if ((gameObj->Range.skill_bit & tier1) == tier1)
+								{
+									//implement spread shot function here
+									for (int i{}; i < MAX_SPREAD; ++i)
+									{
+										GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+										skill_inst->tex = bulletTex;
+										spreadshot(gameObj, skill_inst, i);
+									}
+								}
 							}
 						}
 					}
@@ -332,6 +367,19 @@ void Alwintest_Update()
 					}
 					break;
 
+				}
+				case (GameObject::GAMEOBJECT_TYPE::GO_CAR):
+				{
+					gameObj->position.x += gameObj->direction.x * CAR_VEL;
+					gameObj->position.y += gameObj->direction.y * CAR_VEL;
+
+					if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+					{
+						gameObj->active = false;
+						player->Range.active = false;
+						//std::cout << "car destroyed";
+					}
+					break;
 				}
 			}
 		}

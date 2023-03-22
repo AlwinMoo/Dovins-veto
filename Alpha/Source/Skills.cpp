@@ -46,6 +46,7 @@ void skills_upgrade_check(GameObject* player)
 	if((player->Range.skill_bit & tier2) != tier2 && AEInputCheckTriggered(AEVK_N))
 	{
 		player->Range.skill_bit |= tier2;
+		player->Range.cooldown = 0.0f;
 		std::cout << "car active";
 	}
 
@@ -90,6 +91,7 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 				break;
 			case(tier2):
 				skill_inst->Range.skill_bit = tier2;
+				//here too
 			default:
 				break;
 		}
@@ -97,13 +99,30 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 	//}
 }
 
-void spreadshot(GameObject* parent, GameObject* skill_inst)
+void spreadshot(GameObject* parent, GameObject* skill_inst, int times)
 {
+	skill_inst->type = GameObject::GAMEOBJECT_TYPE::GO_BULLET;
 	skill_inst->position.x = parent->position.x;
 	skill_inst->position.y = parent->position.y;
 	skill_inst->scale.x = BULLET_SIZE;
 	skill_inst->scale.y = BULLET_SIZE;
-	AEVec2Set(&skill_inst->direction, cos(PI), sin(PI));
+	switch(times)
+	{ 
+	case 0 :
+		AEVec2Set(&skill_inst->direction, cos(PI), sin(PI));
+		break;
+	case 1:
+		AEVec2Set(&skill_inst->direction, -cos(PI), sin(PI));
+		break;
+	case 2:
+		AEVec2Set(&skill_inst->direction, cos(0.5 * PI), sin(0.5 * PI));
+		break;
+	case 3:
+		AEVec2Set(&skill_inst->direction, cos(0.5 * PI), -sin(0.5 * PI));
+		break;
+	default:
+		break;
+	}
 }
 
 void car_move(GameObject* Player, GameObject* skill_inst)
@@ -158,8 +177,19 @@ int skill_input_check(GameObject* player)
 		player->AOE.cooldown += AEFrameRateControllerGetFrameTime();
 		if (player->AOE.cooldown >= static_cast<f64> (5.0f))
 		{
-			player->AOE.cooldown = 0;
+			player->AOE.cooldown = 0.f;
 			player->AOE.on_cd = false;
+		}
+	}
+
+	if (player->Range.on_cd) //car cooldown
+	{
+		player->Range.cooldown += AEFrameRateControllerGetFrameTime();
+		if (player->Range.cooldown >= static_cast<f64> (10.0f))
+		{
+			player->Range.cooldown = 0.f;
+			player->Range.on_cd = false;
+
 		}
 	}
 
@@ -174,9 +204,10 @@ int skill_input_check(GameObject* player)
 		return 1;
 	}
 
-	if (AEInputCheckTriggered(AEVK_C) && (player->Range.skill_bit & tier2))
+	if (AEInputCheckTriggered(AEVK_C) && (player->Range.skill_bit & tier2) && !player->Range.on_cd)
 	{
 		player->Range.active = true;
+		player->Range.on_cd = true;
 		return 2;
 	}
 

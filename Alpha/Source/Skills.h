@@ -14,6 +14,9 @@
 #include "Pathfinding/pathfinder.h"
 #include <cmath>
 
+const float CAR_VEL{ 5.0f };
+const int MAX_SPREAD{ 4};
+
 enum which_skill
 {
 	shooting = 0,
@@ -34,7 +37,7 @@ void skills_upgrade_check(GameObject*);
 void skills_update(GameObject*, GameObject*);
 
 void shoot_bullet(GameObject*, GameObject*);
-void spreadshot(GameObject*, GameObject*);
+void spreadshot(GameObject*, GameObject*, int);
 void car_move(GameObject*, GameObject*);
 void random_shoot(GameObject*, GameObject*);
 

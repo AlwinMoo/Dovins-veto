@@ -67,7 +67,7 @@ namespace
 	f32 AOE_posx;
 	f32 AOE_posy;
 	//car stuff
-	const float CAR_VEL{ 5.0f };
+
 	//blink
 	bool blink_ok{ false };
 	f64 blink_cd{};
@@ -299,8 +299,12 @@ void Bevantest_Update()
 							if ((gameObj->Range.skill_bit & tier1) == tier1)
 							{
 								//implement spread shot function here
-								GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
-								spreadshot(gameObj, skill_inst);
+								for (int i{}; i < MAX_SPREAD; ++i)
+								{
+									GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+									skill_inst->tex = Bullet;
+									spreadshot(gameObj, skill_inst, i);
+								}
 							}
 						}
 					}
