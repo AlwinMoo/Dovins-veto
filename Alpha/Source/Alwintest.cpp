@@ -178,7 +178,7 @@ void Alwintest_Update()
 	}
 	else
 	{
-		if (AEInputCheckTriggered(AEVK_RBUTTON) && !test_map->IsOccupied(test_map->WorldToPreOffsetIndex(mouse_pos)))
+		if (AEInputCheckTriggered(AEVK_RBUTTON) && !test_map->IsOccupied(test_map->WorldToIndex(mouse_pos)))
 		{
 			if (test_map->IsInGrid(absMousePos))
 				SetPlayerGoal();
@@ -505,7 +505,7 @@ namespace
 			if (go->type == GameObject::GO_DANGER_SIGN && !go->active)
 			{
 				go->active = true;
-				test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(go->position));
+				test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(go->position));
 			}
 		}
 	}
@@ -517,7 +517,7 @@ namespace
 			if (go->type == GameObject::GO_DANGER_SIGN && go->active)
 			{
 				go->active = false;
-				test_map->RemoveItem(test_map->WorldToPreOffsetIndex(go->position));
+				test_map->RemoveItem(test_map->WorldToIndex(go->position));
 			}
 		}
 	}
@@ -587,7 +587,7 @@ namespace
 			temp = FetchGO(GameObject::GO_WALL);
 			buildResource -= WALL_COST;
 
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 		}
 		else if (hoverStructure->tex == turretTex)
 		{
@@ -596,7 +596,7 @@ namespace
 			temp = FetchGO(GameObject::GO_TURRET);
 			buildResource -= TOWER_COST;
 
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 		}
 		else if (hoverStructure->tex == nexusTex)
 		{
@@ -605,14 +605,14 @@ namespace
 			//duplicate with nexus object below
 			Nexus = temp;
 
-			test_map->AddItem(game_map::TILE_TYPE::TILE_NEXUS, test_map->WorldToPreOffsetIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+			test_map->AddItem(game_map::TILE_TYPE::TILE_NEXUS, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 		}
 		else if (hoverStructure->tex == playerTex)
 		{
 			player->active = true;
 			temp = player;
 
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), hoverStructure->gridScale.x, hoverStructure->gridScale.y);
 		}
 
 		temp->position = hoverStructure->position;
@@ -621,7 +621,7 @@ namespace
 		temp->tex = hoverStructure->tex;
 		temp->gridScale = hoverStructure->gridScale;
 
-		UpdateGOGridIndex(temp, test_map->WorldToPreOffsetIndex(hoverTopLeftPos));
+		UpdateGOGridIndex(temp, test_map->WorldToIndex(hoverTopLeftPos));
 
 		if (temp->type == GameObject::GO_NEXUS)
 		{
@@ -673,7 +673,7 @@ namespace
 			playerButton->hoverText = &textTable->buildPlayerHoverText;
 		}
 
-		test_map->RemoveItem(test_map->WorldToPreOffsetIndex(topRightPos), deleteGridScale.x, deleteGridScale.y);
+		test_map->RemoveItem(test_map->WorldToIndex(topRightPos), deleteGridScale.x, deleteGridScale.y);
 	}
 
 	void UpdateHoverStructure()
@@ -700,7 +700,7 @@ namespace
 		}
 
 		// GameObject Collision (GRID BASED)
-		if (test_map->IsOccupied(test_map->WorldToPreOffsetIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y))
+		if (test_map->IsOccupied(test_map->WorldToIndex(mouse_pos), hoverStructure->gridScale.x, hoverStructure->gridScale.y))
 		{
 			hoverStructure->color.Set(1.0f, 0.2f, 0.2f);
 			validPlacement = false;
@@ -723,7 +723,7 @@ namespace
 		{
 			for (auto& pos : player->Path)
 			{
-				pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
+				pos = test_map->GetWorldPos(test_map->GetIndex(pos.x, pos.y));
 			}
 
 			player->Path.erase(player->Path.end() - 1);
@@ -779,16 +779,16 @@ namespace
 				switch (rand() % 4)
 				{
 				case 0:
-					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->width + test_map->tile_offset, 0));
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->width, 0));
 					break;
 				case 1:
-					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->width + test_map->tile_offset, test_map->height - 1));
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->width, test_map->height - 1));
 					break;
 				case 2:
-					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->height + test_map->tile_offset, 0));
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->height, 0));
 					break;
 				case 3:
-					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->height + test_map->tile_offset, test_map->width - 1));
+					temp->position = test_map->GetWorldPos(test_map->GetIndex(rand() % test_map->height, test_map->width - 1));
 					break;
 				}
 
@@ -910,13 +910,13 @@ namespace
 								std::vector<AEVec2>::iterator it = gameObj->Path.begin();
 								for (auto& pos : gameObj->Path) // converting grid pos to world pos
 								{
-									if (test_map->map_arr[test_map->GetIndex(pos.x + test_map->tile_offset, pos.y)] != game_map::TILE_TYPE::TILE_NONE)
+									if (test_map->map_arr[test_map->GetIndex(pos.x, pos.y)] != game_map::TILE_TYPE::TILE_NONE)
 									{
-										gameObj->smallTarget = IndexToGO(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
+										gameObj->smallTarget = IndexToGO(test_map->GetIndex(pos.x, pos.y));
 										break;
 									}
 
-									pos = test_map->GetWorldPos(test_map->GetIndex(pos.x + test_map->tile_offset, pos.y));
+									pos = test_map->GetWorldPos(test_map->GetIndex(pos.x, pos.y));
 									++it;
 								}
 
@@ -1220,7 +1220,7 @@ namespace
 			temp->position.x = test_map->GetTileSize() * i + test_map->GetTileSize() / 2.f + test_map->world_offset;
 			temp->position.y = test_map->GetTileSize() / 2.f;
 			temp->active = true;
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(temp->position));
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(temp->position));
 		}
 		// Bottom
 		for (int i = 0; i < test_map->width; i++)
@@ -1232,7 +1232,7 @@ namespace
 			temp->position.x = test_map->GetTileSize() * i + test_map->GetTileSize() / 2.f + test_map->world_offset;
 			temp->position.y = test_map->GetTileSize() * test_map->height - test_map->GetTileSize() / 2.f;
 			temp->active = true;
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(temp->position));
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(temp->position));
 		}
 		// Left
 		for (int i = 1; i < test_map->height - 1; i++)
@@ -1244,7 +1244,7 @@ namespace
 			temp->position.y = test_map->GetTileSize() * i + test_map->GetTileSize() / 2.f;
 			temp->position.x = test_map->GetTileSize() / 2.f + test_map->world_offset;
 			temp->active = true;
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(temp->position));
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(temp->position));
 		}
 		// Right
 		for (int i = 1; i < test_map->height - 1; i++)
@@ -1256,7 +1256,7 @@ namespace
 			temp->position.y = test_map->GetTileSize() * i + test_map->GetTileSize() / 2.f;
 			temp->position.x = test_map->GetTileSize() * test_map->width - test_map->GetTileSize() / 2.f + test_map->world_offset;
 			temp->active = true;
-			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToPreOffsetIndex(temp->position));
+			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(temp->position));
 		}
 
 		EnableDangerSigns();
@@ -1289,7 +1289,7 @@ namespace
 			Nexus->active = true;
 
 			// Remove player from collision map
-			test_map->RemoveItem(test_map->WorldToPreOffsetIndex(player->position));
+			test_map->RemoveItem(test_map->WorldToIndex(player->position));
 
 			DisableDangerSigns();
 

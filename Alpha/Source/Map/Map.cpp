@@ -19,7 +19,6 @@ game_map::game_map(unsigned int width_size, unsigned int height_size, float worl
 
 int game_map::GetIndex(int x, int y)
 {
-	x -= tile_offset;
 	return y * width + x;
 }
 
@@ -84,16 +83,7 @@ int game_map::WorldToIndex(AEVec2 pos)
 		return -1;
 
 	AEVec2 gridPos = SnapCoordinates(pos);
-	return GetIndex(gridPos.x / GetTileSize(), gridPos.y / GetTileSize());
-}
-
-int game_map::WorldToPreOffsetIndex(AEVec2 pos)
-{
-	if (pos.x < world_offset || pos.x > world_offset + width * GetTileSize())
-		return -1;
-
-	AEVec2 gridPos = SnapCoordinates(pos);
-	return GetIndex((gridPos.x / GetTileSize()) + tile_offset, gridPos.y / GetTileSize());
+	return GetIndex(gridPos.x / GetTileSize() - tile_offset, gridPos.y / GetTileSize());
 }
 
 void game_map::AddItem(TILE_TYPE tile, int index, int gridScalex, int gridScaleY)
