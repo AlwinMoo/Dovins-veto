@@ -14,8 +14,13 @@
 #include "Pathfinding/pathfinder.h"
 #include <cmath>
 
-const float CAR_VEL{ 5.0f };
-const int MAX_SPREAD{ 4};
+namespace skill_vals
+{
+	const float AOE_VEL{ 1000.f };
+	const float CAR_VEL{ 750.0f };
+	const float BULLET_VEL{ 1750.0f };
+	const int MAX_SPREAD{ 4 };
+}
 
 enum which_skill
 {
@@ -47,6 +52,7 @@ void random_shoot(GameObject*, GameObject*);
 
 //melee functions
 void AOE_move(GameObject*, GameObject*);
+void AOE_ready(GameObject*, GameObject*);
 
 //utility
 void taunt_move(GameObject*, GameObject*);

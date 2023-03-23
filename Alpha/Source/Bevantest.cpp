@@ -179,6 +179,7 @@ void Bevantest_Update()
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
 
 	// Player Input
+	f64 dt{ AEFrameRateControllerGetFrameTime() };
 	AEVec2 mousepos{};
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -210,7 +211,7 @@ void Bevantest_Update()
 
 	skills_upgrade_check(player);
 	skill_input = skill_input_check(player);
-
+	
 
 
 	if (skill_input >= 0)
@@ -232,6 +233,7 @@ void Bevantest_Update()
 			break;
 		case(car):
 			skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CAR);
+			skill_inst->tex = Bullet;
 			to_exec(player, skill_inst);
 			break;
 		case(taunt):
@@ -304,8 +306,8 @@ void Bevantest_Update()
 
 				break;
 			case (GameObject::GAMEOBJECT_TYPE::GO_BULLET):
-				gameObj->position.x += gameObj->direction.x * BULLET_VEL;
-				gameObj->position.y += gameObj->direction.y * BULLET_VEL;
+				gameObj->position.x += gameObj->direction.x * dt * skill_vals::BULLET_VEL;
+				gameObj->position.y += gameObj->direction.y * dt * skill_vals::BULLET_VEL;
 
 				if (gameObj->position.x > winSizeX || gameObj->position.x < 0 || gameObj->position.y > winSizeY || gameObj->position.y < 0)
 				{
@@ -325,7 +327,7 @@ void Bevantest_Update()
 							if ((gameObj->Range.skill_bit & tier1) == tier1)
 							{
 								//implement spread shot function here
-								for (int i{}; i < MAX_SPREAD; ++i)
+								for (int i{}; i < skill_vals::MAX_SPREAD; ++i)
 								{
 									GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
 									skill_inst->tex = Bullet;
@@ -339,8 +341,7 @@ void Bevantest_Update()
 
 			case (GameObject::GAMEOBJECT_TYPE::GO_AOE):
 				//update positions
-				gameObj->position.x = player->position.x;
-				gameObj->position.y = player->position.y;
+
 				player->AOE.timer += AEFrameRateControllerGetFrameTime();
 
 				//check collision
@@ -353,22 +354,51 @@ void Bevantest_Update()
 					}
 				}
 
-				if (player->AOE.timer > static_cast<f64> (0.2f))
+				if (player->Melee.skill_bit & tier2)
 				{
-					gameObj->alpha -= 0.10f;
-					player->AOE.timer = 0;
+					AOE_ready(player, gameObj);
+					if (gameObj->skill_flag)
+					{
+						gameObj->position.x += skill_vals::AOE_VEL * gameObj->direction.x * dt;
+						gameObj->position.y += skill_vals::AOE_VEL * gameObj->direction.y * dt;
+					}
+
+					else
+					{
+						gameObj->position.x = player->position.x;
+						gameObj->position.y = player->position.y;
+					}
+
+
+					if (gameObj->position.x > winSizeX || gameObj->position.x < 0 || gameObj->position.y > winSizeY || gameObj->position.y < 0)
+					{
+						gameObj->active = false;
+						gameObj->skill_flag = false;
+						std::cout << "AOE destroyed";
+					}
 				}
 
-				if (gameObj->alpha < 0)
+				else 
 				{
-					gameObj->active = false;
+					gameObj->position.x = player->position.x;
+					gameObj->position.y = player->position.y;
+					if (player->AOE.timer > static_cast<f64> (0.2f))
+					{
+						gameObj->alpha -= 0.10f;
+						player->AOE.timer = 0;
+					}
+
+					if (gameObj->alpha < 0)
+					{
+						gameObj->active = false;
+					}
 				}
 				break;
 
 			case (GameObject::GAMEOBJECT_TYPE::GO_CAR) : 
 			{
-				gameObj->position.x += gameObj->direction.x * CAR_VEL;
-				gameObj->position.y += gameObj->direction.y * CAR_VEL;
+				gameObj->position.x += gameObj->direction.x * skill_vals::CAR_VEL * dt;
+				gameObj->position.y += gameObj->direction.y * skill_vals::CAR_VEL * dt;
 
 				if (gameObj->position.x > winSizeX || gameObj->position.x < 0 || gameObj->position.y > winSizeY || gameObj->position.y < 0)
 				{
