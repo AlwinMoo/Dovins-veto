@@ -23,17 +23,23 @@ namespace UI
 	UI_Button* UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText, void(*callback)(UI_Button*), UI_TextArea* hoverText)
 	{
 		UI_Button* newButton = new UI_Button();
-		newButton->scale = size;
-		newButton->callback = callback;
-		newButton->hoverText = hoverText;
-		newButton->buttonText = buttonText;
+		newButton->scale = size;			// Scale of button important for render/collision
+		newButton->callback = callback;		// callback function, if any
+		newButton->hoverText = hoverText;	// set text on mouse hover, if any
+		newButton->buttonText = buttonText;	// set button text rendered on button, if any
 		newButton->pos = pos;
 		
+		// Now we set the collision to mouse boundaries for click detection
 		newButton->min.x = pos.x - size.x * 0.5f;
 		newButton->max.x = pos.x + size.x * 0.5f;
 		newButton->min.y = pos.y - size.y * 0.5f;
 		newButton->max.y = pos.y + size.y * 0.5f;
+		// Convert positions to world space where 0,0 is center
 		ConvertToWS(newButton);
+
+		// Button text position
+		newButton->CalculatePosN(m_winDim);
+
 		switch (type) {
 		case BUILD_TOWER_BUTTON:
 			newButton->texID = TEX_TOWER;
@@ -69,6 +75,10 @@ namespace UI
 			break;
 		case CLOSE_BUTTON:
 			newButton->texID = TEX_CLOSE;
+			newButton->meshID = MESH_BOX;
+			break;
+		case GUN_SKILL_BUTTON:
+			newButton->texID = TEX_GUN_SKILL;
 			newButton->meshID = MESH_BOX;
 			break;
 		default:
@@ -141,14 +151,17 @@ namespace UI
 
 	void UI_Manager::Draw(s32 mouseX, s32 mouseY)
 	{
-		f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
-		f32 mouseXN{ mouseX / winX * 2 - 1.f }, mouseYN{ mouseY / winY * -2 + 1.f }; // CALCULATE NORMALIZED COORDINATES
+		f32 const& winX{ m_winDim.x }, &winY{ m_winDim.y };
+		f32 const& mouseXN{ mouseX / winX * 2 - 1.f }, &mouseYN{ mouseY / winY * -2 + 1.f }; // CALCULATE NORMALIZED COORDINATES
 		// Now safe to recalculate mouse pos to worldspace coordinates
 		mouseX -= static_cast<s32>(winX)/ 2;
 		mouseY -= static_cast<s32>(winY) / 2;
 		for (UI_Button* curr : m_buttons) {
 			AEGfxSetBlendColor(1.f, 1.f, 1.f, (curr->bHovering ? BUTTON_HOVER_ALPHA: 0.f));
 			DrawMesh(curr->posWS, curr->scale, curr->texID); // Render the mesh
+			// Now render the button text, if any
+			if (curr->buttonText)
+				curr->buttonText->Draw(curr->posN.x, curr->posN.y, 1.f, 0.f, 0.f);
 		}
 
 		// NOW DRAW DESCRIPTIONS (IF ANY)
@@ -174,6 +187,7 @@ namespace UI
 		{
 			curr->Draw();
 		}
+
 	}
 	UI_Manager::UI_Manager()
 	{

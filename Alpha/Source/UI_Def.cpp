@@ -18,6 +18,7 @@ namespace UI
 		TextureList[TEX_PLAYER_PLACED]	= AEGfxTextureLoad("Assets/PlayerPlaced.png");
 		TextureList[TEX_SKILL_MENU]		= AEGfxTextureLoad("Assets/UpgradeIcon.png");
 		TextureList[TEX_CLOSE]			= AEGfxTextureLoad("Assets/Close.png");
+		TextureList[TEX_GUN_SKILL]		= AEGfxTextureLoad("Assets/GunSkill.png");
 		MeshList[MESH_BOX] = render::GenerateQuad();
 	}
 

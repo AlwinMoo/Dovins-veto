@@ -127,7 +127,7 @@ void Bevantest_Initialize()
 		gameUIManager->SetWinDim(screenWidthX, screenHeightY);
 
 		gameUIManager->CreateButton({ 100.f, 100.f }, {100.f, 100.f}, UI::SKILL_TREE_BUTTON,
-			&textTable->playButton, PlayButton, &textTable->eraseHoverText);
+			&textTable->playButton, PlayButton, nullptr);
 	}
 
 	test_map = new game_map(10, 10, (float)AEGetWindowWidth(), (float)AEGetWindowHeight(), true); // automatically destroyed in deconstructor

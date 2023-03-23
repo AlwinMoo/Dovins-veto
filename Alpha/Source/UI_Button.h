@@ -10,9 +10,9 @@ namespace UI
 		UI_TEX texID;
 		UI_MESH meshID;
 		
-		AEVec2 pos;
-		// world space pos
-		AEVec2 posWS;
+		AEVec2 posN;	//!< normalized pos for text
+		AEVec2 pos;		//!< non-world space pos (origin is bottom left)
+		AEVec2 posWS;	//!< world space pos
 
 		AEVec2 min, max;		//!< Boundaries for screen space
 		AEVec2 minWS, maxWS;	//!< World space boundaries for rendering
@@ -25,6 +25,10 @@ namespace UI
 		bool bHovering;
 		float alpha;			//!< TODO: REMOVE
 		
+		/// <summary>
+		/// Calculates the normalized pos for text based on screen dims
+		/// </summary>
+		void CalculatePosN(AEVec2 screenDims);
 		UI_Button() = default;
 		~UI_Button() = default;
 	};
