@@ -126,9 +126,8 @@ void Bevantest_Initialize()
 		textTable = new UI::UI_TextAreaTable;
 		gameUIManager->SetWinDim(screenWidthX, screenHeightY);
 
-		UI::UI_TextArea endTurnHoverText = { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE" };
 		gameUIManager->CreateButton({ 100.f, 100.f }, {100.f, 100.f}, UI::SKILL_TREE_BUTTON,
-			nullptr, PlayButton, &textTable->eraseHoverText);
+			&textTable->playButton, PlayButton, &textTable->eraseHoverText);
 	}
 
 	test_map = new game_map(10, 10, (float)AEGetWindowWidth(), (float)AEGetWindowHeight(), true); // automatically destroyed in deconstructor
@@ -470,8 +469,10 @@ void Bevantest_Update()
 			}
 		}
 	}
-	//s32 mouseX, mouseY;
-	//AEInputGetCursorPosition(&mouseX, &mouseY);
+
+	AEVec2 invert_mouse = {static_cast<f32>(mouseX), static_cast<f32>(mouseY)}; // Getting inverted mouse pos to match world space
+	invert_mouse.y = gameUIManager->m_winDim.y - mouseY;
+	gameUIManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 	//AEVec2Set(&absMousePos, static_cast<f32>(mouseX), static_cast<f32>(mouseY));
 	//AEVec2Set(&mouse_pos, static_cast<f32>(mouseX), static_cast<f32>(mouseY));
 	//AEVec2 invert_mouse = mouse_pos; // Getting inverted mouse pos to match world space
@@ -527,12 +528,12 @@ void Bevantest_Draw()
 	//{
 	//	enemy->Render();
 	//}
-	gameUIManager->Draw();
 
 	// IMPORTANT SNIPPET:
 	/***********************************************************************/
 	s32 cursorX, cursorY;
 	AEInputGetCursorPosition(&cursorX, &cursorY);
+	gameUIManager->Draw(cursorX, cursorY);
 	f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
 	//std::cout << winX << ", " <<  winY << std::endl;
 	f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES

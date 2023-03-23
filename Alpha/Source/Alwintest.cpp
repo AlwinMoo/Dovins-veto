@@ -1237,17 +1237,17 @@ namespace
 	void InitializeUIButtons()
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
-		f32 screenWidthY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-		AEVec2 const endButtonPos{ screenWidthX * .115f, screenWidthY * .2f };
-		AEVec2 const endButtonSize{ screenWidthX * .2f, screenWidthY * .15f };
+		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+		AEVec2 const endButtonPos{ screenWidthX * .115f, screenHeightY * .2f };
+		AEVec2 const endButtonSize{ screenWidthX * .2f, screenHeightY * .15f };
 
 		UI::UI_Manager& gameUIManager{ *uiManagers[UI::UI_TYPE_GAME] };
 		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
 
 		uiManagers[UI::UI_TYPE_GAME]->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &textTable->endTurnHoverText);
 
-		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenWidthY * .9f };
-		AEVec2 const buildButtonSize{ screenWidthY * .12f, screenWidthY * .12f };
+		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenHeightY * .9f };
+		AEVec2 const buildButtonSize{ screenHeightY * .12f, screenHeightY * .12f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
 		buildButtonPos.x -= buildButtonSize.y * 0.75f;
 		nexusButton = gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, 
@@ -1274,6 +1274,20 @@ namespace
 			nullptr, SkillTreeButton, &textTable->eraseHoverText);
 
 		// Initialize skill tree buttons
+		{
+			AEVec2 tier1Pos{ screenWidthX * .115f, screenHeightY * .7f };
+			float tier1YOffset{ screenHeightY * 0.2f };
+			// TIER 1
+			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::SKILL_TREE_BUTTON,
+				nullptr, nullptr, &textTable->playButton);
+			tier1Pos.y -= tier1YOffset; // Offset y
+			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::SKILL_TREE_BUTTON,
+				nullptr, nullptr, &textTable->playButton);
+			tier1Pos.y -= tier1YOffset; // Offset y
+			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::SKILL_TREE_BUTTON,
+				nullptr, nullptr, &textTable->playButton);
+		}
+			
 	}
 
 	void InitializeUIElements()
