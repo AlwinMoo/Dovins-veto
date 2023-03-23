@@ -7,6 +7,7 @@ enum STAT_TYPE : size_t
 	STAT_HEALTH = 0,
 	STAT_MOVE_SPEED,
 	STAT_ATTACK_SPEED,
+	STAT_DAMAGE,
 	STAT_TOTAL
 };
 
@@ -83,6 +84,7 @@ public:
 		TAR_PLAYER,
 		TAR_NEXUS,
 		TAR_WALL,
+		TAR_TURRET,
 
 		NUM_TAR
 	};

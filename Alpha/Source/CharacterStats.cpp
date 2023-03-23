@@ -7,7 +7,8 @@ std::array<const float, STAT_TOTAL> STAT_MULT
 {
 	1.f, //STAT_HEALTH,
 	1.f, //STAT_MOVE_SPEED,
-	1.f //STAT_ATTACK_SPEED
+	1.f, //STAT_ATTACK_SPEED
+	1.f
 };
 
 CharacterStats::CharacterStats() : m_rawStats{}, m_subRawStat{}, m_stats{}, m_dirty{}, currState(STATE::STATE_NONE), currInnerState(INNER_STATE::ISTATE_NONE)

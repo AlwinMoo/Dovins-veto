@@ -54,9 +54,10 @@ namespace
 	static const int NEXUS_HEALTH = 15;
 	static const int WALL_HEALTH = 5;
 	static const int TURRET_HEALTH = 10;
-	static const int ENEMY_HEALTH = 1;
+	static const int INFANTRY_HEALTH = 1;
+	static const int TANK_HEALTH = 10;
 
-	static const int BULLET_DAMAGE = 1;
+	static const int TURRET_DAMAGE = 1;
 
 	//player
 	GameObject* player;
@@ -74,6 +75,8 @@ namespace
 	int	enemiesSpawned;
 	int	enemiesRemaining;
 	int currentWave;
+	int enemyTankInGame;
+	static const size_t tank_count = 2;
 
 	//Skills
 	int skill_input;
@@ -117,7 +120,7 @@ namespace
 
 	void RenderTexture(AEGfxTexture* texture, AEVec2 pos_, AEVec2 scale_, float rotation_);
 	
-	AEVec2 FindClosestEnemy(GameObject* gameObj);
+	GameObject* FindClosestGO(GameObject*, GameObject::GAMEOBJECT_TYPE);
 	void UpdateTurretShooting(AEVec2 target, GameObject* gameObj);
 #pragma endregion
 
@@ -241,6 +244,128 @@ void Alwintest_Update()
 			default:
 				break;
 			}
+		}
+
+
+		// GameObject Update
+		for (GameObject* gameObj : go_list)
+		{
+			if (!gameObj->active || gameObj->type == GameObject::GAMEOBJECT_TYPE::GO_TILE)
+				continue;
+
+			gameObj->Update();
+
+			switch (gameObj->type)
+			{
+			case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
+			{
+				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+					gameObj->active = false;
+
+				//if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
+				//{
+				//	//NexusEnemyUpdate(gameObj);
+				//	gameObj->target = Nexus;
+				//}
+				//else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
+				//{
+				//	gameObj->target = player;
+				//}
+
+				UpdateEnemyState(gameObj);
+
+				//UpdateEnemyPath(gameObj);
+				//UpdateEnemyRotation(gameObj);
+				//UpdateEnemyPosition(gameObj);
+
+				break;
+			}
+			case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
+			{
+				UpdatePlayerPosition(gameObj);
+
+				for (GameObject* go : go_list)
+				{
+					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					{
+						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+						{
+							std::cout << "Remain: " << enemiesRemaining << std::endl;
+							enemiesRemaining--;
+							go->active = false;
+						}
+					}
+				}
+				break;
+			}
+			case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
+			{
+				gameObj->Stats.SetStat(STAT_ATTACK_SPEED, gameObj->Stats.GetStat(STAT_ATTACK_SPEED) + AEFrameRateControllerGetFrameTime());
+
+				GameObject* temp = FindClosestGO(gameObj, GameObject::GO_ENEMY);
+				if (!temp)
+					break;
+
+				AEVec2 result = temp->position;
+				UpdateTurretShooting(result, gameObj);
+
+				break;
+			}
+			case (GameObject::GAMEOBJECT_TYPE::GO_BULLET):
+			{
+				gameObj->position.x += gameObj->direction.x * AEFrameRateControllerGetFrameTime() * 600;
+				gameObj->position.y += gameObj->direction.y * AEFrameRateControllerGetFrameTime() * 600;
+
+				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+					gameObj->active = false;
+
+				for (GameObject* go : go_list)
+				{
+					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					{
+						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+						{
+							std::cout << "Remain: " << enemiesRemaining << std::endl;
+							enemiesRemaining--;
+							go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE)); // we just say 1 bullet does 1 damage for now
+							gameObj->active = false;
+						}
+					}
+				}
+
+				break;
+			}
+			case (GameObject::GAMEOBJECT_TYPE::GO_AOE):
+			{
+				gameObj->position.x = player->position.x;
+				gameObj->position.y = player->position.y;
+				player->AOE.timer += AEFrameRateControllerGetFrameTime();
+
+				//check collision
+				for (GameObject* go : go_list)
+				{
+					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					{
+						if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
+							go->active = false;
+					}
+				}
+
+				if (player->AOE.timer > static_cast<f64> (0.2f))
+				{
+					gameObj->alpha -= 0.10f;
+					player->AOE.timer = 0;
+				}
+				if (gameObj->alpha < 0)
+				{
+					gameObj->active = false;
+					//player->AOE.on_cd = true;
+				}
+				break;
+
+			}
+			}
+
 		}
 	}
 
@@ -930,16 +1055,32 @@ namespace
 				temp->Stats.SetCurrInnerState(INNER_STATE::ISTATE_NONE);
 				temp->Stats.SetCurrStateFromNext();
 				temp->Stats.SetRawStat(STAT_HEALTH, ENEMY_HEALTH);
+				temp->target = player; // deafult
 
-				if (rand() % 2)
+				if (enemyTankInGame < tank_count)
 				{
-					temp->target = Nexus;
-					temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
+					temp->target = FindClosestGO(temp, GameObject::GO_TURRET);
+					temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_TURRET;
+					temp->Stats.SetStat(STAT_HEALTH, TANK_HEALTH);
+					temp->Stats.SetStat(STAT_DAMAGE, 10);
+					++enemyTankInGame;
 				}
 				else
 				{
-					temp->target = player;
-					temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_PLAYER;
+					if (rand() % 2)
+					{
+						temp->target = Nexus;
+						temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
+						temp->Stats.SetStat(STAT_HEALTH, INFANTRY_HEALTH);
+						temp->Stats.SetStat(STAT_DAMAGE, 5);
+					}
+					else
+					{
+						temp->target = player;
+						temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_PLAYER;
+						temp->Stats.SetStat(STAT_HEALTH, INFANTRY_HEALTH);
+						temp->Stats.SetStat(STAT_DAMAGE, 5);
+					}
 				}
 
 				++enemiesRemaining;
@@ -972,6 +1113,7 @@ namespace
 				enemySpawnRate -= 0.05f;
 			currentWave++;
 			enemiesSpawned = 0;
+			enemyTankInGame = 0;
 			buildPhase = true;
 			buildResource += 500;
 			for (GameObject* tile : go_list)
@@ -1050,7 +1192,7 @@ namespace
 					// if target down, choose next target
 					gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
 
-					if (gameObj->Stats.path_timer >= 1.0f)
+					if (gameObj->Stats.path_timer >= 1.0f && gameObj->target != nullptr)
 					{
 						PathManager pathmaker(test_map, false);
 						gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
@@ -1086,6 +1228,12 @@ namespace
 							gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
 						}
 					}
+					else if (gameObj->target == nullptr)
+					{
+						gameObj->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
+						gameObj->target = Nexus;
+					}
+				}
 					break;
 				case (INNER_STATE::ISTATE_EXIT):
 				{
@@ -1095,7 +1243,7 @@ namespace
 					gameObj->Stats.SetCurrStateFromNext();
 				}
 				break;
-				}
+				
 				}
 			}
 			break;
@@ -1117,7 +1265,7 @@ namespace
 						if (!gameObj->Path.size() && gameObj->smallTarget != nullptr) // we are at our target
 						{
 							// whack small target
-							gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - 10 * AEFrameRateControllerGetFrameTime());
+							gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE) * AEFrameRateControllerGetFrameTime());
 
 							if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f && gameObj->smallTarget->active)
 							{
@@ -1142,6 +1290,20 @@ namespace
 									break;
 								case (CharacterStats::TARGET_TYPE::TAR_NEXUS):
 									gameObj->target = Nexus;
+									break;
+								case (CharacterStats::TARGET_TYPE::TAR_TURRET):
+								{
+									GameObject* turret{ FindClosestGO(gameObj, GameObject::GO_TURRET) };
+
+									if (!turret)
+									{
+										gameObj->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
+										gameObj->target = Nexus;
+										break;
+									}
+										
+									gameObj->target = turret;
+								}
 									break;
 							}
 							
@@ -1179,21 +1341,22 @@ namespace
 		}
 	}
 
-	AEVec2 FindClosestEnemy(GameObject* gameObj)
+	GameObject* FindClosestGO(GameObject* gameObj, GameObject::GAMEOBJECT_TYPE type)
 	{
-		AEVec2 result{ 0,0 };
+		GameObject* result{};
 		f32 smallest_dist{ FLT_MAX };
 		for (GameObject* other : go_list)
 		{
-			if (other->active && other->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+			if (other->active && other->type == type)
 			{
 				if (smallest_dist > AEVec2Distance(&gameObj->position, &other->position)) // old distance larger than new distance
 				{
 					smallest_dist = AEVec2Distance(&gameObj->position, &other->position);
-					result = other->position;
+					result = other;
 				}
 			}
 		}
+
 		return result;
 	}
 
@@ -1453,6 +1616,7 @@ namespace
 		enemiesRemaining = 0;
 		currentWave = 1;
 		enemySpawnTimer = 0.f;
+		enemyTankInGame = 0;
 	}
 
 #pragma region UI_CALLBACK_DEFINITIONS
@@ -1480,7 +1644,10 @@ namespace
 				if (go->type == GameObject::GO_WALL)
 					go->Stats.SetRawStat(STAT_HEALTH, WALL_HEALTH);
 				else if (go->type == GameObject::GO_TURRET)
-					go->Stats.SetRawStat(STAT_HEALTH, TURRET_HEALTH);
+				{
+					go->Stats.SetStat(STAT_HEALTH, TURRET_HEALTH);
+					go->Stats.SetStat(STAT_DAMAGE, TURRET_DAMAGE);
+				}
 				else if (go->type == GameObject::GO_NEXUS)
 					go->Stats.SetRawStat(STAT_HEALTH, NEXUS_HEALTH);
 			}
