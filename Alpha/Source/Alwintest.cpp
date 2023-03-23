@@ -252,6 +252,19 @@ void Alwintest_Update()
 			}
 		}
 
+		if (player->Range.second_tier.active)
+		{
+			GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+			for (GameObject* go : go_list)
+			{
+				if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_CAR)
+				{
+					skill_inst->tex = bulletTex;
+					random_shoot(go, skill_inst);
+					break;
+				}
+			}
+		}
 
 		// GameObject Update
 		for (GameObject* gameObj : go_list)
