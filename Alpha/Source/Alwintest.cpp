@@ -155,7 +155,7 @@ void Alwintest_Initialize()
 void Alwintest_Update()
 {
 	turret_shoot_timer += AEFrameRateControllerGetFrameRate();
-
+	f64 dt = AEFrameRateControllerGetFrameTime();
 	// Player Input
 	UpdateMousePos();
 	UpdateUIManager();
@@ -198,6 +198,7 @@ void Alwintest_Update()
 		GameObject* player_clone = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CLONE);
 		player_clone->tex = playerTex;
 		afterimage(player_clone, player);
+		
 
 		//skill stuff
 		skill_input = skill_input_check(player);
@@ -223,6 +224,7 @@ void Alwintest_Update()
 				skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CAR);
 				skill_inst->tex = bulletTex;
 				to_exec(player, skill_inst);
+				break;
 			case(taunt):
 				for (int i{}; i < 5; ++i) // taunt nearest five
 				{
@@ -348,7 +350,7 @@ void Alwintest_Update()
 								if ((gameObj->Range.skill_bit & tier1) == tier1)
 								{
 									//implement spread shot function here
-									for (int i{}; i < MAX_SPREAD; ++i)
+									for (int i{}; i < skill_vals::MAX_SPREAD; ++i)
 									{
 										GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
 										skill_inst->tex = bulletTex;
@@ -376,8 +378,8 @@ void Alwintest_Update()
 				}
 				case (GameObject::GAMEOBJECT_TYPE::GO_AOE) :
 				{
-					gameObj->position.x = player->position.x;
-					gameObj->position.y = player->position.y;
+					//update positions
+
 					player->AOE.timer += AEFrameRateControllerGetFrameTime();
 
 					//check collision
@@ -385,28 +387,57 @@ void Alwintest_Update()
 					{
 						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
 						{
-							if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
-								go->active = false;
+							if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5)) go->active = false;
+							break;
 						}
 					}
 
-					if (player->AOE.timer > static_cast<f64> (0.2f))
+					if (player->Melee.skill_bit & tier2)
 					{
-						gameObj->alpha -= 0.125f;
-						player->AOE.timer = 0;
+						AOE_ready(player, gameObj);
+						if (gameObj->skill_flag)
+						{
+							gameObj->position.x += skill_vals::AOE_VEL * gameObj->direction.x * dt;
+							gameObj->position.y += skill_vals::AOE_VEL * gameObj->direction.y * dt;
+						}
+
+						else
+						{
+							gameObj->position.x = player->position.x;
+							gameObj->position.y = player->position.y;
+						}
+
+
+						if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+						{
+							gameObj->active = false;
+							gameObj->skill_flag = false;
+							std::cout << "AOE destroyed";
+						}
 					}
-					if (gameObj->alpha <= 0)
+
+					else
 					{
-						gameObj->active = false;
-						//player->AOE.on_cd = true;
+						gameObj->position.x = player->position.x;
+						gameObj->position.y = player->position.y;
+						if (player->AOE.timer > static_cast<f64> (0.2f))
+						{
+							gameObj->alpha -= 0.10f;
+							player->AOE.timer = 0;
+						}
+
+						if (gameObj->alpha < 0)
+						{
+							gameObj->active = false;
+						}
 					}
 					break;
 
 				}
 				case (GameObject::GAMEOBJECT_TYPE::GO_CAR):
 				{
-					gameObj->position.x += gameObj->direction.x * CAR_VEL;
-					gameObj->position.y += gameObj->direction.y * CAR_VEL;
+					gameObj->position.x += gameObj->direction.x * skill_vals::CAR_VEL * dt;
+					gameObj->position.y += gameObj->direction.y * skill_vals::CAR_VEL * dt;
 
 					if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 					{
@@ -947,6 +978,9 @@ namespace
 			{
 				if (tile->type == GameObject::GO_TILE)
 					tile->tex = grassTex;
+
+				if (tile->type == GameObject::GO_BULLET)
+					tile->active = false;
 			}
 			hoverStructure->active = true;
 			EnableDangerSigns();

@@ -70,6 +70,12 @@ void skills_upgrade_check(GameObject* player)
 		std::cout << "taunt active";
 	}
 
+	if ((player->Melee.skill_bit & tier2) != tier2 && AEInputCheckTriggered(AEVK_I))
+	{
+		player->Melee.skill_bit |= tier2;
+		std::cout << "Blasting";
+	}
+
 	if ((player->skill_flag & blink_flag) != blink_flag && AEInputCheckTriggered(AEVK_K))
 	{
 		player->skill_flag |= blink_flag;
@@ -82,13 +88,16 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 	double bullet_ang;
 	s32 mouseX, mouseY;
 	AEInputGetCursorPosition(&mouseX, &mouseY);
-		
+	
+	skill_inst->type = GameObject::GAMEOBJECT_TYPE::GO_BULLET;
 	skill_inst->position.x = Player->position.x;
 	skill_inst->position.y = Player->position.y;
 	skill_inst->scale.x = BULLET_SIZE;
 	skill_inst->scale.y = BULLET_SIZE;
 	bullet_ang = atan2(static_cast<double> (skill_inst->position.y - mouseY), static_cast<double> (skill_inst->position.x - mouseX));
+
 	AEVec2Set(&skill_inst->direction, -cos(bullet_ang), -sin(bullet_ang));
+	AEVec2Normalize(&skill_inst->direction, &skill_inst->direction);
 		switch (Player->Range.skill_bit)
 		{
 			case(base):
@@ -171,11 +180,34 @@ void AOE_move(GameObject* Player, GameObject* skill_inst)
 	skill_inst->scale.y = AOE_SIZE;
 	skill_inst->alpha = AOE_ALPHA;
 	AEVec2Set(&skill_inst->direction, 0, 0);
+
+}
+
+void AOE_ready(GameObject* player, GameObject* AOE)
+{
+	if (player->AOE.timer > 0.2 && AOE->alpha < 1.0f)
+	{
+		AOE->alpha += 0.1f;
+		player->AOE.timer = 0;
+	}
+
+	if (AOE->alpha >= 1.0f && !AOE->skill_flag)
+	{
+		s32 mouseX, mouseY;
+		AEInputGetCursorPosition(&mouseX, &mouseY);
+		double AOE_ang;
+		AOE_ang = atan2(static_cast<double>(AOE->position.y - mouseY), static_cast<double> (AOE->position.x - mouseX));
+		AEVec2Set(&AOE->direction, -cos(AOE_ang), -sin(AOE_ang));
+		AEVec2 norm_direc;
+		AEVec2Normalize(&norm_direc, &AOE->direction);
+		AEVec2Set(&AOE->direction, norm_direc.x, norm_direc.y);
+		AOE->skill_flag = true;
+	}
 }
 
 void taunt_move(GameObject* player, GameObject* enemy)
 {
-	enemy->target = player;
+	enemy->smallTarget = player;
 	enemy->alpha = 0.5f;
 }
 
