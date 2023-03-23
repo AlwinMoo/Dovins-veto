@@ -132,6 +132,9 @@ namespace
 	void PlaceWallButton(UI::UI_Button*);
 	void EraseButton(UI::UI_Button*);
 	void SkillTreeButton(UI::UI_Button*);
+	void MeleeSkillUpgrade(UI::UI_Button*);
+	void RangeSkillUpgrade(UI::UI_Button*);
+	void UtilitySkillUpgrade(UI::UI_Button*);
 #pragma endregion
 }
 
@@ -241,6 +244,9 @@ void Alwintest_Update()
 					}
 				}
 				break;
+			case(blink):
+				player_blink(player);
+				break;
 			default:
 				break;
 			}
@@ -313,8 +319,8 @@ void Alwintest_Update()
 			}
 			case (GameObject::GAMEOBJECT_TYPE::GO_BULLET):
 			{
-				gameObj->position.x += gameObj->direction.x * AEFrameRateControllerGetFrameTime() * 600;
-				gameObj->position.y += gameObj->direction.y * AEFrameRateControllerGetFrameTime() * 600;
+				gameObj->position.x += gameObj->direction.x * AEFrameRateControllerGetFrameTime() * skill_vals::BULLET_VEL;
+				gameObj->position.y += gameObj->direction.y * AEFrameRateControllerGetFrameTime() * skill_vals::BULLET_VEL;
 
 				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 					gameObj->active = false;
@@ -337,32 +343,78 @@ void Alwintest_Update()
 			}
 			case (GameObject::GAMEOBJECT_TYPE::GO_AOE):
 			{
-				gameObj->position.x = player->position.x;
-				gameObj->position.y = player->position.y;
-				player->AOE.timer += AEFrameRateControllerGetFrameTime();
+				//update positions
 
-				//check collision
+				player->Melee.timer += AEFrameRateControllerGetFrameTime();
+
+					//check collision
 				for (GameObject* go : go_list)
 				{
 					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
 					{
 						if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
+						{
+							std::cout << "Remain: " << enemiesRemaining << std::endl;
+							enemiesRemaining--;
 							go->active = false;
+						}
 					}
 				}
 
-				if (player->AOE.timer > static_cast<f64> (0.2f))
+				if (player->Melee.skill_bit & tier2)
 				{
-					gameObj->alpha -= 0.10f;
-					player->AOE.timer = 0;
+					AOE_ready(player, gameObj);
+					if (gameObj->skill_flag)
+					{
+						gameObj->position.x += skill_vals::AOE_VEL * gameObj->direction.x * AEFrameRateControllerGetFrameTime();
+						gameObj->position.y += skill_vals::AOE_VEL * gameObj->direction.y * AEFrameRateControllerGetFrameTime();
+					}
+					else
+					{
+						gameObj->position.x = player->position.x;
+						gameObj->position.y = player->position.y;
+					}
+
+
+					if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+					{
+						gameObj->active = false;
+						gameObj->skill_flag = false;
+						std::cout << "AOE destroyed";
+					}
 				}
-				if (gameObj->alpha < 0)
+
+				else
 				{
-					gameObj->active = false;
-					//player->AOE.on_cd = true;
+					gameObj->position.x = player->position.x;
+					gameObj->position.y = player->position.y;
+					if (player->Melee.timer > static_cast<f64> (0.2f))
+					{
+						gameObj->alpha -= 0.10f;
+						player->Melee.timer = 0;
+					}
+
+					if (gameObj->alpha < 0)
+					{
+						gameObj->active = false;
+					}
 				}
 				break;
 
+
+			}
+			case (GameObject::GAMEOBJECT_TYPE::GO_CAR):
+			{
+				gameObj->position.x += gameObj->direction.x * skill_vals::CAR_VEL * AEFrameRateControllerGetFrameTime();
+				gameObj->position.y += gameObj->direction.y * skill_vals::CAR_VEL * AEFrameRateControllerGetFrameTime();
+
+				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+				{
+					gameObj->active = false;
+					player->Range.second_tier.active = false;
+					//std::cout << "car destroyed";
+				}
+				break;
 			}
 			case(GameObject::GAMEOBJECT_TYPE::GO_CLONE):
 			{
@@ -385,7 +437,7 @@ void Alwintest_Update()
 		}
 	}
 
-	if (player->Range.active)
+	if (player->Range.first_tier.active)
 	{
 		GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
 		for (GameObject* go : go_list)
@@ -1291,13 +1343,13 @@ namespace
 			float tier1YOffset{ screenHeightY * 0.2f };
 			// TIER 1
 			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::SKILL_TREE_BUTTON,
-				nullptr, nullptr, &textTable->playButton);
+				nullptr, MeleeSkillUpgrade, &textTable->playButton);
 			tier1Pos.y -= tier1YOffset; // Offset y
 			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::SKILL_TREE_BUTTON,
-				nullptr, nullptr, &textTable->playButton);
+				nullptr, RangeSkillUpgrade, &textTable->playButton);
 			tier1Pos.y -= tier1YOffset; // Offset y
 			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::SKILL_TREE_BUTTON,
-				nullptr, nullptr, &textTable->playButton);
+				nullptr, UtilitySkillUpgrade, &textTable->playButton);
 		}
 			
 	}
@@ -1527,6 +1579,39 @@ namespace
 	void SkillTreeButton(UI::UI_Button* button) 
 	{
 		UICurrLayer = (UICurrLayer == UI::UI_TYPE_SKILL? UI::UI_TYPE_GAME : UI::UI_TYPE_SKILL);
+	}
+
+	void MeleeSkillUpgrade(UI::UI_Button*)
+	{
+		if ((player->Melee.skill_bit & base) != base)
+		{
+			player->Melee.skill_bit |= base;
+			player->Melee.first_tier.cooldown = 0.0f;
+			player->Melee.first_tier.damage = 1.0f;
+			player->Melee.timer = 0.0f;
+			std::cout << "AOE active\n";
+		}
+	}
+
+	void RangeSkillUpgrade(UI::UI_Button*)
+	{
+		if ((player->Range.skill_bit & base) != base)
+		{
+			player->Range.skill_bit |= base;
+			player->Range.first_tier.cooldown = 0.0f;
+			player->Range.first_tier.damage = 1.0f;
+			player->Range.timer = 0.0f;
+			std::cout << "shoot active\n";
+		}
+	}
+	void UtilitySkillUpgrade(UI::UI_Button*)
+	{
+		if ((player->Utility.skill_bit & base) != base)
+		{
+			player->Utility.skill_bit |= base;
+			player->Utility.first_tier.cooldown = 0;
+			std::cout << "blink active\n";
+		}
 	}
 #pragma endregion
 }

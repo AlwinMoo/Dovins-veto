@@ -248,6 +248,9 @@ void Bevantest_Update()
 				}
 			}
 			break;
+		case(blink):
+			player_blink(player);
+			break;
 		default:
 			break;
 		}
@@ -255,16 +258,16 @@ void Bevantest_Update()
 
 
 	//L-shift muscle to blink
-	if (AEInputCheckTriggered(AEVK_LSHIFT) && !blink_ok) //cant blink while blinking
-	{
-		player_blink(player, mouseX, mouseY);
-		blink_ok = true;
-	}
+	//if (AEInputCheckTriggered(AEVK_LSHIFT) && !player->Utility.first_tier.on_cd) //cant blink while blinking
+	//{
+	//	player_blink(player);
+	//	player->Utility.first_tier.on_cd = true;
+	//}
 
 	// GameObject Update
 	if (len_check <= 75) enemy->active = false;
 
-	if (player->Range.active)
+	if (player->Range.second_tier.active)
 	{
 		GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
 		for (GameObject* go : go_list)
@@ -342,7 +345,7 @@ void Bevantest_Update()
 			case (GameObject::GAMEOBJECT_TYPE::GO_AOE):
 				//update positions
 
-				player->AOE.timer += AEFrameRateControllerGetFrameTime();
+				player->Melee.timer += AEFrameRateControllerGetFrameTime();
 
 				//check collision
 				for (GameObject* go : go_list)
@@ -382,10 +385,10 @@ void Bevantest_Update()
 				{
 					gameObj->position.x = player->position.x;
 					gameObj->position.y = player->position.y;
-					if (player->AOE.timer > static_cast<f64> (0.2f))
+					if (player->Melee.timer > static_cast<f64> (0.2f))
 					{
 						gameObj->alpha -= 0.10f;
-						player->AOE.timer = 0;
+						player->Melee.timer = 0;
 					}
 
 					if (gameObj->alpha < 0)
@@ -403,7 +406,7 @@ void Bevantest_Update()
 				if (gameObj->position.x > winSizeX || gameObj->position.x < 0 || gameObj->position.y > winSizeY || gameObj->position.y < 0)
 				{
 					gameObj->active = false;
-					player->Range.active = false;
+					player->Range.second_tier.active = false;
 					std::cout << "car destroyed";
 				}
 				break;

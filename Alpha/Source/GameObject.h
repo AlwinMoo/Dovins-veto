@@ -14,16 +14,23 @@ struct Color
 
 	void Set(float r, float g, float b);
 };
-
-struct skill_stuff
+struct skill_necessity
 {
-	f32 cooldown;
-	f32 timer;
-	u32 skill_bit;
+	f64 cooldown;
 	f32 damage;
 	int on_cd;
 	bool active;
 };
+
+struct skill_stuff
+{
+	skill_necessity first_tier;
+	skill_necessity second_tier;
+	skill_necessity third_tier;
+	u32 skill_bit;
+	f64 timer;
+};
+
 
 class GameObject
 {
@@ -57,7 +64,7 @@ public:
 	f64	  timer;
 	u32	  skill_flag;
 
-	skill_stuff AOE;
+	skill_stuff Utility;
 	skill_stuff Range;
 	skill_stuff Melee;
 
