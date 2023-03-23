@@ -23,6 +23,9 @@ namespace
 
 	const int num_skills{ 3 }; // AOE, shoot and car
 	skill_func skills_array[num_skills]{shoot_bullet, AOE_move};
+
+	//afterimage
+	const float CLONE_ALPHA{ 0.25f };
 }
 
 void skills_upgrade_check(GameObject* player)
@@ -232,5 +235,17 @@ int skill_input_check(GameObject* player)
 	return -1;
 }
 
+void afterimage(GameObject* clone, GameObject* player)
+{
+	clone->type		  = GameObject::GAMEOBJECT_TYPE::GO_CLONE;
+	clone->position.x = player->position.x;
+	clone->position.y = player->position.y;
+	clone->alpha	  = CLONE_ALPHA;
+	clone->scale.x	  = player->scale.x;
+	clone->scale.y	  = player->scale.y;
+	clone->active	  = true;
+	clone->timer	  = 0.0;
+	clone->direction  = { 0,0 };
+}
 
 

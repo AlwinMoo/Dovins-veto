@@ -195,6 +195,10 @@ void Alwintest_Update()
 		SpawnEnemies();
 		NextWaveCheck();
 
+		GameObject* player_clone = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CLONE);
+		player_clone->tex = playerTex;
+		afterimage(player_clone, player);
+
 		//skill stuff
 		skill_input = skill_input_check(player);
 
@@ -252,7 +256,6 @@ void Alwintest_Update()
 		}
 	}
 
-	//AEGfxLine()
 	// end skill stuff
 	// 
 	// Quit Game
@@ -389,10 +392,10 @@ void Alwintest_Update()
 
 					if (player->AOE.timer > static_cast<f64> (0.2f))
 					{
-						gameObj->alpha -= 0.10f;
+						gameObj->alpha -= 0.125f;
 						player->AOE.timer = 0;
 					}
-					if (gameObj->alpha < 0)
+					if (gameObj->alpha <= 0)
 					{
 						gameObj->active = false;
 						//player->AOE.on_cd = true;
@@ -410,6 +413,23 @@ void Alwintest_Update()
 						gameObj->active = false;
 						player->Range.active = false;
 						//std::cout << "car destroyed";
+					}
+					break;
+				}
+
+				case(GameObject::GAMEOBJECT_TYPE::GO_CLONE):
+				{
+					gameObj->timer += AEFrameRateControllerGetFrameTime();
+
+					if (gameObj->timer > 0.2)
+					{
+						gameObj->timer = 0.0;
+						gameObj->alpha -= 0.25f;
+					}
+
+					if (gameObj->alpha < 0.f)
+					{
+						gameObj->active = false;
 					}
 					break;
 				}

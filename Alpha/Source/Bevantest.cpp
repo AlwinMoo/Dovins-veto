@@ -195,9 +195,14 @@ void Bevantest_Update()
 		}
 	}
 	
+	GameObject* player_clone = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CLONE);
+	player_clone->tex = Player;
+	afterimage(player_clone, player);
 
 	skills_upgrade_check(player);
 	skill_input = skill_input_check(player);
+
+
 
 	if (skill_input >= 0)
 	{
@@ -364,6 +369,23 @@ void Bevantest_Update()
 				}
 				break;
 			}
+
+			case(GameObject::GAMEOBJECT_TYPE::GO_CLONE):
+			{
+				gameObj->timer += AEFrameRateControllerGetFrameTime();
+
+				if (gameObj->timer > 0.2)
+				{
+					gameObj->timer = 0.0;
+					gameObj->alpha -= 0.25f;
+				}
+
+				if (gameObj->alpha < 0.f)
+				{
+					gameObj->active = false;
+				}
+				break;
+			}
 			default :
 				break;
 			}
@@ -470,7 +492,10 @@ void Bevantest_Draw()
 				case GameObject:: GO_CAR	:
 												gameObj->Render();
 												break;
-				default: 
+				case GameObject:: GO_CLONE  :
+												gameObj->Render();
+												break;
+				default						: 
 												break;
 
 			}
