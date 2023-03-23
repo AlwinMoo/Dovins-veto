@@ -364,6 +364,22 @@ void Alwintest_Update()
 				break;
 
 			}
+			case(GameObject::GAMEOBJECT_TYPE::GO_CLONE):
+			{
+				gameObj->timer += AEFrameRateControllerGetFrameTime();
+
+				if (gameObj->timer > 0.2)
+				{
+					gameObj->timer = 0.0;
+					gameObj->alpha -= 0.25f;
+				}
+
+				if (gameObj->alpha < 0.f)
+				{
+					gameObj->active = false;
+				}
+				break;
+			}
 			}
 
 		}
@@ -853,7 +869,7 @@ namespace
 				temp->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
 				temp->Stats.SetCurrInnerState(INNER_STATE::ISTATE_NONE);
 				temp->Stats.SetCurrStateFromNext();
-				temp->Stats.SetRawStat(STAT_HEALTH, ENEMY_HEALTH);
+				//temp->Stats.SetRawStat(STAT_HEALTH, ENEMY_HEALTH);
 				temp->target = player; // deafult
 
 				if (enemyTankInGame < tank_count)
