@@ -23,6 +23,9 @@ namespace
 
 	const int num_skills{ 3 }; // AOE, shoot and car
 	skill_func skills_array[num_skills]{shoot_bullet, AOE_move};
+
+	//afterimage
+	const float CLONE_ALPHA{ 0.25f };
 }
 
 void skills_upgrade_check(GameObject* player)
@@ -46,6 +49,7 @@ void skills_upgrade_check(GameObject* player)
 	if((player->Range.skill_bit & tier2) != tier2 && AEInputCheckTriggered(AEVK_N))
 	{
 		player->Range.skill_bit |= tier2;
+		player->Range.cooldown = 0.0f;
 		std::cout << "car active";
 	}
 
@@ -55,8 +59,15 @@ void skills_upgrade_check(GameObject* player)
 		player->AOE.cooldown = 0.0f;
 		player->AOE.damage = 1.0f;
 		player->AOE.skill_bit = 0000'0000;
-		player->Range.timer = 0.0f;
+		player->AOE.timer = 0.0f;
+		player->Melee.skill_bit = base;
 		std::cout << "AOE active\n";
+	}
+
+	if ((player->Melee.skill_bit & tier1) != tier1 && AEInputCheckTriggered(AEVK_U))
+	{
+		player->Melee.skill_bit |= tier1;
+		std::cout << "taunt active";
 	}
 
 	if ((player->skill_flag & blink_flag) != blink_flag && AEInputCheckTriggered(AEVK_K))
@@ -90,6 +101,7 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 				break;
 			case(tier2):
 				skill_inst->Range.skill_bit = tier2;
+				//here too
 			default:
 				break;
 		}
@@ -97,13 +109,30 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 	//}
 }
 
-void spreadshot(GameObject* parent, GameObject* skill_inst)
+void spreadshot(GameObject* parent, GameObject* skill_inst, int times)
 {
+	skill_inst->type = GameObject::GAMEOBJECT_TYPE::GO_BULLET;
 	skill_inst->position.x = parent->position.x;
 	skill_inst->position.y = parent->position.y;
 	skill_inst->scale.x = BULLET_SIZE;
 	skill_inst->scale.y = BULLET_SIZE;
-	AEVec2Set(&skill_inst->direction, cos(PI), sin(PI));
+	switch(times)
+	{ 
+	case 0 :
+		AEVec2Set(&skill_inst->direction, cos(PI), sin(PI));
+		break;
+	case 1:
+		AEVec2Set(&skill_inst->direction, -cos(PI), sin(PI));
+		break;
+	case 2:
+		AEVec2Set(&skill_inst->direction, cos(0.5 * PI), sin(0.5 * PI));
+		break;
+	case 3:
+		AEVec2Set(&skill_inst->direction, cos(0.5 * PI), -sin(0.5 * PI));
+		break;
+	default:
+		break;
+	}
 }
 
 void car_move(GameObject* Player, GameObject* skill_inst)
@@ -144,6 +173,12 @@ void AOE_move(GameObject* Player, GameObject* skill_inst)
 	AEVec2Set(&skill_inst->direction, 0, 0);
 }
 
+void taunt_move(GameObject* player, GameObject* enemy)
+{
+	enemy->target = player;
+	enemy->alpha = 0.5f;
+}
+
 void player_blink(GameObject* player, f32 mousex, f32 mousey)
 {
 	player->position.x = mousex;
@@ -158,8 +193,19 @@ int skill_input_check(GameObject* player)
 		player->AOE.cooldown += AEFrameRateControllerGetFrameTime();
 		if (player->AOE.cooldown >= static_cast<f64> (5.0f))
 		{
-			player->AOE.cooldown = 0;
+			player->AOE.cooldown = 0.f;
 			player->AOE.on_cd = false;
+		}
+	}
+
+	if (player->Range.on_cd) //car cooldown
+	{
+		player->Range.cooldown += AEFrameRateControllerGetFrameTime();
+		if (player->Range.cooldown >= static_cast<f64> (10.0f))
+		{
+			player->Range.cooldown = 0.f;
+			player->Range.on_cd = false;
+
 		}
 	}
 
@@ -174,14 +220,32 @@ int skill_input_check(GameObject* player)
 		return 1;
 	}
 
-	if (AEInputCheckTriggered(AEVK_C) && (player->Range.skill_bit & tier2))
+	if (AEInputCheckTriggered(AEVK_C) && (player->Range.skill_bit & tier2) && !player->Range.on_cd)
 	{
 		player->Range.active = true;
+		player->Range.on_cd = true;
 		return 2;
+	}
+
+	if (AEInputCheckTriggered(AEVK_V) && (player->Melee.skill_bit & tier1))
+	{
+		return 3;
 	}
 
 	return -1;
 }
 
+void afterimage(GameObject* clone, GameObject* player)
+{
+	clone->type		  = GameObject::GAMEOBJECT_TYPE::GO_CLONE;
+	clone->position.x = player->position.x;
+	clone->position.y = player->position.y;
+	clone->alpha	  = CLONE_ALPHA;
+	clone->scale.x	  = player->scale.x;
+	clone->scale.y	  = player->scale.y;
+	clone->active	  = true;
+	clone->timer	  = 0.0;
+	clone->direction  = { 0,0 };
+}
 
 

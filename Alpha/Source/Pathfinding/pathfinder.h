@@ -27,13 +27,13 @@ class PathManager
 {
 	game_map* Map;
 	bool is_player;
-	std::queue<std::pair<AEVec2, AEVec2>> frontier;
-	std::map < std::string, AEVec2 > visited;
+	/*std::queue<std::pair<AEVec2, AEVec2>> frontier;
+	std::map < std::string, AEVec2 > visited;*/
 
 	std::string VectorToString(AEVec2);
 	AEVec2 StringToVector(std::string);
 
-	bool CheckCell(AEVec2, AEVec2, AEVec2);
+	//bool CheckCell(AEVec2, AEVec2, AEVec2);
 
 	// A* variables
 	bool IsPositionValid(AEVec2);
@@ -46,9 +46,11 @@ class PathManager
 	std::map<std::string, bool> closedList;
 	std::set<std::pair<double, std::string>> openList;
 
+	unsigned int iterations;
+
 	std::vector<AEVec2> result;
 
-	//bool calculate_neighbour(AEVec2, AEVec2);
+	bool calculate_neighbour(AEVec2, AEVec2);
 	std::vector<AEVec2> tracePath(std::map < std::string , cell > , AEVec2);
 
 public:

@@ -14,11 +14,15 @@
 #include "Pathfinding/pathfinder.h"
 #include <cmath>
 
+const float CAR_VEL{ 5.0f };
+const int MAX_SPREAD{ 4};
+
 enum which_skill
 {
 	shooting = 0,
 	AOEing,
 	car,
+	taunt,
 	TOTAL_SKILLS
 };
 
@@ -29,16 +33,24 @@ enum upgrade_level : u32
 	tier2 = 0b0000'0010
 };
 
+//overall skill funcs
 using skill_func = void (*)(GameObject*, GameObject*);
 void skills_upgrade_check(GameObject*);
 void skills_update(GameObject*, GameObject*);
+int skill_input_check(GameObject*);
 
+//range functions
 void shoot_bullet(GameObject*, GameObject*);
-void spreadshot(GameObject*, GameObject*);
+void spreadshot(GameObject*, GameObject*, int);
 void car_move(GameObject*, GameObject*);
 void random_shoot(GameObject*, GameObject*);
 
+//melee functions
 void AOE_move(GameObject*, GameObject*);
+
+//utility
+void taunt_move(GameObject*, GameObject*);
 void player_blink(GameObject*, f32, f32);
 
-int skill_input_check(GameObject*);
+//praticles
+void afterimage(GameObject*, GameObject*);

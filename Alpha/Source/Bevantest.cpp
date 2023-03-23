@@ -68,13 +68,13 @@ namespace
 	f32 AOE_posx;
 	f32 AOE_posy;
 	//car stuff
-	const float CAR_VEL{ 5.0f };
+
 	//blink
 	bool blink_ok{ false };
 	f64 blink_cd{};
 
 	//skill stuff
-	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move };
+	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move , taunt_move};
 	int skill_input{};
 
 
@@ -205,9 +205,14 @@ void Bevantest_Update()
 		}
 	}
 	
+	GameObject* player_clone = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CLONE);
+	player_clone->tex = Player;
+	afterimage(player_clone, player);
 
 	skills_upgrade_check(player);
 	skill_input = skill_input_check(player);
+
+
 
 	if (skill_input >= 0)
 	{
@@ -229,6 +234,18 @@ void Bevantest_Update()
 		case(car):
 			skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CAR);
 			to_exec(player, skill_inst);
+			break;
+		case(taunt):
+			for (int i{}; i < 5; ++i) // taunt nearest five
+			{
+				for (GameObject* gameobj : go_list)
+				{
+					if (!gameobj->active || (gameobj->target == player)) continue;
+
+					to_exec(player, gameobj);
+					break;
+				}
+			}
 			break;
 		default:
 			break;
@@ -309,8 +326,12 @@ void Bevantest_Update()
 							if ((gameObj->Range.skill_bit & tier1) == tier1)
 							{
 								//implement spread shot function here
-								GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
-								spreadshot(gameObj, skill_inst);
+								for (int i{}; i < MAX_SPREAD; ++i)
+								{
+									GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+									skill_inst->tex = Bullet;
+									spreadshot(gameObj, skill_inst, i);
+								}
 							}
 						}
 					}
@@ -355,6 +376,23 @@ void Bevantest_Update()
 					gameObj->active = false;
 					player->Range.active = false;
 					std::cout << "car destroyed";
+				}
+				break;
+			}
+
+			case(GameObject::GAMEOBJECT_TYPE::GO_CLONE):
+			{
+				gameObj->timer += AEFrameRateControllerGetFrameTime();
+
+				if (gameObj->timer > 0.2)
+				{
+					gameObj->timer = 0.0;
+					gameObj->alpha -= 0.25f;
+				}
+
+				if (gameObj->alpha < 0.f)
+				{
+					gameObj->active = false;
 				}
 				break;
 			}
@@ -470,7 +508,10 @@ void Bevantest_Draw()
 				case GameObject:: GO_CAR	:
 												gameObj->Render();
 												break;
-				default: 
+				case GameObject:: GO_CLONE  :
+												gameObj->Render();
+												break;
+				default						: 
 												break;
 
 			}
