@@ -14,6 +14,7 @@ namespace UI
 		UI::UI_TextArea buildNexusPlacedHoverText = { .3f, 1.f, "Nexus already built. You only get one." };
 		UI::UI_TextArea buildPlayerPlacedHoverText = { .3f, 1.f, "Player already placed. You only get one." };
 		UI::UI_TextArea eraseHoverText = { .3f, 1.f, "Erase your building. No shame in mistakes." };
+		UI::UI_TextArea elementTestText = { .2f, 0.f, "HEALTH:" };
 		// For skill tree
 		
 

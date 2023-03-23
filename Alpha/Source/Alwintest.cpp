@@ -1146,12 +1146,12 @@ namespace
 
 	void InitializeUIElements()
 	{
-		//elementTestText = { .2f, 0.f, "HEALTH:" };
-		//AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 50.f, 50.f };
-		//uiManager->CreateUIStat(healthBarPos, healthBarScale, &elementTestText);
-		//auto tempPtr = gameUiManager->CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
-		//tempPtr->SetValue(1.f);
-		//tempPtr->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, 1.f });
+		AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 100.f, 50.f };
+		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
+		skillUIManager.CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
+		auto tempPtr = skillUIManager.CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
+		tempPtr->SetValue(1.f);
+		tempPtr->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, 1.f });
 	}
 
 	void InitializeTestMap()

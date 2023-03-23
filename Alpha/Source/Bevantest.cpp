@@ -12,7 +12,7 @@
 #include <iostream>
 #include "Pathfinding/pathfinder.h"
 #include <cmath>
-
+#include "UI_TextAreaTable.h"
 f32 winSizeX, winSizeY;
 s8 m_fontId;
 
@@ -24,7 +24,8 @@ namespace
 	int object_count;
 	f32 len_check;
 
-	UI::UI_Manager* gameUiManager;
+	UI::UI_Manager* gameUIManager;
+	UI::UI_TextAreaTable* textTable;
 	//textures
 	AEGfxTexture* pTex;
 	AEGfxTexture* Grass;
@@ -52,7 +53,7 @@ namespace
 	const float BULLET_SIZE{ 10.0f };
 	int bullet_flag{};
 	const u32 shoot_flag{ 0b0000'0010 };
-	f64 bullet_cooldown {};
+	f64 bullet_cooldown{};
 	f32 burst_fire_x;
 	f32 burst_fire_y;
 	//AEGfxVertexList* bull_mesh{nullptr};
@@ -76,6 +77,9 @@ namespace
 	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move };
 	int skill_input{};
 
+
+	
+
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
 	{
 		for (auto it : go_list)
@@ -98,6 +102,7 @@ namespace
 
 	}
 }
+void PlayButton(UI::UI_Button*);
 
 void Bevantest_Load()
 {
@@ -117,8 +122,13 @@ void Bevantest_Initialize()
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		//auto meshTest = render::GenerateQuad();
-		gameUiManager = new UI::UI_Manager();
-		gameUiManager->SetWinDim(screenWidthX, screenHeightY);
+		gameUIManager = new UI::UI_Manager();
+		textTable = new UI::UI_TextAreaTable;
+		gameUIManager->SetWinDim(screenWidthX, screenHeightY);
+
+		UI::UI_TextArea endTurnHoverText = { .3f, 1.f, "Ends The Build Phase. BE WARNED: YOU CANNOT BUILD DURING DEFENDING PHASE" };
+		gameUIManager->CreateButton({ 100.f, 100.f }, {100.f, 100.f}, UI::SKILL_TREE_BUTTON,
+			nullptr, PlayButton, &textTable->eraseHoverText);
 	}
 
 	test_map = new game_map(10, 10, (float)AEGetWindowWidth(), (float)AEGetWindowHeight(), true); // automatically destroyed in deconstructor
@@ -178,8 +188,8 @@ void Bevantest_Update()
 	AEVec2Set(&absmousepos, mouseX, mouseY);
 	{
 		AEVec2 invert_mouse = mousepos;
-		invert_mouse.y = gameUiManager->m_winDim.y - mousepos.y;
-		gameUiManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+		invert_mouse.y = gameUIManager->m_winDim.y - mousepos.y;
+		gameUIManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 	}
 	mousepos = test_map->SnapCoordinates(mousepos);
 
@@ -422,7 +432,13 @@ void Bevantest_Update()
 			}
 		}
 	}
-	
+	//s32 mouseX, mouseY;
+	//AEInputGetCursorPosition(&mouseX, &mouseY);
+	//AEVec2Set(&absMousePos, static_cast<f32>(mouseX), static_cast<f32>(mouseY));
+	//AEVec2Set(&mouse_pos, static_cast<f32>(mouseX), static_cast<f32>(mouseY));
+	//AEVec2 invert_mouse = mouse_pos; // Getting inverted mouse pos to match world space
+	//invert_mouse.y = uiManagers[UI::UI_TYPE_GAME]->m_winDim.y - mouse_pos.y;
+	//gameUIManager.Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 }
 
 void Bevantest_Draw()
@@ -470,7 +486,7 @@ void Bevantest_Draw()
 	//{
 	//	enemy->Render();
 	//}
-	gameUiManager->Draw();
+	gameUIManager->Draw();
 
 	// IMPORTANT SNIPPET:
 	/***********************************************************************/
@@ -500,7 +516,8 @@ void Bevantest_Free()
 void Bevantest_Unload()
 {
 	//AEGfxMeshFree(bull_mesh);
-	delete gameUiManager;
+	delete gameUIManager;
+	delete textTable;
 	delete test_map;
 	AEGfxTextureUnload(Bullet);
 	AEGfxTextureUnload(Enemy);
@@ -508,4 +525,9 @@ void Bevantest_Unload()
 	AEGfxTextureUnload(Grass);
 	AEGfxTextureUnload(pTex);
 
+}
+
+void PlayButton(UI::UI_Button*)
+{
+	next = GS_LEVEL3;
 }
