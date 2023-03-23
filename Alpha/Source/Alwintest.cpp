@@ -1355,10 +1355,10 @@ namespace
 			AEVec2 tier1Pos{ screenWidthX * .115f, screenHeightY * .7f };
 			float tier1YOffset{ screenHeightY * 0.2f };
 			// TIER 1
-			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::SKILL_TREE_BUTTON,
+			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::AOE_SKILL_BUTTON,
 				nullptr, MeleeSkillUpgrade, &textTable->playButton);
 			tier1Pos.y -= tier1YOffset; // Offset y
-			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::SKILL_TREE_BUTTON,
+			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::GUN_SKILL_BUTTON,
 				nullptr, RangeSkillUpgrade, &textTable->playButton);
 			tier1Pos.y -= tier1YOffset; // Offset y
 			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::SKILL_TREE_BUTTON,

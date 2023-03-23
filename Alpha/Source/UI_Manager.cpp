@@ -81,6 +81,10 @@ namespace UI
 			newButton->texID = TEX_GUN_SKILL;
 			newButton->meshID = MESH_BOX;
 			break;
+		case AOE_SKILL_BUTTON:
+			newButton->texID = TEX_AOE_SKILL;
+			newButton->meshID = MESH_BOX;
+			break;
 		default:
 			break;
 		}
