@@ -1352,17 +1352,72 @@ namespace
 
 		// Initialize skill tree buttons
 		{
-			AEVec2 tier1Pos{ screenWidthX * .115f, screenHeightY * .7f };
+			float const tier1XPos{ screenWidthX * .115f };
+			AEVec2 skillPos{ tier1XPos, screenHeightY * .7f };
 			float tier1YOffset{ screenHeightY * 0.2f };
-			// TIER 1
-			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::AOE_SKILL_BUTTON,
-				nullptr, MeleeSkillUpgrade, &textTable->playButton);
-			tier1Pos.y -= tier1YOffset; // Offset y
-			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::GUN_SKILL_BUTTON,
-				nullptr, RangeSkillUpgrade, &textTable->playButton);
-			tier1Pos.y -= tier1YOffset; // Offset y
-			skillUIManager.CreateButton(tier1Pos, buildButtonSize, UI::SKILL_TREE_BUTTON,
-				nullptr, UtilitySkillUpgrade, &textTable->playButton);
+			float xOffset{ screenWidthX * 0.1f };
+			// FIRST SKILL
+			{
+				// TIER 1
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::AOE_SKILL_BUTTON,
+					nullptr, MeleeSkillUpgrade, &textTable->playButton);
+				skillPos.x += xOffset;
+				// TIER 2
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::AOE_SKILL_BUTTON,
+					nullptr, MeleeSkillUpgrade, &textTable->playButton);
+				skillPos.x += xOffset;
+				// TIER 3
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::AOE_SKILL_BUTTON,
+					nullptr, MeleeSkillUpgrade, &textTable->playButton);
+				skillPos.x += xOffset;
+				// TIER 4
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::AOE_SKILL_BUTTON,
+					nullptr, MeleeSkillUpgrade, &textTable->playButton);
+				skillPos.x += xOffset;
+				// TIER 5
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::AOE_SKILL_BUTTON,
+					nullptr, MeleeSkillUpgrade, &textTable->playButton);
+			}
+			skillPos.x = tier1XPos;		// Reset to x pos
+			skillPos.y -= tier1YOffset; // Offset y for skill 2
+			// SECOND SKILL
+			{
+				// TIER 1
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::GUN_SKILL_BUTTON,
+					nullptr, RangeSkillUpgrade, &textTable->playButton);
+				skillPos.x += xOffset;
+				// TIER 2
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::GUN_SKILL_BUTTON,
+					nullptr, RangeSkillUpgrade, &textTable->playButton);
+				skillPos.x += xOffset;
+				// TIER 3
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::GUN_SKILL_BUTTON,
+					nullptr, RangeSkillUpgrade, &textTable->playButton);
+				skillPos.x += xOffset;
+				// TIER 4
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::GUN_SKILL_BUTTON,
+					nullptr, RangeSkillUpgrade, &textTable->playButton);
+				skillPos.x += xOffset;
+				// TIER 5
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::GUN_SKILL_BUTTON,
+					nullptr, RangeSkillUpgrade, &textTable->playButton);
+			}
+			skillPos.x = tier1XPos;		// Reset to x pos
+			skillPos.y -= tier1YOffset; // Offset y for skill 3
+			// THIRD SKILL
+			{
+				// TIER 1
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::SKILL_TREE_BUTTON,
+					nullptr, UtilitySkillUpgrade, &textTable->playButton);
+				skillPos.x += xOffset;
+				// TIER 2
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::SKILL_TREE_BUTTON,
+					nullptr, UtilitySkillUpgrade, &textTable->playButton);
+				skillPos.x += xOffset;
+				// TIER 3
+				skillUIManager.CreateButton(skillPos, buildButtonSize, UI::SKILL_TREE_BUTTON,
+					nullptr, UtilitySkillUpgrade, &textTable->playButton);
+			}
 		}
 			
 	}
