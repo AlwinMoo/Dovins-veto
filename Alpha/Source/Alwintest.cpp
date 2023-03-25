@@ -1274,7 +1274,7 @@ namespace
 			temp->scale.x = 10;
 			temp->scale.y = 10;
 			temp->tex = bulletTex;
-			temp->Stats.SetStat(STAT_DAMAGE, 1.f);
+			temp->Stats.SetStat(STAT_DAMAGE, TURRET_DAMAGE);
 
 			AEVec2Set(&temp->direction, -AESinDeg(gameObj->rotation), -AECosDeg(gameObj->rotation)); // @TODO: ROTATION BANDAGE
 			AEVec2Normalize(&temp->direction, &temp->direction);
@@ -1602,7 +1602,6 @@ namespace
 				else if (go->type == GameObject::GO_TURRET)
 				{
 					go->Stats.SetStat(STAT_HEALTH, TURRET_HEALTH);
-					go->Stats.SetStat(STAT_DAMAGE, TURRET_DAMAGE);
 				}
 				else if (go->type == GameObject::GO_NEXUS)
 					go->Stats.SetRawStat(STAT_HEALTH, NEXUS_HEALTH);
