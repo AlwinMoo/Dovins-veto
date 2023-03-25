@@ -76,7 +76,7 @@ namespace
 	int	enemiesRemaining;
 	int currentWave;
 	int enemyTankInGame;
-	static const size_t tank_count = 2;
+	int tank_count;
 
 	//Skills
 	int skill_input;
@@ -345,9 +345,14 @@ void Alwintest_Update()
 						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 						{
 							std::cout << "Remain: " << enemiesRemaining << std::endl;
-							enemiesRemaining--;
 							go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE)); // we just say 1 bullet does 1 damage for now
 							gameObj->active = false;
+
+							if (go->Stats.GetStat(STAT_HEALTH) <= 0)
+							{
+								go->active = false;
+								enemiesRemaining--;
+							}
 						}
 					}
 				}
@@ -900,9 +905,10 @@ namespace
 		}
 	}
 
-	float easeInOutSine(int x)
+	// normalised time
+	double easeInOutSine(double t)
 	{
-		return -(cos(PI * x) - 1) * 0.5f;
+		return 0.5 * (1 + sin(PI * (t - 0.5)));
 	}
 
 	void SpawnEnemies()
@@ -951,6 +957,7 @@ namespace
 					temp->Stats.SetStat(STAT_HEALTH, TANK_HEALTH);
 					temp->Stats.SetStat(STAT_DAMAGE, 10);
 					temp->Stats.SetStat(STAT_MOVE_SPEED, 65);
+					temp->Stats.SetStat(STAT_ATTACK_SPEED, 0.3f);
 					++enemyTankInGame;
 				}
 				else
@@ -961,6 +968,7 @@ namespace
 						temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
 						temp->Stats.SetStat(STAT_HEALTH, INFANTRY_HEALTH);
 						temp->Stats.SetStat(STAT_DAMAGE, 5);
+						temp->Stats.SetStat(STAT_ATTACK_SPEED, 0.5f);
 					}
 					else
 					{
@@ -968,6 +976,7 @@ namespace
 						temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_PLAYER;
 						temp->Stats.SetStat(STAT_HEALTH, INFANTRY_HEALTH);
 						temp->Stats.SetStat(STAT_DAMAGE, 5);
+						temp->Stats.SetStat(STAT_ATTACK_SPEED, 0.5f);
 					}
 				}
 
@@ -982,6 +991,9 @@ namespace
 	void NextWaveCheck()
 	{
 		//std::cout << "Remain: " << enemiesRemaining << std::endl;
+		enemiesToSpawn = static_cast<int>(std::floor(easeInOutSine((double)currentWave + 6 / 20) * 50));
+		tank_count = static_cast<int>(std::round(easeInOutSine((double)currentWave + 6 / 20) * 7));
+
 		if ((enemiesRemaining == 0 && enemiesSpawned == enemiesToSpawn) || !player->active || !Nexus->active)
 		{
 			for (GameObject* gameObj : go_list)
@@ -996,7 +1008,6 @@ namespace
 
 			enemiesRemaining = 0;
 
-			enemiesToSpawn += 5;
 			if(enemySpawnRate >= 0.1f)
 				enemySpawnRate -= 0.05f;
 			currentWave++;
@@ -1153,7 +1164,7 @@ namespace
 						if (!gameObj->Path.size() && gameObj->smallTarget != nullptr) // we are at our target
 						{
 							// whack small target
-							gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE) * AEFrameRateControllerGetFrameTime());
+							gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE) * AEFrameRateControllerGetFrameTime() * gameObj->Stats.GetStat(STAT_ATTACK_SPEED));
 
 							if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f && gameObj->smallTarget->active)
 							{
@@ -1253,7 +1264,7 @@ namespace
 		AEVec2Sub(&target, &gameObj->position, &target);
 		gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
 
-		if (gameObj->Stats.GetStat(STAT_ATTACK_SPEED) >= 2.0f)
+		if (gameObj->Stats.GetStat(STAT_ATTACK_SPEED) >= 1.0f)
 		{
 			gameObj->Stats.SetStat(STAT_ATTACK_SPEED, 0.0f);
 
@@ -1263,6 +1274,7 @@ namespace
 			temp->scale.x = 10;
 			temp->scale.y = 10;
 			temp->tex = bulletTex;
+			temp->Stats.SetStat(STAT_DAMAGE, 1.f);
 
 			AEVec2Set(&temp->direction, -AESinDeg(gameObj->rotation), -AECosDeg(gameObj->rotation)); // @TODO: ROTATION BANDAGE
 			AEVec2Normalize(&temp->direction, &temp->direction);
@@ -1554,6 +1566,7 @@ namespace
 		nexusPlaced = false;
 		buildResource = 3000;
 		enemiesToSpawn = 10;
+		tank_count = 2;
 		enemySpawnRate = 0.5f;
 		enemiesSpawned = 0;
 		enemiesRemaining = 0;
