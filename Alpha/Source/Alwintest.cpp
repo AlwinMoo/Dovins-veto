@@ -303,7 +303,7 @@ void Alwintest_Update()
 			{
 				UpdatePlayerPosition(gameObj);
 
-				for (GameObject* go : go_list)
+				/*for (GameObject* go : go_list)
 				{
 					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
 					{
@@ -314,7 +314,7 @@ void Alwintest_Update()
 							go->active = false;
 						}
 					}
-				}
+				}*/
 				break;
 			}
 			case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
