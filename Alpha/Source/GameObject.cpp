@@ -23,8 +23,8 @@ void GameObject::Update()
 					AEVec2Set(&norm, (Path[0].x - position.x), (Path[0].y - position.y));
 					AEVec2Normalize(&out, &norm);
 
-					position.x += out.x * AEFrameRateControllerGetFrameTime() * 100;
-					position.y += out.y * AEFrameRateControllerGetFrameTime() * 100;
+					position.x += out.x * AEFrameRateControllerGetFrameTime() * Stats.GetStat(STAT_MOVE_SPEED);
+					position.y += out.y * AEFrameRateControllerGetFrameTime() * Stats.GetStat(STAT_MOVE_SPEED);
 
 
 					AEVec2 leng{};

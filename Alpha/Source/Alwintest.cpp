@@ -900,6 +900,11 @@ namespace
 		}
 	}
 
+	float easeInOutSine(int x)
+	{
+		return -(cos(PI * x) - 1) * 0.5f;
+	}
+
 	void SpawnEnemies()
 	{
 		enemySpawnTimer += AEFrameRateControllerGetFrameTime();
@@ -934,8 +939,10 @@ namespace
 				temp->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
 				temp->Stats.SetCurrInnerState(INNER_STATE::ISTATE_NONE);
 				temp->Stats.SetCurrStateFromNext();
+				// deafult values, can be overwritten later
 				//temp->Stats.SetRawStat(STAT_HEALTH, ENEMY_HEALTH);
-				temp->target = player; // deafult
+				temp->Stats.SetStat(STAT_MOVE_SPEED, 100);
+				temp->target = player;
 
 				if (enemyTankInGame < tank_count)
 				{
@@ -943,6 +950,7 @@ namespace
 					temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_TURRET;
 					temp->Stats.SetStat(STAT_HEALTH, TANK_HEALTH);
 					temp->Stats.SetStat(STAT_DAMAGE, 10);
+					temp->Stats.SetStat(STAT_MOVE_SPEED, 65);
 					++enemyTankInGame;
 				}
 				else
