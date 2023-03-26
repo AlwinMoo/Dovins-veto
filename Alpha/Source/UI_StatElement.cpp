@@ -23,7 +23,10 @@ namespace	// Anonymous namespace
 	//UI_STAT_ELEMENT_TOTAL
 	void CalculateIntPos(UI_StatInfo& info) 
 	{
-		AEVec2 textSize{ info.textArea->GetBoxWidthN(), info.textArea->GetBoxHeightN() };
+		AEVec2 textSize{};
+		if (info.textArea)
+			textSize = { info.textArea->GetBoxWidthN(), info.textArea->GetBoxHeightN() };
+
 		// Offset the mesh to the right based on text
 		info.meshPos.x = info.posWS.x + textSize.x * 0.5f * static_cast<f32>(AEGetWindowWidth());
 
