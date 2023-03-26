@@ -696,6 +696,7 @@ void Alwintest_Free()
 	{
 		delete i;
 	}
+	delete goHealthBar;
 	delete textTable;
 	delete uiManagers[UI::UI_TYPE_GAME];
 	delete uiManagers[UI::UI_TYPE_SKILL];
