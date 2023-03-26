@@ -50,6 +50,19 @@ void CharacterStats::SetRawStat(STAT_TYPE stat, int val)
 	m_rawStats.at(stat) = val;
 }
 
+void CharacterStats::SetDefault(float health, float move_speed, float attack_speed, float damage)
+{
+	m_default[STAT_HEALTH] = health;
+	m_default[STAT_MOVE_SPEED] = move_speed;
+	m_default[STAT_ATTACK_SPEED] = attack_speed;
+	m_default[STAT_DAMAGE] = damage;
+}
+
+float CharacterStats::GetNormalisedRemaining(STAT_TYPE stat)
+{
+	return m_stats.at(stat) / m_default.at(stat);
+}
+
 void CharacterStats::SetStat(STAT_TYPE stat, float val)
 {
 	m_dirty = false;

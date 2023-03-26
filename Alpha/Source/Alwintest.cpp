@@ -995,15 +995,19 @@ namespace
 				//temp->Stats.SetRawStat(STAT_HEALTH, ENEMY_HEALTH);
 				temp->Stats.SetStat(STAT_MOVE_SPEED, ENEMY_BASE_MOVESPEED);
 				temp->target = player;
+				temp->Stats.SetDefault(INFANTRY_HEALTH, ENEMY_BASE_MOVESPEED, INFANTRY_ATTACK_SPEED, INFANTRY_DAMAGE);
 
 				if (enemyTankInGame < tank_count)
 				{
 					temp->target = FindClosestGO(temp, GameObject::GO_TURRET);
 					temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_TURRET;
 					temp->Stats.SetStat(STAT_HEALTH, TANK_HEALTH);
-					temp->Stats.SetStat(STAT_DAMAGE, TANK_DAMAGE);
 					temp->Stats.SetStat(STAT_MOVE_SPEED, TANK_MOVE_SPEED);
 					temp->Stats.SetStat(STAT_ATTACK_SPEED, TANK_ATTACK_SPEED);
+					temp->Stats.SetStat(STAT_DAMAGE, TANK_DAMAGE);
+
+					temp->Stats.SetDefault(TANK_HEALTH, TANK_MOVE_SPEED, TANK_ATTACK_SPEED, TANK_DAMAGE);
+
 					++enemyTankInGame;
 				}
 				else

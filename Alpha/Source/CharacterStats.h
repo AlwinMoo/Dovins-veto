@@ -2,6 +2,8 @@
 #define CHARACTER_STATS_H
 #include "AEEngine.h"
 #include <array>
+#include <initializer_list>
+
 enum STAT_TYPE : size_t
 {
 	STAT_HEALTH = 0,
@@ -45,6 +47,7 @@ private:
 	std::array<int, STAT_TOTAL>	m_rawStats;
 	std::array<int, STAT_TOTAL> m_subRawStat; //!< stats to add to raw stats
 	std::array<float, STAT_TOTAL>m_stats;
+	std::array<float, STAT_TOTAL>m_default;
 	bool m_dirty;
 
 	STATE currState;
@@ -66,7 +69,8 @@ public:
 	int		GetRawStat(STAT_TYPE stat); //!< get raw stat
 	void	SetRawStat(STAT_TYPE stat, int val);
 
-	
+	void SetDefault(float, float, float, float);
+	float GetNormalisedRemaining(STAT_TYPE stat);
 
 	void SetCurrInnerState(INNER_STATE);
 	INNER_STATE GetCurrInnerState();
