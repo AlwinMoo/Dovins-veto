@@ -83,6 +83,10 @@ namespace
 
 	float turret_shoot_timer{};
 
+	// UI variables
+	int uiCurrWave;
+	int uiEnemiesCount;
+
 	// Enemies
 	int	enemiesToSpawn;
 	float enemySpawnRate;
@@ -662,6 +666,12 @@ void Alwintest_Draw()
 		char buff[30]{};
 		sprintf_s(buff, "Resources Left: %d", buildResource);
 		AEGfxPrint(1, buff, .7f, .9f, 1.5f, 1.f, 1.f, 0.f);
+
+		sprintf_s(buff, "Current Wave: %d", uiCurrWave);
+		AEGfxPrint(1, buff, .7f, .7f, 1.5f, 1.f, 1.f, 0.f);
+
+		sprintf_s(buff, "Enemies Remaining: %d", uiEnemiesCount);
+		AEGfxPrint(1, buff, .7f, .5f, 1.5f, 1.f, 1.f, 0.f);
 		//std::cout << "Resource Left:" << buildResource << std::endl;
 	}
 }
