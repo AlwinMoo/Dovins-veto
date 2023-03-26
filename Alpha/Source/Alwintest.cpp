@@ -1015,11 +1015,11 @@ namespace
 	void NextWaveCheck()
 	{
 		//std::cout << "Remain: " << enemiesRemaining << std::endl;
-		enemiesToSpawn = static_cast<int>(std::floor(easeInOutSine((double)currentWave + 6 / 20) * 50));
-		tank_count = static_cast<int>(std::round(easeInOutSine((double)currentWave + 6 / 20) * 7));
-
 		if ((enemiesRemaining == 0 && enemiesSpawned == enemiesToSpawn) || !player->active || !Nexus->active)
 		{
+			enemiesToSpawn = static_cast<int>(std::floor(easeInOutSine(static_cast<double>(currentWave + 6) / 20) * 50));
+			tank_count = static_cast<int>(std::round(easeInOutSine(static_cast<double>(currentWave + 6) / 20) * 7));
+
 			for (GameObject* gameObj : go_list)
 			{
 				//Gameobjects Render
