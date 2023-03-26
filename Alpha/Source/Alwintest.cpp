@@ -373,7 +373,7 @@ void Alwintest_Update()
 				gameObj->position.x += gameObj->direction.x * AEFrameRateControllerGetFrameTime() * skill_vals::BULLET_VEL;
 				gameObj->position.y += gameObj->direction.y * AEFrameRateControllerGetFrameTime() * skill_vals::BULLET_VEL;
 
-				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+				if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 					gameObj->active = false;
 
 				for (GameObject* go : go_list)
@@ -482,7 +482,7 @@ void Alwintest_Update()
 				gameObj->position.x += gameObj->direction.x * skill_vals::CAR_VEL * AEFrameRateControllerGetFrameTime();
 				gameObj->position.y += gameObj->direction.y * skill_vals::CAR_VEL * AEFrameRateControllerGetFrameTime();
 
-				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+				if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 				{
 					gameObj->active = false;
 					player->Range.second_tier.active = false;
