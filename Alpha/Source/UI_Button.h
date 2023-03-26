@@ -23,8 +23,8 @@ namespace UI
 		void(*callback)(UI_Button*);
 		UI_TextArea* hoverText;
 		bool bHovering;
+		bool bEnable;
 		float alpha;			//!< TODO: REMOVE
-		
 		/// <summary>
 		/// Calculates the normalized pos for text based on screen dims
 		/// </summary>

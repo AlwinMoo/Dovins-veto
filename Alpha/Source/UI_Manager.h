@@ -20,7 +20,17 @@ namespace UI
 
 		
 		UI_Button* CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText = nullptr, void(*callback)(UI_Button*) = nullptr, UI_TextArea* hoverText = nullptr);
+		
+		/// <summary>
+		/// Creates a UI stat and returns. User has to call RenderUIElement to render it
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <param name="meshDim"></param>
+		/// <param name="text"></param>
+		/// <returns></returns>
 		UI_StatElement* CreateUIStat(AEVec2 pos, AEVec2 meshDim, UI_TextArea* text = nullptr);
+
+		void RenderUIElement(UI_StatElement& element);
 
 		void Load();
 

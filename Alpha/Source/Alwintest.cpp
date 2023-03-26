@@ -618,6 +618,25 @@ void Alwintest_Draw()
 			RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);
 	}
 
+	for (GameObject* gameObj : go_list)
+	{
+		//Gameobjects Render
+		if (!gameObj->active)
+			continue;
+
+		goHealthBar->SetValue(gameObj->Stats.GetNormalisedRemaining(STAT_HEALTH));
+		if (goHealthBar->GetValue() < 1.f)
+		{
+			float const yOffset = gameObj->scale.y * 0.5f;
+			AEVec2 pos{ gameObj->position.x, -gameObj->position.y };
+			pos.x -= uiManagers[UI::UI_TYPE_GAME]->m_winDim.x * 0.5f;
+			pos.y += uiManagers[UI::UI_TYPE_GAME]->m_winDim.y * 0.5f - yOffset;
+			goHealthBar->SetElementPos(pos);
+			//goHealthBar->CalculatePositions(); TODO
+			goHealthBar->Draw();
+		}
+	}
+
 	// Render above
 	if (hoverStructure->active)
 		hoverStructure->Render();
@@ -1529,7 +1548,7 @@ namespace
 
 	void InitializeUIElements()
 	{
-		AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 100.f, 50.f };
+		AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 50.f, 5.f };
 		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
 		skillUIManager.CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
 		goHealthBar = skillUIManager.CreateUIStat(healthBarPos, healthBarScale, nullptr);
