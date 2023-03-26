@@ -16,11 +16,15 @@ namespace
 	GameObject* hoverStructure;
 	bool validPlacement;
 
-	UI::UI_TYPE		UICurrLayer;
-	UI::UI_Manager* uiManagers[UI::NUM_UI_TYPE];
+	// Health bars
+	UI::UI_StatElement*	goHealthBar;
 
-	UI::UI_Manager* gameUiManager;
-	UI::UI_Manager* skillTreeManager;
+	// UI MANAGERS
+	UI::UI_TYPE			UICurrLayer;	// Current layer to update & render
+	UI::UI_Manager*		uiManagers[UI::NUM_UI_TYPE]; // Array of pointers to UI managers
+
+	UI::UI_Manager*		gameUiManager;
+	UI::UI_Manager*		skillTreeManager;
 
 	// Input
 	AEVec2 mouse_pos{};
@@ -1515,9 +1519,9 @@ namespace
 		AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 100.f, 50.f };
 		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
 		skillUIManager.CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
-		auto tempPtr = skillUIManager.CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
-		tempPtr->SetValue(1.f);
-		tempPtr->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, 1.f });
+		goHealthBar = skillUIManager.CreateUIStat(healthBarPos, healthBarScale, nullptr);
+		goHealthBar->SetValue(1.f);
+		goHealthBar->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, 1.f });
 	}
 
 	void InitializeTestMap()
