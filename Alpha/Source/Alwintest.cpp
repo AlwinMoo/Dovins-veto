@@ -612,7 +612,7 @@ void Alwintest_Draw()
 			continue;
 
 		goHealthBar->SetValue(gameObj->Stats.GetNormalisedRemaining(STAT_HEALTH));
-		if (goHealthBar->GetValue() <= 1.f)
+		if (goHealthBar->GetValue() < 1.f)
 		{
 			float const yOffset = gameObj->scale.y * 0.5f;
 			AEVec2 pos{ gameObj->position.x, -gameObj->position.y };
