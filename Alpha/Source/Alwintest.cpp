@@ -1299,7 +1299,7 @@ namespace
 			temp->scale.y = 10;
 			temp->tex = bulletTex;
 			temp->Stats.SetStat(STAT_DAMAGE, TURRET_DAMAGE);
-
+			temp->Range.damage = 3.f;
 			AEVec2Set(&temp->direction, -AESinDeg(gameObj->rotation), -AECosDeg(gameObj->rotation)); // @TODO: ROTATION BANDAGE
 			AEVec2Normalize(&temp->direction, &temp->direction);
 		}
