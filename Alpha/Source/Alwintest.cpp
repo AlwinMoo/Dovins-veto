@@ -53,10 +53,19 @@ namespace
 
 	static const int NEXUS_HEALTH = 15;
 	static const int WALL_HEALTH = 5;
-	static const int TURRET_HEALTH = 10;
-	static const int INFANTRY_HEALTH = 1;
-	static const int TANK_HEALTH = 10;
 
+	const static int ENEMY_BASE_MOVESPEED = 100;
+
+	static const int TANK_HEALTH = 20;
+	const static float TANK_ATTACK_SPEED = 0.5;
+	const static int TANK_MOVE_SPEED = 65;
+	const static int TANK_DAMAGE = 10;
+
+	static const int INFANTRY_HEALTH = 1;
+	const static int INFANTRY_DAMAGE = 5;
+	const static float INFANTRY_ATTACK_SPEED = 0.5;
+
+	static const int TURRET_HEALTH = 10;
 	static const int TURRET_DAMAGE = 1;
 
 	//player
@@ -977,7 +986,7 @@ namespace
 				temp->Stats.SetCurrStateFromNext();
 				// deafult values, can be overwritten later
 				//temp->Stats.SetRawStat(STAT_HEALTH, ENEMY_HEALTH);
-				temp->Stats.SetStat(STAT_MOVE_SPEED, 100);
+				temp->Stats.SetStat(STAT_MOVE_SPEED, ENEMY_BASE_MOVESPEED);
 				temp->target = player;
 
 				if (enemyTankInGame < tank_count)
@@ -985,9 +994,9 @@ namespace
 					temp->target = FindClosestGO(temp, GameObject::GO_TURRET);
 					temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_TURRET;
 					temp->Stats.SetStat(STAT_HEALTH, TANK_HEALTH);
-					temp->Stats.SetStat(STAT_DAMAGE, 10);
-					temp->Stats.SetStat(STAT_MOVE_SPEED, 65);
-					temp->Stats.SetStat(STAT_ATTACK_SPEED, 0.3f);
+					temp->Stats.SetStat(STAT_DAMAGE, TANK_DAMAGE);
+					temp->Stats.SetStat(STAT_MOVE_SPEED, TANK_MOVE_SPEED);
+					temp->Stats.SetStat(STAT_ATTACK_SPEED, TANK_ATTACK_SPEED);
 					++enemyTankInGame;
 				}
 				else
@@ -997,16 +1006,16 @@ namespace
 						temp->target = Nexus;
 						temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
 						temp->Stats.SetStat(STAT_HEALTH, INFANTRY_HEALTH);
-						temp->Stats.SetStat(STAT_DAMAGE, 5);
-						temp->Stats.SetStat(STAT_ATTACK_SPEED, 0.5f);
+						temp->Stats.SetStat(STAT_DAMAGE, INFANTRY_DAMAGE);
+						temp->Stats.SetStat(STAT_ATTACK_SPEED, INFANTRY_ATTACK_SPEED);
 					}
 					else
 					{
 						temp->target = player;
 						temp->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_PLAYER;
 						temp->Stats.SetStat(STAT_HEALTH, INFANTRY_HEALTH);
-						temp->Stats.SetStat(STAT_DAMAGE, 5);
-						temp->Stats.SetStat(STAT_ATTACK_SPEED, 0.5f);
+						temp->Stats.SetStat(STAT_DAMAGE, INFANTRY_DAMAGE);
+						temp->Stats.SetStat(STAT_ATTACK_SPEED, INFANTRY_ATTACK_SPEED);
 					}
 				}
 
@@ -1023,8 +1032,8 @@ namespace
 		//std::cout << "Remain: " << enemiesRemaining << std::endl;
 		if ((enemiesRemaining == 0 && enemiesSpawned == enemiesToSpawn) || !player->active || !Nexus->active)
 		{
-			enemiesToSpawn = static_cast<int>(std::floor(easeInOutSine(static_cast<double>(currentWave + 6) / 20) * 50));
-			tank_count = static_cast<int>(std::round(easeInOutSine(static_cast<double>(currentWave + 6) / 20) * 7));
+			enemiesToSpawn = static_cast<int>(std::floor(easeInOutSine(static_cast<double>(currentWave + 6) / 20) * 100));
+			tank_count = static_cast<int>(std::round(easeInOutSine(static_cast<double>(currentWave + 6) / 20) * 10));
 
 			for (GameObject* gameObj : go_list)
 			{
