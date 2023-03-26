@@ -91,10 +91,20 @@ namespace
 	int skill_input;
 	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move, taunt_move};
 
-	//const int RangeBase;
-	//const int RangeTier1;
-	//const int RangeTier2;
-	//const int RnageTier3;
+	const int RangeBase_cost		{ 200 };
+	const int RangeTier1_cost		{ 200 };
+	const int RangeTier2_cost		{ 300 };
+	const int RangeTier3_cost		{ 300 };
+	const int RangeTier4_cost		{ 500 };
+
+	const int MeleeBase_cost		{ 200 };
+	const int MeleeTier1_cost		{ 200 };
+	const int MeleeTier2_cost		{ 300 };
+	const int MeleeTier3_cost		{ 300 };
+	const int MeleeTier4_cost		{ 500 };
+	
+	const int UtilityBase_cost		{ 200 };
+	const int UtilityTier1_cost		{ 200 };
 	// TEXT TEST
 	UI::UI_TextAreaTable* textTable;
 	
@@ -1722,44 +1732,49 @@ namespace
 
 	void MeleeSkillUpgrade_tier0(UI::UI_Button*)
 	{
-		if ((player->Melee.skill_bit & base) != base)
+		if ((player->Melee.skill_bit & base) != base && buildResource >= MeleeBase_cost)
 		{
 			player->Melee.skill_bit |= base;
 			player->Melee.first_tier.cooldown = 0.0f;
 			player->Melee.timer = 7.5f;
+			buildResource -= MeleeBase_cost;
 			std::cout << "AOE active\n";
 		}
 	}
 
 	void MeleeSkillUpgrade_tier1(UI::UI_Button*)
 	{
-		if (!(player->Melee.skill_bit & tier1) && (player->Melee.skill_bit & base))
+		if (!(player->Melee.skill_bit & tier1) && (player->Melee.skill_bit & base) && buildResource >= MeleeTier1_cost)
 		{
 			player->Melee.skill_bit |= tier1;
+			buildResource -= MeleeTier1_cost;
 			std::cout << "Melee tier1 active\n";
 		}
 	}
 	void MeleeSkillUpgrade_tier2(UI::UI_Button*)
 	{
-		if (!(player->Melee.skill_bit & tier2) && (player->Melee.skill_bit & tier1))
+		if (!(player->Melee.skill_bit & tier2) && (player->Melee.skill_bit & tier1) && buildResource >= MeleeTier2_cost)
 		{
 			player->Melee.skill_bit |= tier2;
 			player->Melee.timer = 5.f;
+			buildResource -= MeleeTier2_cost;
 			std::cout << "Melee tier2 active\n";
 		}
 	}
 	void MeleeSkillUpgrade_tier3(UI::UI_Button*)
 	{
-		if (!(player->Melee.skill_bit & tier3) && (player->Melee.skill_bit & tier2))
+		if (!(player->Melee.skill_bit & tier3) && (player->Melee.skill_bit & tier2) && buildResource >= MeleeTier3_cost)
 		{
 			player->Melee.skill_bit |= tier3;
+			buildResource -= MeleeTier3_cost;
 			std::cout << "Melee tier3 active\n";
 		}
 	}
 	void MeleeSkillUpgrade_tier4(UI::UI_Button*)
 	{
-		if (!(player->Melee.skill_bit & tier4) && (player->Melee.skill_bit & tier3))
+		if (!(player->Melee.skill_bit & tier4) && (player->Melee.skill_bit & tier3) && buildResource >= MeleeTier4_cost)
 		{
+			buildResource -= MeleeTier4_cost;
 			player->Melee.skill_bit |= tier4;
 			std::cout << "Melee tier4 active\n";
 		}
@@ -1767,19 +1782,21 @@ namespace
 
 	void RangeSkillUpgrade_tier0(UI::UI_Button*)
 	{
-		if ((player->Range.skill_bit & base) != base)
+		if ((player->Range.skill_bit & base) != base && buildResource >= RangeBase_cost)
 		{
 			player->Range.skill_bit |= base;
 			player->Range.first_tier.cooldown = 0.0f;
 			player->Range.timer = 0.2f;
+			buildResource -= RangeBase_cost;
 			std::cout << "shoot active\n";
 		}
 	}
 
 	void RangeSkillUpgrade_tier1(UI::UI_Button*)
 	{
-		if ((player->Range.skill_bit & tier1) != tier1 && (player->Range.skill_bit & base))
+		if ((player->Range.skill_bit & tier1) != tier1 && (player->Range.skill_bit & base) && buildResource >= RangeTier1_cost)
 		{
+			buildResource -= RangeTier1_cost;
 			player->Range.skill_bit |= tier1;
 			std::cout << "Range tier1 active\n";
 		}
@@ -1787,24 +1804,27 @@ namespace
 
 	void RangeSkillUpgrade_tier2(UI::UI_Button*)
 	{
-		if ((player->Range.skill_bit & tier2) != tier2 && (player->Range.skill_bit & tier1))
+		if ((player->Range.skill_bit & tier2) != tier2 && (player->Range.skill_bit & tier1) && buildResource >= RangeTier2_cost)
 		{
+			buildResource -= RangeBase_cost;
 			player->Range.skill_bit |= tier2;
 			std::cout << "Range tier2 active\n";
 		}
 	}
 	void RangeSkillUpgrade_tier3(UI::UI_Button*)
 	{
-		if ((player->Range.skill_bit & tier3) != tier3 && (player->Range.skill_bit & tier2))
+		if ((player->Range.skill_bit & tier3) != tier3 && (player->Range.skill_bit & tier2) && buildResource >= RangeTier3_cost)
 		{
+			buildResource -= RangeTier3_cost;
 			player->Range.skill_bit |= tier3;
 			std::cout << "Range tier3 active\n";
 		}
 	}
 	void RangeSkillUpgrade_tier4(UI::UI_Button*)
 	{
-		if ((player->Range.skill_bit & tier4) != tier4 && (player->Range.skill_bit & tier3))
+		if ((player->Range.skill_bit & tier4) != tier4 && (player->Range.skill_bit & tier3) && buildResource >= RangeTier4_cost)
 		{
+			buildResource -= RangeTier4_cost;
 			player->Range.skill_bit |= tier4;
 			std::cout << "Range tier4 active\n";
 		}
@@ -1812,8 +1832,9 @@ namespace
 
 	void UtilitySkillUpgrade_tier0(UI::UI_Button*)
 	{
-		if ((player->Utility.skill_bit & base) != base)
+		if ((player->Utility.skill_bit & base) != base && buildResource >= UtilityBase_cost)
 		{
+			buildResource -= UtilityBase_cost;
 			player->Utility.skill_bit |= base;
 			player->Utility.first_tier.cooldown = 0;
 			std::cout << "blink active\n";
@@ -1822,8 +1843,9 @@ namespace
 
 	void UtilitySkillUpgrade_tier1(UI::UI_Button*)
 	{
-		if ((player->Utility.skill_bit & tier1) != tier1)
+		if ((player->Utility.skill_bit & tier1) != tier1 && buildResource >= UtilityTier1_cost)
 		{
+			buildResource -= UtilityTier1_cost;
 			player->Utility.skill_bit |= tier1;
 			player->Utility.second_tier.cooldown = 0;
 			std::cout << "taunt active\n";
