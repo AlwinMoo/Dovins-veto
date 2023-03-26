@@ -337,6 +337,19 @@ void Alwintest_Update()
 
 				UpdateEnemyState(gameObj);
 
+				if (gameObj->smallTarget != nullptr)
+				{
+					AEVec2 target{ gameObj->smallTarget->position };
+					AEVec2Sub(&target, &gameObj->position, &target);
+					gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
+				}
+				else
+				{
+					AEVec2 target{ gameObj->target->position };
+					AEVec2Sub(&target, &gameObj->position, &target);
+					gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
+				}
+
 				//UpdateEnemyPath(gameObj);
 				//UpdateEnemyRotation(gameObj);
 				//UpdateEnemyPosition(gameObj);
