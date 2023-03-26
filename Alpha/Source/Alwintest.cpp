@@ -84,7 +84,6 @@ namespace
 	float turret_shoot_timer{};
 
 	// UI variables
-	int uiCurrWave;
 	int uiEnemiesCount;
 
 	// Enemies
@@ -426,6 +425,7 @@ void Alwintest_Update()
 							{
 								go->active = false;
 								enemiesRemaining--;
+								uiEnemiesCount--;
 							}
 						}
 					}
@@ -453,6 +453,7 @@ void Alwintest_Update()
 						{
 							std::cout << "Remain: " << enemiesRemaining << std::endl;
 							enemiesRemaining--;
+							uiEnemiesCount--;
 							go->active = false;
 						}
 					}
@@ -681,7 +682,7 @@ void Alwintest_Draw()
 		sprintf_s(buff, "Resources Left: %d", buildResource);
 		AEGfxPrint(1, buff, .65f, .9f, 1.5f, 1.f, 1.f, 0.f);
 
-		sprintf_s(buff, "Current Wave: %d", uiCurrWave);
+		sprintf_s(buff, "Current Wave: %d", currentWave);
 		AEGfxPrint(1, buff, .65f, .7f, 1.5f, 1.f, 1.f, 0.f);
 
 		sprintf_s(buff, "Enemies Remaining: %d", uiEnemiesCount);
@@ -1104,7 +1105,7 @@ namespace
 		{
 			enemiesToSpawn = static_cast<int>(std::floor(easeInOutSine(static_cast<double>(currentWave + 6) / 20) * 100));
 			tank_count = static_cast<int>(std::round(easeInOutSine(static_cast<double>(currentWave + 6) / 20) * 10));
-
+			uiEnemiesCount = enemiesToSpawn;
 			for (GameObject* gameObj : go_list)
 			{
 				//Gameobjects Render
@@ -1683,6 +1684,7 @@ namespace
 		nexusPlaced = false;
 		buildResource = 3000;
 		enemiesToSpawn = 10;
+		uiEnemiesCount = enemiesToSpawn;
 		tank_count = 2;
 		enemySpawnRate = 0.5f;
 		enemiesSpawned = 0;
