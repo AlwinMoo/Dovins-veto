@@ -88,6 +88,7 @@ namespace UI
 		default:
 			break;
 		}
+		newButton->bEnable = true;
 		m_buttons.push_back(newButton);
 		return newButton;
 	}
@@ -96,8 +97,12 @@ namespace UI
 	{
 		UI_StatElement* newStat{ new UI_StatElement{text, meshDim} };
 		newStat->CalculatePositions();
-		m_statElements.push_back(newStat);
 		return newStat;
+	}
+
+	void UI_Manager::RenderUIElement(UI_StatElement& element)
+	{
+		element.Draw();
 	}
 
 	void UI_Manager::Load()
