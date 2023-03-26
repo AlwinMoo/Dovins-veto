@@ -17,7 +17,6 @@ struct Color
 struct skill_necessity
 {
 	f64 cooldown;
-	f32 damage;
 	int on_cd;
 	bool active;
 };
@@ -29,6 +28,8 @@ struct skill_stuff
 	skill_necessity third_tier;
 	u32 skill_bit;
 	f64 timer;
+	f32 damage;
+	f64 lifetime;
 };
 
 

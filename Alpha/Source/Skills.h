@@ -50,7 +50,9 @@ enum upgrade_level : u32
 {
 	base  = 0b0000'0001,
 	tier1 = 0b0000'0010,
-	tier2 = 0b0000'0100
+	tier2 = 0b0000'0100,
+	tier3 = 0b0000'1000,
+	tier4 = 0b0001'0000
 };
 
 //overall skill funcs

@@ -18,8 +18,20 @@ namespace UI
 		UI::UI_TextArea playButton					= { .2f, 0.f, "PLAY" };
 		
 		// For skill tree
+		UI::UI_TextArea RangeBase					= { .3f, 1.f, "Enables shooting with the left mouse button" };
+		UI::UI_TextArea RangeTier1					= { .3f, 1.f, "Increases the damage of your bullets" };
+		UI::UI_TextArea RangeTier2					= { .3f, 1.f, "Your bullets now explode on contact with the enemy" };
+		UI::UI_TextArea RangeTier3					= { .3f, 1.f, "Now your bullets really hurt" };
+		UI::UI_TextArea RangeTier4					= { .3f, 1.f, "Go crazy with the C key, creates a projectile that sprays bullets everywhere" };
 
-		
+		UI::UI_TextArea MeleeBase					= { .3f, 1.f, "Enables for a big AOE move with the X key" };
+		UI::UI_TextArea MeleeTier1					= { .3f, 1.f, "Increased damage for the AOE" };
+		UI::UI_TextArea MeleeTier2					= { .3f, 1.f, "Lower cooldown for your AOE" };
+		UI::UI_TextArea MeleeTier3					= { .3f, 1.f, "Make the AOE really hurt" };
+		UI::UI_TextArea MeleeTier4					= { .3f, 1.f, "The ultimate move, throw your AOE at the enemy!" };
+
+		UI::UI_TextArea UtiliyBase					= { .3f, 1.f, "Blink with the left shift key, but mind the range!" };
+		UI::UI_TextArea UtilityTier1				= { .3f, 1.f, "Taunt 5 random enemies to you with the V key" };
 
 		UI_TextAreaTable();
 		~UI_TextAreaTable() = default;
