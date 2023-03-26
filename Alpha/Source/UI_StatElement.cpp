@@ -36,6 +36,7 @@ namespace	// Anonymous namespace
 
 void UI_StatElement::SetElementPos(AEVec2 const& pos)
 {
+	data.meshPos = pos;
 }
 
 void UI_StatElement::CalculatePositions()
