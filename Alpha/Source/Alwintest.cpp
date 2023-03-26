@@ -82,6 +82,10 @@ namespace
 	int skill_input;
 	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move, taunt_move};
 
+	//const int RangeBase;
+	//const int RangeTier1;
+	//const int RangeTier2;
+	//const int RnageTier3;
 	// TEXT TEST
 	UI::UI_TextAreaTable* textTable;
 	
@@ -211,12 +215,14 @@ void Alwintest_Update()
 
 		TempTestUpdateFunctions();
 
+		GameObject* player_clone = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CLONE);
+		player_clone->tex = playerTex;
+
+		afterimage(player_clone, player);
+
 		SpawnEnemies();
 		NextWaveCheck();
 
-		GameObject* player_clone = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CLONE);
-		player_clone->tex = playerTex;
-		afterimage(player_clone, player);
 		
 
 		//skill stuff
@@ -1045,6 +1051,11 @@ namespace
 					tile->tex = grassTex;
 
 				if (tile->type == GameObject::GO_BULLET)
+					tile->active = false;
+
+				if (tile->type == GameObject::GO_CLONE)
+					tile->active = false;
+				if (tile->type == GameObject::GO_CAR)
 					tile->active = false;
 			}
 			hoverStructure->active = true;

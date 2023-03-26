@@ -18,7 +18,7 @@ namespace skill_vals
 {
 	const float AOE_VEL{ 1000.f };
 	const float CAR_VEL{ 250.f };
-	const float BULLET_VEL{ 1750.0f };
+	const float BULLET_VEL{ 750.0f };
 	const int MAX_SPREAD{ 4 };
 
 	//Range stuff

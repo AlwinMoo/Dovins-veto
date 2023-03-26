@@ -71,24 +71,24 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 		switch (Player->Range.skill_bit)
 		{
 			case(0b0000'0001):
-				skill_inst->Range.damage = 4.0f;
+				skill_inst->Range.damage = 1.0f;
 				//can update damage numbers here
 				break;
 			case(0b0000'0011):
-				skill_inst->Range.damage = 5.0f;
+				skill_inst->Range.damage = 2.0f;
 				//here too
 				break;
 			case(0b0000'0111):
-				skill_inst->Range.damage = 5.0f;
+				skill_inst->Range.damage = 2.0f;
 				skill_inst->Range.skill_bit = tier2;
 				//here too
 				break;
 			case(0b0000'1111):
-				skill_inst->Range.damage = 10.0f;
+				skill_inst->Range.damage = 3.0f;
 				skill_inst->Range.skill_bit = tier2;
 				break;
 			case(0b0001'1111):
-				skill_inst->Range.damage = 10.0f;
+				skill_inst->Range.damage = 3.0f;
 				skill_inst->Range.skill_bit = tier2;
 				break;
 			default:
@@ -106,7 +106,7 @@ void spreadshot(GameObject* parent, GameObject* skill_inst, int times)
 	skill_inst->position.y = parent->position.y;
 	skill_inst->scale.x = skill_vals::BULLET_SIZE;
 	skill_inst->scale.y = skill_vals::BULLET_SIZE;
-	skill_inst->Range.damage = 2.0f;
+	skill_inst->Range.damage = 1.0f;
 	skill_inst->Range.skill_bit = base;
 	switch(times)
 	{ 
@@ -151,7 +151,7 @@ void random_shoot(GameObject* parent, GameObject* skill_inst)
 	skill_inst->scale.x = skill_vals::BULLET_SIZE;
 	skill_inst->scale.y = skill_vals::BULLET_SIZE;
 	skill_inst->alpha = 1.0f;
-	skill_inst->Range.damage = 2.0f;
+	skill_inst->Range.damage = 1.0f;
 	skill_inst->Range.skill_bit = base;
 	AEVec2Set(&skill_inst->direction, -cos(2 * PI * AERandFloat()), -sin(2 * PI * AERandFloat()));
 }
