@@ -1390,9 +1390,9 @@ namespace
 		// Both skill tree and gameplay layers share same button pos
 		buildButtonPos.x = screenWidthX - buildButtonSize.x;
 		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::SKILL_TREE_BUTTON, 
-			nullptr, SkillTreeButton, &textTable->eraseHoverText);
+			nullptr, SkillTreeButton, &textTable->Skill_Tree);
 		skillUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::CLOSE_BUTTON,
-			nullptr, SkillTreeButton, &textTable->eraseHoverText);
+			nullptr, SkillTreeButton, &textTable->Skill_Tree);
 
 		// Initialize skill tree buttons
 		{

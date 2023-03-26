@@ -18,6 +18,7 @@ namespace UI
 		UI::UI_TextArea playButton					= { .2f, 0.f, "PLAY" };
 		
 		// For skill tree
+		UI::UI_TextArea Skill_Tree					= { .3f, 1.f, "Skill Tree" };
 		UI::UI_TextArea RangeBase					= { .3f, 1.f, "Enables shooting with the left mouse button" };
 		UI::UI_TextArea RangeTier1					= { .3f, 1.f, "Increases the damage of your bullets" };
 		UI::UI_TextArea RangeTier2					= { .3f, 1.f, "Your bullets now explode on contact with the enemy" };
