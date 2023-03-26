@@ -359,7 +359,9 @@ void Alwintest_Update()
 
 				for (GameObject* go : go_list)
 				{
-					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					if (!go->active)
+						continue;
+					if (go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
 					{
 						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 						{
@@ -384,6 +386,11 @@ void Alwintest_Update()
 								enemiesRemaining--;
 							}
 						}
+					}
+					else if (go->type == GameObject::GAMEOBJECT_TYPE::GO_WALL || go->type == GameObject::GAMEOBJECT_TYPE::GO_TURRET || go->type == GameObject::GAMEOBJECT_TYPE::GO_NEXUS)
+					{
+						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+							gameObj->active = false;
 					}
 				}
 
