@@ -57,7 +57,7 @@ namespace
 	static const int WALL_COST = 50;
 	static const int TOWER_COST = 500;
 
-	static const int NEXUS_HEALTH = 15;
+	static const int NEXUS_HEALTH = 35;
 	static const int WALL_HEALTH = 5;
 
 	const static int ENEMY_BASE_MOVESPEED = 100;
@@ -621,8 +621,8 @@ void Alwintest_Draw()
 		gameObj->Render();
 
 		//
-		if (gameObj->type == GameObject::GO_ENEMY && gameObj->Stats.GetCurrState() == STATE::STATE_ENEMY_ATTACK)
-			RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);
+		/*if (gameObj->type == GameObject::GO_ENEMY && gameObj->Stats.GetCurrState() == STATE::STATE_ENEMY_ATTACK)
+			RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);*/
 	}
 
 	if (!buildPhase)
