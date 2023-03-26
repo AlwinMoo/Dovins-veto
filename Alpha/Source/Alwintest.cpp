@@ -1334,15 +1334,16 @@ namespace
 			gameObj->Stats.SetStat(STAT_ATTACK_SPEED, 0.0f);
 
 			GameObject* temp = FetchGO(GameObject::GO_BULLET);
-			temp->position = gameObj->position;
 			temp->active = true;
 			temp->scale.x = 10;
 			temp->scale.y = 10;
 			temp->tex = bulletTex;
-			temp->Stats.SetStat(STAT_DAMAGE, TURRET_DAMAGE);
 			temp->Range.damage = 3.f;
-			AEVec2Set(&temp->direction, -AESinDeg(gameObj->rotation), -AECosDeg(gameObj->rotation)); // @TODO: ROTATION BANDAGE
+			AEVec2Set(&temp->direction, -AESinDeg(gameObj->rotation), -AECosDeg(gameObj->rotation));
 			AEVec2Normalize(&temp->direction, &temp->direction);
+
+			temp->position.x = gameObj->position.x + (temp->direction.x * (gameObj->scale.x + temp->scale.x) * 0.5f);
+			temp->position.y = gameObj->position.y + (temp->direction.y * (gameObj->scale.y + temp->scale.y) * 0.5f);
 		}
 	}
 
