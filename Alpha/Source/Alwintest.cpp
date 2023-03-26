@@ -40,6 +40,8 @@ namespace
 	AEGfxTexture* bulletTex;
 	AEGfxTexture* playerTex;
 	AEGfxTexture* enemyTex;
+	AEGfxTexture* enemy_nexusTex;
+	AEGfxTexture* enemy_tankTex;
 	AEGfxTexture* dangerTex;
 	AEGfxTexture* targetedTex;
 	AEGfxVertexList* squareMesh;
@@ -60,7 +62,7 @@ namespace
 
 	const static int ENEMY_BASE_MOVESPEED = 100;
 
-	static const int TANK_HEALTH = 20;
+	static const int TANK_HEALTH = 35;
 	const static float TANK_ATTACK_SPEED = 0.5;
 	const static int TANK_MOVE_SPEED = 65;
 	const static int TANK_DAMAGE = 10;
@@ -70,7 +72,7 @@ namespace
 	const static float INFANTRY_ATTACK_SPEED = 0.5;
 
 	static const int TURRET_HEALTH = 10;
-	static const int TURRET_DAMAGE = 1;
+	static const float TURRET_DAMAGE = 5.0f;
 
 	static const int PLAYER_HEALTH = 20;
 
@@ -714,6 +716,8 @@ void Alwintest_Unload()
 	AEGfxTextureUnload(eraseTex);
 	AEGfxTextureUnload(dangerTex);
 	AEGfxTextureUnload(targetedTex);
+	AEGfxTextureUnload(enemy_nexusTex);
+	AEGfxTextureUnload(enemy_tankTex);
 	AEGfxMeshFree(squareMesh);
 }
 
@@ -1065,6 +1069,7 @@ namespace
 					temp->Stats.SetStat(STAT_DAMAGE, TANK_DAMAGE);
 
 					temp->Stats.SetDefault(TANK_HEALTH, TANK_MOVE_SPEED, TANK_ATTACK_SPEED, TANK_DAMAGE);
+					temp->tex = enemy_tankTex;
 
 					++enemyTankInGame;
 				}
@@ -1077,6 +1082,8 @@ namespace
 						temp->Stats.SetStat(STAT_HEALTH, INFANTRY_HEALTH);
 						temp->Stats.SetStat(STAT_DAMAGE, INFANTRY_DAMAGE);
 						temp->Stats.SetStat(STAT_ATTACK_SPEED, INFANTRY_ATTACK_SPEED);
+
+						temp->tex = enemy_nexusTex;
 					}
 					else
 					{
@@ -1386,7 +1393,7 @@ namespace
 			temp->scale.x = 10;
 			temp->scale.y = 10;
 			temp->tex = bulletTex;
-			temp->Range.damage = 3.f;
+			temp->Range.damage = TURRET_DAMAGE;
 			AEVec2Set(&temp->direction, -AESinDeg(gameObj->rotation), -AECosDeg(gameObj->rotation));
 			AEVec2Normalize(&temp->direction, &temp->direction);
 
@@ -1405,6 +1412,8 @@ namespace
 		grassBorderlessTex = AEGfxTextureLoad("Assets/GrassTileBorderless.png");
 		playerTex = AEGfxTextureLoad("Assets/PlayerTexture.png");
 		enemyTex = AEGfxTextureLoad("Assets/EnemyTexture.png");
+		enemy_nexusTex = AEGfxTextureLoad("Assets/nexus_enemy.png");
+		enemy_tankTex = AEGfxTextureLoad("Assets/tank.png");
 		eraseTex = AEGfxTextureLoad("Assets/Eraser.png");
 		dangerTex = AEGfxTextureLoad("Assets/Danger.png");
 		targetedTex = AEGfxTextureLoad("Assets/Targeted.png");
