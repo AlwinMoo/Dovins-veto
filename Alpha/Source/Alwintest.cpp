@@ -86,7 +86,6 @@ namespace
 	float turret_shoot_timer{};
 
 	// UI variables
-	int uiCurrWave;
 	int uiEnemiesCount;
 
 	// Enemies
@@ -428,6 +427,7 @@ void Alwintest_Update()
 							{
 								go->active = false;
 								enemiesRemaining--;
+								uiEnemiesCount--;
 							}
 						}
 					}
@@ -455,6 +455,7 @@ void Alwintest_Update()
 						{
 							std::cout << "Remain: " << enemiesRemaining << std::endl;
 							enemiesRemaining--;
+							uiEnemiesCount--;
 							go->active = false;
 						}
 					}
@@ -624,6 +625,7 @@ void Alwintest_Draw()
 			RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);
 	}
 
+	if (!buildPhase)
 	for (GameObject* gameObj : go_list)
 	{
 		//Gameobjects Render
@@ -680,13 +682,13 @@ void Alwintest_Draw()
 
 		char buff[30]{};
 		sprintf_s(buff, "Resources Left: %d", buildResource);
-		AEGfxPrint(1, buff, .7f, .9f, 1.5f, 1.f, 1.f, 0.f);
+		AEGfxPrint(1, buff, .65f, .9f, 1.5f, 1.f, 1.f, 0.f);
 
-		sprintf_s(buff, "Current Wave: %d", uiCurrWave);
-		AEGfxPrint(1, buff, .7f, .7f, 1.5f, 1.f, 1.f, 0.f);
+		sprintf_s(buff, "Current Wave: %d", currentWave);
+		AEGfxPrint(1, buff, .65f, .7f, 1.5f, 1.f, 1.f, 0.f);
 
 		sprintf_s(buff, "Enemies Remaining: %d", uiEnemiesCount);
-		AEGfxPrint(1, buff, .7f, .5f, 1.5f, 1.f, 1.f, 0.f);
+		AEGfxPrint(1, buff, .65f, .5f, 1.5f, 1.f, 1.f, 0.f);
 		//std::cout << "Resource Left:" << buildResource << std::endl;
 	}
 }
@@ -697,6 +699,7 @@ void Alwintest_Free()
 	{
 		delete i;
 	}
+	delete goHealthBar;
 	delete textTable;
 	delete uiManagers[UI::UI_TYPE_GAME];
 	delete uiManagers[UI::UI_TYPE_SKILL];
@@ -1110,7 +1113,7 @@ namespace
 		{
 			enemiesToSpawn = static_cast<int>(std::floor(easeInOutSine(static_cast<double>(currentWave + 6) / 20) * 100));
 			tank_count = static_cast<int>(std::round(easeInOutSine(static_cast<double>(currentWave + 6) / 20) * 10));
-
+			uiEnemiesCount = enemiesToSpawn;
 			for (GameObject* gameObj : go_list)
 			{
 				//Gameobjects Render
@@ -1691,6 +1694,7 @@ namespace
 		nexusPlaced = false;
 		buildResource = 3000;
 		enemiesToSpawn = 10;
+		uiEnemiesCount = enemiesToSpawn;
 		tank_count = 2;
 		enemySpawnRate = 0.5f;
 		enemiesSpawned = 0;
