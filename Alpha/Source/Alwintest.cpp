@@ -68,6 +68,8 @@ namespace
 	static const int TURRET_HEALTH = 10;
 	static const int TURRET_DAMAGE = 1;
 
+	static const int PLAYER_HEALTH = 20;
+
 	//player
 	GameObject* player;
 	GameObject* Nexus;
@@ -1566,6 +1568,8 @@ namespace
 		player->scale.y = player->scale.x;
 		player->active = false;
 		player->tex = playerTex;
+		player->Stats.SetStat(STAT_HEALTH, PLAYER_HEALTH);
+		player->Stats.SetDefault(PLAYER_HEALTH, 0.0f, 0.0f, 0.0f);
 
 		InitializeDangerSigns();
 	}
@@ -1664,13 +1668,20 @@ namespace
 				if (!go->active)
 					continue;
 				if (go->type == GameObject::GO_WALL)
+				{
 					go->Stats.SetRawStat(STAT_HEALTH, WALL_HEALTH);
+					go->Stats.SetDefault(WALL_HEALTH, 0.0f, 0.0f, 0.0f);
+				}
 				else if (go->type == GameObject::GO_TURRET)
 				{
 					go->Stats.SetStat(STAT_HEALTH, TURRET_HEALTH);
+					go->Stats.SetDefault(TURRET_HEALTH, 0.0f, 0.0f, 0.0f);
 				}
 				else if (go->type == GameObject::GO_NEXUS)
+				{
 					go->Stats.SetRawStat(STAT_HEALTH, NEXUS_HEALTH);
+					go->Stats.SetDefault(NEXUS_HEALTH, 0.0f, 0.0f, 0.0f);
+				}
 			}
 		}
 		else
