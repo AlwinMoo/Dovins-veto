@@ -154,6 +154,7 @@ void random_shoot(GameObject* parent, GameObject* skill_inst)
 	skill_inst->Range.damage = 1.0f;
 	skill_inst->Range.skill_bit = base;
 	AEVec2Set(&skill_inst->direction, -cos(2 * PI * AERandFloat()), -sin(2 * PI * AERandFloat()));
+	AEVec2Normalize(&skill_inst->direction, &skill_inst->direction);
 }
 
 void AOE_move(GameObject* Player, GameObject* skill_inst)
@@ -169,25 +170,25 @@ void AOE_move(GameObject* Player, GameObject* skill_inst)
 	switch (Player->Melee.skill_bit)
 	{
 	case(0b0000'0001):
-		skill_inst->Melee.damage = 2.0f;
+		skill_inst->Melee.damage = 1.0f;
 		skill_inst->Melee.skill_bit |= base;
 		//can update damage numbers here
 		break;
 	case(0b0000'0011):
-		skill_inst->Melee.damage = 3.0f;
+		skill_inst->Melee.damage = 2.0f;
 		skill_inst->Melee.skill_bit |= tier1;
 		//here too
 		break;
 	case(0b0000'0111):
-		skill_inst->Melee.damage = 3.0f;
+		skill_inst->Melee.damage = 2.0f;
 		skill_inst->Melee.skill_bit |= tier2;
 		//here too
 	case(0b0000'1111):
-		skill_inst->Melee.damage = 5.0f;
+		skill_inst->Melee.damage = 3.0f;
 		skill_inst->Melee.skill_bit |= tier3;
 		break;
 	case(0b0001'1111):
-		skill_inst->Melee.damage = 5.0f;
+		skill_inst->Melee.damage = 3.0f;
 		skill_inst->Melee.skill_bit |= tier4;
 		break;
 	default:
@@ -222,7 +223,6 @@ void AOE_ready(GameObject* player, GameObject* AOE)
 void taunt_move(GameObject* player, GameObject* enemy)
 {
 	enemy->smallTarget = player;
-	enemy->alpha = 0.5f;
 }
 
 
