@@ -622,6 +622,7 @@ void Alwintest_Draw()
 			RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);
 	}
 
+	if (!buildPhase)
 	for (GameObject* gameObj : go_list)
 	{
 		//Gameobjects Render
