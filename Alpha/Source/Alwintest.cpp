@@ -350,6 +350,9 @@ void Alwintest_Update()
 				}
 				else
 				{
+					if (gameObj->target == nullptr)
+						gameObj->target = Nexus;
+
 					AEVec2 target{ gameObj->target->position };
 					AEVec2Sub(&target, &gameObj->position, &target);
 					gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
