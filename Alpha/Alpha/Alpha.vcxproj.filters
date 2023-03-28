@@ -67,6 +67,9 @@
     <ClCompile Include="..\Source\UI_SkillTree.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Splashscreen.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h">
@@ -148,6 +151,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\UI_SkillTree.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Splashscreen.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
