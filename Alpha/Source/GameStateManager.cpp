@@ -5,6 +5,7 @@
 #include "TestScene.h"
 #include "Alwintest.h"
 #include "Splashscreen.h"
+#include "Menu.h"
 
 int current = 0, previous = 0, next = 0;
 
@@ -50,6 +51,14 @@ void GSM_Update()
 			fpDraw = splashscreen_Draw;
 			fpFree = splashscreen_Free;
 			fpUnload = splashscreen_Unload;
+			break;
+		case GS_MENU:
+			fpLoad = menu_Load;
+			fpInitialize = menu_Initialize;
+			fpUpdate = menu_Update;
+			fpDraw = menu_Draw;
+			fpFree = menu_Free;
+			fpUnload = menu_Unload;
 			break;
 		case GS_RESTART:
 			break;

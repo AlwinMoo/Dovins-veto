@@ -57,7 +57,7 @@ void splashscreen_Update()
 
 	if (!digi_logo && !gam_logo)
 	{
-		next = GS_LEVEL1;
+		next = GS_MENU;
 	}
 }
 
