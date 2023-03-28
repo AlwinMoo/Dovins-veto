@@ -4,6 +4,7 @@
 #include "Bevantest.h"
 #include "TestScene.h"
 #include "Alwintest.h"
+#include "Splashscreen.h"
 
 int current = 0, previous = 0, next = 0;
 
@@ -11,7 +12,7 @@ FP fpLoad = nullptr, fpInitialize = nullptr, fpUpdate = nullptr, fpDraw = nullpt
 
 void GSM_Initialize(int startingState)
 {
-	current = previous = next;
+	current = previous = next = startingState;
 }
 
 void GSM_Update()
@@ -41,6 +42,14 @@ void GSM_Update()
 			fpDraw = Alwintest_Draw;
 			fpFree = Alwintest_Free;
 			fpUnload = Alwintest_Unload;
+			break;
+		case GS_SPLASH:
+			fpLoad = splashscreen_Load;
+			fpInitialize = splashscreen_Initialize;
+			fpUpdate = splashscreen_Update;
+			fpDraw = splashscreen_Draw;
+			fpFree = splashscreen_Free;
+			fpUnload = splashscreen_Unload;
 			break;
 		case GS_RESTART:
 			break;

@@ -23,7 +23,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	 _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	#endif
 	 
-	GSM_Initialize(GS_LEVEL1);
+	GSM_Initialize(GS_SPLASH);
 	// Using custom window procedure
 	//AESysInit(hInstance, nCmdShow, 800, 600, 1, 60, true, NULL);
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, true, NULL);
