@@ -18,15 +18,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	// Enable run-time memory check for debug builds.
-	#if defined(DEBUG) | defined(_DEBUG)
-	 _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	#endif
 	 
 	GSM_Initialize(GS_LEVEL1);
 	// Using custom window procedure
 	//AESysInit(hInstance, nCmdShow, 800, 600, 1, 60, true, NULL);
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, true, NULL);
+#if defined(DEBUG) | defined(_DEBUG)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 
 	UI::InitUI();
 
@@ -36,7 +35,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	g_fontID = AEGfxCreateFont("Assets/Roboto-Regular.ttf", 16);
 	// reset the system modules
 	AESysReset();
-	
+	// Enable run-time memory check for debug builds.
+	// 
 	//test_scene::TestScene* mainScene = new test_scene::TestScene();
 	//mainScene->Init();
 	//s8 defaultFont = AEGfxCreateFont("./Assets/Roboto-Regular.ttf", 0);
@@ -68,6 +68,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			fpUpdate();
 			fpDraw();
 			AESysFrameEnd();
+			// check if forcing the application to quit
+			if (0 == AESysDoesWindowExist())
+				next = GS_QUIT;
 		}
 
 		fpFree();
@@ -86,11 +89,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//mainScene->Render();
 		// Informing the system about the loop's end
 
-		// check if forcing the application to quit
-		//if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
-		//	gGameRunning = 0;
 	}
-
+	
 	//AEGfxDestroyFont(defaultFont);
 	UI::UnloadUI();
 	// free the system
