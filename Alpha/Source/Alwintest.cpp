@@ -698,10 +698,12 @@ void Alwintest_Draw()
 
 void Alwintest_Free()
 {
-	for (auto i : go_list)
+	while (!go_list.empty())
 	{
-		delete i;
+		delete go_list.back();
+		go_list.pop_back();
 	}
+
 	delete goHealthBar;
 	delete textTable;
 	delete uiManagers[UI::UI_TYPE_GAME];
@@ -1575,7 +1577,7 @@ namespace
 	{
 		AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 50.f, 5.f };
 		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
-		skillUIManager.CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
+		//skillUIManager.CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
 		goHealthBar = skillUIManager.CreateUIStat(healthBarPos, healthBarScale, nullptr);
 		goHealthBar->SetValue(1.f);
 		goHealthBar->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, 1.f });
