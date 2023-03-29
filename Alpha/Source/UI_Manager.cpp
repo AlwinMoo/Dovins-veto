@@ -171,6 +171,7 @@ namespace UI
 			// Now render the button text, if any
 			if (curr->buttonText)
 				curr->buttonText->Draw(curr->posN.x, curr->posN.y, 1.f, 0.f, 0.f);
+			AEGfxSetBlendColor(0.f, 0.f, 0.f, 0.f);
 		}
 
 		// NOW DRAW DESCRIPTIONS (IF ANY)

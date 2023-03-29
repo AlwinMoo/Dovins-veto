@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include "UI_Manager.h"
+#include "UI_TextAreaTable.h"
 #include <vector>
 #include "Map/Map.h"
 #include "GameObject.h"
@@ -12,7 +13,6 @@
 #include <iostream>
 #include "Pathfinding/pathfinder.h"
 #include <cmath>
-#include "UI_TextAreaTable.h"
 f32 winSizeX, winSizeY;
 s8 m_fontId;
 

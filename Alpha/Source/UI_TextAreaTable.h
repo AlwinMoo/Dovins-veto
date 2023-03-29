@@ -16,7 +16,16 @@ namespace UI
 		UI::UI_TextArea eraseHoverText				= { .3f, 1.f, "Erase your building. No shame in mistakes." };
 		UI::UI_TextArea elementTestText				= { .2f, 0.f, "HEALTH:" };
 		UI::UI_TextArea playButton					= { .2f, 0.f, "PLAY" };
-		
+		UI::UI_TextArea howToButton					= { .2f, 0.f, "HOW TO PLAY" };
+		UI::UI_TextArea creditsButton				= { .2f, 0.f, "CREDITS" };
+		UI::UI_TextArea quitButton					= { .2f, 0.f, "QUIT" };
+
+		/*
+			start
+			how to play
+			credits
+			quit
+		*/
 		// For skill tree
 		UI::UI_TextArea Skill_Tree					= { .3f, 1.f, "Skill Tree" };
 		UI::UI_TextArea RangeBase					= { .3f, 1.f, "Enables shooting with the left mouse button" };

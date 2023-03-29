@@ -1,9 +1,13 @@
 #include "Menu.h"
-
+#include "UI_Manager.h"
+#include "UI_TextAreaTable.h"
 namespace
 {
 	AEGfxTexture* pTex;
 	AEGfxVertexList* pMesh;
+
+	UI::UI_Manager* gameUIManager;
+	UI::UI_TextAreaTable* textTable;
 }
 
 void menu_Load()
@@ -13,6 +17,34 @@ void menu_Load()
 
 void menu_Initialize()
 {
+	{
+		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
+		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
+		//auto meshTest = render::GenerateQuad();
+		gameUIManager = new UI::UI_Manager();
+		textTable = new UI::UI_TextAreaTable;
+		gameUIManager->SetWinDim(screenWidthX, screenHeightY);
+
+
+		float const yOffset{ gameUIManager->m_winDim.y * 0.1f };
+		AEVec2 buttonPos{ gameUIManager->m_winDim.x * 0.5f, gameUIManager->m_winDim.y * 0.6f };
+		AEVec2 const buttonSize{ 200.f, 70.f };
+		// PLAY BUTTON
+		gameUIManager->CreateButton(buttonPos, buttonSize, UI::SKILL_TREE_BUTTON,
+			&textTable->playButton, nullptr, nullptr);
+		buttonPos.y -= yOffset;
+		// HOW TO PLAY
+		gameUIManager->CreateButton(buttonPos, buttonSize, UI::SKILL_TREE_BUTTON,
+			&textTable->howToButton, nullptr, nullptr);
+		// CREDITS
+		buttonPos.y -= yOffset;
+		gameUIManager->CreateButton(buttonPos, buttonSize, UI::SKILL_TREE_BUTTON,
+			&textTable->creditsButton, nullptr, nullptr);
+		// QUIT
+		buttonPos.y -= yOffset;
+		gameUIManager->CreateButton(buttonPos, buttonSize, UI::SKILL_TREE_BUTTON,
+			&textTable->quitButton, nullptr, nullptr);
+	}
 	AEGfxMeshStart();
 
 	AEGfxTriAdd(
@@ -30,6 +62,9 @@ void menu_Initialize()
 
 void menu_Update()
 {
+	s32 mouseX, mouseY;
+	AEInputGetCursorPosition(&mouseX, &mouseY);
+
 	if (AEInputCheckTriggered(AEVK_Q))
 	{
 		next = GS_QUIT;
@@ -39,6 +74,10 @@ void menu_Update()
 	{
 		next = GS_LEVEL3;
 	}
+
+	AEVec2 invert_mouse = { static_cast<f32>(mouseX), static_cast<f32>(mouseY) }; // Getting inverted mouse pos to match world space
+	invert_mouse.y = gameUIManager->m_winDim.y - mouseY;
+	gameUIManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 }
 
 void menu_Draw()
@@ -64,11 +103,17 @@ void menu_Draw()
 
 	AEGfxSetTransform(transform.m);
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+
+	s32 cursorX, cursorY;
+	AEInputGetCursorPosition(&cursorX, &cursorY);
+	gameUIManager->Draw(cursorX, cursorY);
 }
 
 void menu_Free()
 {
 	AEGfxMeshFree(pMesh);
+	delete gameUIManager;
+	delete textTable;
 }
 
 void menu_Unload()
