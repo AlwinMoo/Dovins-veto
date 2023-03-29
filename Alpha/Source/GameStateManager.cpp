@@ -6,6 +6,7 @@
 #include "Alwintest.h"
 #include "Splashscreen.h"
 #include "Menu.h"
+#include "Credits.h"
 
 int current = 0, previous = 0, next = 0;
 
@@ -59,6 +60,14 @@ void GSM_Update()
 			fpDraw = menu_Draw;
 			fpFree = menu_Free;
 			fpUnload = menu_Unload;
+			break;
+		case GS_CREDITS:
+			fpLoad = credits_Load;
+			fpInitialize = credits_Initialize;
+			fpUpdate = credits_Update;
+			fpDraw = credits_Draw;
+			fpFree = credits_Free;
+			fpUnload = credits_Unload;
 			break;
 		case GS_RESTART:
 			break;

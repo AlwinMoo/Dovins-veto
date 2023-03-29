@@ -1,4 +1,5 @@
 #include "Splashscreen.h"
+#include "Menu.h"
 
 namespace
 {
@@ -6,16 +7,19 @@ namespace
 	AEGfxVertexList*	logo_mesh;
 	//AEGfxTexture*		badea2;
 	//AEGfxVertexList*	badea2_mesh
-	f32					opacity			{ 1.0f };
+	f32					digi_opacity			{ 1.0f };
 	f64					dt;
 	f64					timer;
 	bool				digi_logo		{ true };
 	bool				gam_logo		{ false };
+	
+	f32					win_X;
+	f32					win_Y;
 }
 
 void splashscreen_Load()
 {
-	logo = AEGfxTextureLoad("Assets/DigiPen_Singapore_WEB_RED.png");
+	logo = AEGfxTextureLoad("Assets/DigiPen_Logo_2023.png");
 }
 
 void splashscreen_Initialize()
@@ -33,6 +37,9 @@ void splashscreen_Initialize()
 		 0.5f,  0.5f, 0xFFFFFFFF, 1.0f, 0.0f);
 
 	logo_mesh = AEGfxMeshEnd();
+	
+	win_X = static_cast<f32>(AEGetWindowWidth());
+	win_Y = static_cast<f32>(AEGetWindowHeight());
 }
 
 void splashscreen_Update()
@@ -40,10 +47,10 @@ void splashscreen_Update()
 	dt = AEFrameRateControllerGetFrameTime();
 
 	timer += dt;
-	if (timer > 0.5)
+	if (timer > 1.0)
 	{
-		opacity -= 0.1f;
-		if (opacity < 0.1f && digi_logo)
+		digi_opacity -= 0.1f;
+		if (digi_opacity < 0.1f && digi_logo)
 		{
 			digi_logo = false;
 			timer = 0;
@@ -64,29 +71,7 @@ void splashscreen_Update()
 void splashscreen_Draw()
 {
 	if (digi_logo)
-	{
-		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
-		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxSetTintColor(1.0f, 1.0f, 1.0f, opacity);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxSetTransparency(1.0f);
-
-		AEGfxTextureSet(logo, 0, 0);
-
-		AEMtx33 scale = { 0 };
-		AEMtx33 rotate = { 0 };
-		AEMtx33 translate = { 0 };
-		AEMtx33 transform = { 0 };
-
-		AEMtx33Scale(&scale, AEGetWindowWidth(), AEGetWindowHeight() * 0.75f);
-		AEMtx33Rot(&rotate, 0);
-		AEMtx33Trans(&translate, 0, 0);
-		AEMtx33Concat(&transform, &rotate, &scale);
-		AEMtx33Concat(&transform, &translate, &transform);
-
-		AEGfxSetTransform(transform.m);
-		AEGfxMeshDraw(logo_mesh, AE_GFX_MDM_TRIANGLES);
-	}
+		generic_draw(logo_mesh, logo, digi_opacity, win_X, win_Y, 0, 0);
 
 	//if (gam_logo)
 	//{

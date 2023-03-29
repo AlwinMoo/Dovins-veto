@@ -10,6 +10,12 @@ namespace
 	UI::UI_TextAreaTable* textTable;
 }
 
+//button declaration
+void start_button(UI::UI_Button*);
+void tutorial_button(UI::UI_Button*);
+void credits_button(UI::UI_Button*);
+void exit_button(UI::UI_Button*);
+
 void menu_Load()
 {
 	pTex = AEGfxTextureLoad("Assets/EnemyTexture.png");
@@ -27,11 +33,11 @@ void menu_Initialize()
 
 
 		float const yOffset{ gameUIManager->m_winDim.y * 0.1f };
-		AEVec2 buttonPos{ gameUIManager->m_winDim.x * 0.5f, gameUIManager->m_winDim.y * 0.6f };
+		AEVec2 buttonPos{ gameUIManager->m_winDim.x * 0.5f, gameUIManager->m_winDim.y * 0.5f };
 		AEVec2 const buttonSize{ 200.f, 70.f };
 		// PLAY BUTTON
 		gameUIManager->CreateButton(buttonPos, buttonSize, UI::SKILL_TREE_BUTTON,
-			&textTable->playButton, nullptr, nullptr);
+			&textTable->playButton, start_button, nullptr);
 		buttonPos.y -= yOffset;
 		// HOW TO PLAY
 		gameUIManager->CreateButton(buttonPos, buttonSize, UI::SKILL_TREE_BUTTON,
@@ -39,11 +45,11 @@ void menu_Initialize()
 		// CREDITS
 		buttonPos.y -= yOffset;
 		gameUIManager->CreateButton(buttonPos, buttonSize, UI::SKILL_TREE_BUTTON,
-			&textTable->creditsButton, nullptr, nullptr);
+			&textTable->creditsButton, credits_button, nullptr);
 		// QUIT
 		buttonPos.y -= yOffset;
 		gameUIManager->CreateButton(buttonPos, buttonSize, UI::SKILL_TREE_BUTTON,
-			&textTable->quitButton, nullptr, nullptr);
+			&textTable->quitButton, exit_button, nullptr);
 	}
 	AEGfxMeshStart();
 
@@ -82,27 +88,7 @@ void menu_Update()
 
 void menu_Draw()
 {
-	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetTintColor(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1.0f);
-
-	AEGfxTextureSet(pTex, 0, 0);
-
-	AEMtx33 scale = { 0 };
-	AEMtx33 rotate = { 0 };
-	AEMtx33 translate = { 0 };
-	AEMtx33 transform = { 0 };
-
-	AEMtx33Scale(&scale, 250.f, 250.f);
-	AEMtx33Rot(&rotate, 0);
-	AEMtx33Trans(&translate, -300.f, 200.f);
-	AEMtx33Concat(&transform, &rotate, &scale);
-	AEMtx33Concat(&transform, &translate, &transform);
-
-	AEGfxSetTransform(transform.m);
-	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+	generic_draw(pMesh, pTex, 1.0f, 250.f, 250.f, -300.f, 200.f);
 
 	s32 cursorX, cursorY;
 	AEInputGetCursorPosition(&cursorX, &cursorY);
@@ -119,4 +105,47 @@ void menu_Free()
 void menu_Unload()
 {
 	AEGfxTextureUnload(pTex);
+}
+
+void start_button(UI::UI_Button*)
+{
+	next = GS_LEVEL3;
+}
+void tutorial_button(UI::UI_Button*)
+{
+	//next = tutorial scene
+}
+void credits_button(UI::UI_Button*)
+{
+	next = GS_CREDITS;
+}
+
+void exit_button(UI::UI_Button*)
+{
+	next = GS_QUIT;
+}
+
+void generic_draw(AEGfxVertexList* mesh, AEGfxTexture* tex, f32 opacity, f32 width, f32 height, f32 x, f32 y)
+{
+	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetTintColor(1.0f, 1.0f, 1.0f, opacity);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.0f);
+
+	AEGfxTextureSet(tex, 0, 0);
+
+	AEMtx33 scale = { 0 };
+	AEMtx33 rotate = { 0 };
+	AEMtx33 translate = { 0 };
+	AEMtx33 transform = { 0 };
+
+	AEMtx33Scale(&scale, width, height);
+	AEMtx33Rot(&rotate, 0);
+	AEMtx33Trans(&translate, x, y);
+	AEMtx33Concat(&transform, &rotate, &scale);
+	AEMtx33Concat(&transform, &translate, &transform);
+
+	AEGfxSetTransform(transform.m);
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 }

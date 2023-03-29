@@ -98,6 +98,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
   <ItemGroup>
     <ClCompile Include="..\Source\Alwintest.cpp" />
     <ClCompile Include="..\Source\Bevantest.cpp" />
+    <ClCompile Include="..\Source\Credit.cpp" />
     <ClCompile Include="..\Source\Menu.cpp" />
     <ClCompile Include="..\Source\Splashscreen.cpp" />
     <ClCompile Include="..\Source\UI_Button.cpp" />
@@ -124,6 +125,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
   <ItemGroup>
     <ClInclude Include="..\Source\Alwintest.h" />
     <ClInclude Include="..\Source\Bevantest.h" />
+    <ClInclude Include="..\Source\Credits.h" />
     <ClInclude Include="..\Source\Menu.h" />
     <ClInclude Include="..\Source\Splashscreen.h" />
     <ClInclude Include="..\Source\UI_Button.h" />
