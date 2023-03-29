@@ -53,6 +53,7 @@ public:
 		GO_CLONE,
 		GO_ENEMY,
 		GO_DANGER_SIGN,
+		GO_PARTICLE,
 		GO_TOTAL,
 	};
 

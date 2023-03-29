@@ -44,11 +44,18 @@ void GameObject::Update()
 
 void GameObject::Render()
 {
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	if (tex)
+	{
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxTextureSet(tex, 0, 0);
+	}
+	else
+	{
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	}
 	AEGfxSetTintColor(color.r, color.g, color.b, 1.0f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(alpha);
-	AEGfxTextureSet(tex, 0, 0);
 
 	AEMtx33 scale = { 0 };
 	AEMtx33Scale(&scale, this->scale.x, this->scale.x);

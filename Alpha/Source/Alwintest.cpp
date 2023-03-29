@@ -152,6 +152,10 @@ namespace
 	void UpdateEnemyState(GameObject* gameObj);
 	void UpdatePlayerPosition(GameObject* gameObj);
 
+	float RandFloat(float min, float max);
+	void SpawnCollideParticles(int numOfParticles, AEVec2 spawnPos, Color color, AEVec2 direction, float spreadAngle, float minSpeed, float maxSpeed, float minLifetime, float maxLifetime, float minScale, float maxScale);
+	void SpawnDeathParticles(int numOfParticles, AEVec2 spawnPos, Color color, float minSpeed, float maxSpeed, float minLifetime, float maxLifetime, float minScale, float maxScale);
+
 	void RenderTexture(AEGfxTexture* texture, AEVec2 pos_, AEVec2 scale_, float rotation_);
 	
 	GameObject* FindClosestGO(GameObject*, GameObject::GAMEOBJECT_TYPE);
@@ -325,218 +329,243 @@ void Alwintest_Update()
 
 			switch (gameObj->type)
 			{
-			case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
-			{
-				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
-					gameObj->active = false;
-
-				//if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
-				//{
-				//	//NexusEnemyUpdate(gameObj);
-				//	gameObj->target = Nexus;
-				//}
-				//else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
-				//{
-				//	gameObj->target = player;
-				//}
-
-				UpdateEnemyState(gameObj);
-
-				if (gameObj->smallTarget != nullptr)
+				case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
 				{
-					AEVec2 target{ gameObj->smallTarget->position };
-					AEVec2Sub(&target, &gameObj->position, &target);
-					gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
-				}
-				else
-				{
-					if (gameObj->target == nullptr)
-						gameObj->target = Nexus;
+					if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+						gameObj->active = false;
 
-					AEVec2 target{ gameObj->target->position };
-					AEVec2Sub(&target, &gameObj->position, &target);
-					gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
-				}
+					//if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
+					//{
+					//	//NexusEnemyUpdate(gameObj);
+					//	gameObj->target = Nexus;
+					//}
+					//else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
+					//{
+					//	gameObj->target = player;
+					//}
 
-				//UpdateEnemyPath(gameObj);
-				//UpdateEnemyRotation(gameObj);
-				//UpdateEnemyPosition(gameObj);
+					UpdateEnemyState(gameObj);
 
-				break;
-			}
-			case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
-			{
-				UpdatePlayerPosition(gameObj);
-
-				/*for (GameObject* go : go_list)
-				{
-					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					if (gameObj->smallTarget != nullptr)
 					{
-						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
-						{
-							std::cout << "Remain: " << enemiesRemaining << std::endl;
-							enemiesRemaining--;
-							go->active = false;
-						}
+						AEVec2 target{ gameObj->smallTarget->position };
+						AEVec2Sub(&target, &gameObj->position, &target);
+						gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
 					}
-				}*/
-				break;
-			}
-			case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
-			{
-				gameObj->Stats.SetStat(STAT_ATTACK_SPEED, gameObj->Stats.GetStat(STAT_ATTACK_SPEED) + AEFrameRateControllerGetFrameTime());
-
-				GameObject* temp = FindClosestGO(gameObj, GameObject::GO_ENEMY);
-				if (!temp)
-					break;
-
-				AEVec2 result = temp->position;
-				UpdateTurretShooting(result, gameObj);
-
-				break;
-			}
-			case (GameObject::GAMEOBJECT_TYPE::GO_BULLET):
-			{
-				gameObj->position.x += gameObj->direction.x * AEFrameRateControllerGetFrameTime() * skill_vals::BULLET_VEL;
-				gameObj->position.y += gameObj->direction.y * AEFrameRateControllerGetFrameTime() * skill_vals::BULLET_VEL;
-
-				if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
-					gameObj->active = false;
-
-				for (GameObject* go : go_list)
-				{
-					if (!go->active)
-						continue;
-					if (go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					else
 					{
-						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
-						{
-							std::cout << "Remain: " << enemiesRemaining << std::endl;
-							go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - gameObj->Range.damage);//gameObj->Stats.GetStat(STAT_DAMAGE)); // we just say 1 bullet does 1 damage for now
-							gameObj->active = false;
+						if (gameObj->target == nullptr)
+							gameObj->target = Nexus;
 
-							if ((gameObj->Range.skill_bit & tier2))
+						AEVec2 target{ gameObj->target->position };
+						AEVec2Sub(&target, &gameObj->position, &target);
+						gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
+					}
+
+					//UpdateEnemyPath(gameObj);
+					//UpdateEnemyRotation(gameObj);
+					//UpdateEnemyPosition(gameObj);
+
+					break;
+				}
+				case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
+				{
+					UpdatePlayerPosition(gameObj);
+
+					/*for (GameObject* go : go_list)
+					{
+						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+						{
+							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 							{
-								//implement spread shot function here
-								for (int i{}; i < skill_vals::MAX_SPREAD; ++i)
+								std::cout << "Remain: " << enemiesRemaining << std::endl;
+								enemiesRemaining--;
+								go->active = false;
+							}
+						}
+					}*/
+					break;
+				}
+				case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
+				{
+					gameObj->Stats.SetStat(STAT_ATTACK_SPEED, gameObj->Stats.GetStat(STAT_ATTACK_SPEED) + AEFrameRateControllerGetFrameTime());
+
+					GameObject* temp = FindClosestGO(gameObj, GameObject::GO_ENEMY);
+					if (!temp)
+						break;
+
+					AEVec2 result = temp->position;
+					UpdateTurretShooting(result, gameObj);
+
+					break;
+				}
+				case (GameObject::GAMEOBJECT_TYPE::GO_BULLET):
+				{
+					gameObj->position.x += gameObj->direction.x * AEFrameRateControllerGetFrameTime() * skill_vals::BULLET_VEL;
+					gameObj->position.y += gameObj->direction.y * AEFrameRateControllerGetFrameTime() * skill_vals::BULLET_VEL;
+
+					if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+						gameObj->active = false;
+
+					for (GameObject* go : go_list)
+					{
+						if (!go->active)
+							continue;
+						if (go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+						{
+							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+							{
+								std::cout << "Remain: " << enemiesRemaining << std::endl;
+								go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - gameObj->Range.damage);//gameObj->Stats.GetStat(STAT_DAMAGE)); // we just say 1 bullet does 1 damage for now
+								gameObj->active = false;
+								AEVec2 collideDir;
+								AEVec2 collidePos;
+								AEVec2Sub(&collideDir, &gameObj->position, &go->position);
+								AEVec2Normalize(&collideDir, &collideDir);
+
+								AEVec2Scale(&collidePos, &collideDir, go->scale.x / 2.f);
+								AEVec2Add(&collidePos, &go->position, &collidePos);
+
+								SpawnCollideParticles(5, collidePos, Color{ 1.f, 0.f, 0.f }, collideDir, 30.f, 70.f, 100.f, 0.1f, 0.3f, 2.f, 3.f);
+
+								if ((gameObj->Range.skill_bit & tier2))
 								{
-									GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
-									skill_inst->tex = bulletTex;
-									spreadshot(gameObj, skill_inst, i);
+									//implement spread shot function here
+									for (int i{}; i < skill_vals::MAX_SPREAD; ++i)
+									{
+										GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+										skill_inst->tex = bulletTex;
+										spreadshot(gameObj, skill_inst, i);
+									}
+								}
+
+								if (go->Stats.GetStat(STAT_HEALTH) <= 0)
+								{
+									go->active = false;
+									enemiesRemaining--;
+									uiEnemiesCount--;
+									SpawnDeathParticles(20, go->position, Color{ 1.f, 0.f, 0.f } , 10.f, 30.f, 0.3f, 0.5f, 2.f, 3.f);
 								}
 							}
+						}
+						else if (go->type == GameObject::GAMEOBJECT_TYPE::GO_WALL || go->type == GameObject::GAMEOBJECT_TYPE::GO_TURRET || go->type == GameObject::GAMEOBJECT_TYPE::GO_NEXUS)
+						{
+							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+								gameObj->active = false;
+						}
+					}
 
-							if (go->Stats.GetStat(STAT_HEALTH) <= 0)
+					break;
+				}
+				case (GameObject::GAMEOBJECT_TYPE::GO_AOE):
+				{
+					//update positions
+
+					player->Melee.lifetime += AEFrameRateControllerGetFrameTime();
+
+					//check collision
+					for (GameObject* go : go_list)
+					{
+						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+						{
+							if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
 							{
-								go->active = false;
+								std::cout << "Remain: " << enemiesRemaining << std::endl;
 								enemiesRemaining--;
 								uiEnemiesCount--;
+								go->active = false;
+								SpawnDeathParticles(20, go->position, Color{ 1.f, 0.f, 0.f }, 10.f, 30.f, 0.3f, 0.5f, 2.f, 3.f);
 							}
 						}
 					}
-					else if (go->type == GameObject::GAMEOBJECT_TYPE::GO_WALL || go->type == GameObject::GAMEOBJECT_TYPE::GO_TURRET || go->type == GameObject::GAMEOBJECT_TYPE::GO_NEXUS)
+
+					if (player->Melee.skill_bit & tier4)
 					{
-						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
-							gameObj->active = false;
-					}
-				}
-
-				break;
-			}
-			case (GameObject::GAMEOBJECT_TYPE::GO_AOE):
-			{
-				//update positions
-
-				player->Melee.lifetime += AEFrameRateControllerGetFrameTime();
-
-					//check collision
-				for (GameObject* go : go_list)
-				{
-					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
-					{
-						if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
+						AOE_ready(player, gameObj);
+						if (gameObj->skill_flag)
 						{
-							std::cout << "Remain: " << enemiesRemaining << std::endl;
-							enemiesRemaining--;
-							uiEnemiesCount--;
-							go->active = false;
+							gameObj->position.x += skill_vals::AOE_VEL * gameObj->direction.x * AEFrameRateControllerGetFrameTime();
+							gameObj->position.y += skill_vals::AOE_VEL * gameObj->direction.y * AEFrameRateControllerGetFrameTime();
+						}
+						else
+						{
+							gameObj->position.x = player->position.x;
+							gameObj->position.y = player->position.y;
+						}
+
+
+						if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+						{
+							gameObj->active = false;
+							gameObj->skill_flag = false;
+							std::cout << "AOE destroyed";
 						}
 					}
-				}
 
-				if (player->Melee.skill_bit & tier4)
-				{
-					AOE_ready(player, gameObj);
-					if (gameObj->skill_flag)
-					{
-						gameObj->position.x += skill_vals::AOE_VEL * gameObj->direction.x * AEFrameRateControllerGetFrameTime();
-						gameObj->position.y += skill_vals::AOE_VEL * gameObj->direction.y * AEFrameRateControllerGetFrameTime();
-					}
 					else
 					{
 						gameObj->position.x = player->position.x;
 						gameObj->position.y = player->position.y;
+						if (player->Melee.lifetime > static_cast<f64> (0.2f))
+						{
+							gameObj->alpha -= 0.10f;
+							player->Melee.lifetime = 0;
+						}
+
+						if (gameObj->alpha < 0)
+						{
+							gameObj->active = false;
+						}
 					}
+					break;
 
 
-					if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+				}
+				case (GameObject::GAMEOBJECT_TYPE::GO_CAR):
+				{
+					gameObj->position.x += gameObj->direction.x * skill_vals::CAR_VEL * AEFrameRateControllerGetFrameTime();
+					gameObj->position.y += gameObj->direction.y * skill_vals::CAR_VEL * AEFrameRateControllerGetFrameTime();
+
+					if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 					{
 						gameObj->active = false;
-						gameObj->skill_flag = false;
-						std::cout << "AOE destroyed";
+						player->Range.second_tier.active = false;
+						//std::cout << "car destroyed";
 					}
+					break;
 				}
-
-				else
+				case(GameObject::GAMEOBJECT_TYPE::GO_CLONE):
 				{
-					gameObj->position.x = player->position.x;
-					gameObj->position.y = player->position.y;
-					if (player->Melee.lifetime > static_cast<f64> (0.2f))
+					gameObj->timer += AEFrameRateControllerGetFrameTime();
+
+					if (gameObj->timer > 0.2)
 					{
-						gameObj->alpha -= 0.10f;
-						player->Melee.lifetime = 0;
+						gameObj->timer = 0.0;
+						gameObj->alpha -= 0.25f;
 					}
 
-					if (gameObj->alpha < 0)
+					if (gameObj->alpha < 0.f)
 					{
 						gameObj->active = false;
 					}
+					break;
 				}
-				break;
-
-
 			}
-			case (GameObject::GAMEOBJECT_TYPE::GO_CAR):
-			{
-				gameObj->position.x += gameObj->direction.x * skill_vals::CAR_VEL * AEFrameRateControllerGetFrameTime();
-				gameObj->position.y += gameObj->direction.y * skill_vals::CAR_VEL * AEFrameRateControllerGetFrameTime();
+		}
+	}
 
-				if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
-				{
-					gameObj->active = false;
-					player->Range.second_tier.active = false;
-					//std::cout << "car destroyed";
-				}
-				break;
-			}
-			case(GameObject::GAMEOBJECT_TYPE::GO_CLONE):
-			{
-				gameObj->timer += AEFrameRateControllerGetFrameTime();
-
-				if (gameObj->timer > 0.2)
-				{
-					gameObj->timer = 0.0;
-					gameObj->alpha -= 0.25f;
-				}
-
-				if (gameObj->alpha < 0.f)
-				{
-					gameObj->active = false;
-				}
-				break;
-			}
-			}
-
+	// Gameobjects to update no matter what phase
+	for (auto gameObj : go_list)
+	{
+		switch (gameObj->type)
+		{
+		case(GameObject::GAMEOBJECT_TYPE::GO_PARTICLE):
+			gameObj->position.x += gameObj->direction.x * AEFrameRateControllerGetFrameTime();
+			gameObj->position.y += gameObj->direction.y * AEFrameRateControllerGetFrameTime();
+			gameObj->timer -= AEFrameRateControllerGetFrameTime();
+			if (gameObj->timer <= 0)
+				gameObj->active = false;
+			break;
 		}
 	}
 
@@ -1131,7 +1160,7 @@ namespace
 
 			enemiesRemaining = 0;
 
-			if(enemySpawnRate >= 0.1f)
+			if (enemySpawnRate >= 0.1f)
 				enemySpawnRate -= 0.05f;
 			currentWave++;
 			enemiesSpawned = 0;
@@ -1201,156 +1230,156 @@ namespace
 	{
 		switch (gameObj->Stats.GetCurrState())
 		{
-			case (STATE::STATE_ENEMY_MOVE):
+		case (STATE::STATE_ENEMY_MOVE):
+		{
+			switch (gameObj->Stats.GetCurrInnerState())
 			{
-				switch (gameObj->Stats.GetCurrInnerState())
-				{
-				case (INNER_STATE::ISTATE_ENTER):
-				{
-					// init
-					// always set next state
-					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
-				}
-				break;
-				case (INNER_STATE::ISTATE_UPDATE):
-				{
-					// whack target if near target
-					// if far from target, move to target,
-					// if target down, choose next target
-					gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
+			case (INNER_STATE::ISTATE_ENTER):
+			{
+				// init
+				// always set next state
+				gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
+			}
+			break;
+			case (INNER_STATE::ISTATE_UPDATE):
+			{
+				// whack target if near target
+				// if far from target, move to target,
+				// if target down, choose next target
+				gameObj->Stats.path_timer += AEFrameRateControllerGetFrameTime();
 
-					if (gameObj->Stats.path_timer >= 1.0f && gameObj->target != nullptr)
+				if (gameObj->Stats.path_timer >= 1.0f && gameObj->target != nullptr)
+				{
+					PathManager pathmaker(test_map, false);
+					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
+
+					if (!gameObj->Path.empty())
 					{
-						PathManager pathmaker(test_map, false);
-						gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
-
-						if (!gameObj->Path.empty())
+						gameObj->Path.erase(gameObj->Path.begin());
+						std::vector<AEVec2>::iterator it = gameObj->Path.begin();
+						for (auto& pos : gameObj->Path) // converting grid pos to world pos
 						{
-							gameObj->Path.erase(gameObj->Path.begin());
-							std::vector<AEVec2>::iterator it = gameObj->Path.begin();
-							for (auto& pos : gameObj->Path) // converting grid pos to world pos
+							if (test_map->map_arr[test_map->GetIndex(pos.x, pos.y)] != game_map::TILE_TYPE::TILE_NONE)
 							{
-								if (test_map->map_arr[test_map->GetIndex(pos.x, pos.y)] != game_map::TILE_TYPE::TILE_NONE)
-								{
-									gameObj->smallTarget = IndexToGO(test_map->GetIndex(pos.x, pos.y));
-									if (gameObj->smallTarget != nullptr) break;
-								}
-
-								pos = test_map->GetWorldPos(test_map->GetIndex(pos.x, pos.y));
-								++it;
+								gameObj->smallTarget = IndexToGO(test_map->GetIndex(pos.x, pos.y));
+								if (gameObj->smallTarget != nullptr) break;
 							}
 
-							gameObj->Path.erase(it, gameObj->Path.end()); // delete everything from small target onwards
-
-							gameObj->Stats.path_timer = 0.0f;
+							pos = test_map->GetWorldPos(test_map->GetIndex(pos.x, pos.y));
+							++it;
 						}
 
-						// @TODO CHANGE MELEE RANGE
-						if (gameObj->smallTarget == nullptr)
-							gameObj->smallTarget = gameObj->target;
+						gameObj->Path.erase(it, gameObj->Path.end()); // delete everything from small target onwards
 
-						if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= test_map->GetTileSize() * gameObj->smallTarget->scale.x * 0.5f)
-						{
-							gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
-							gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
-						}
+						gameObj->Stats.path_timer = 0.0f;
 					}
-					else if (gameObj->target == nullptr)
+
+					// @TODO CHANGE MELEE RANGE
+					if (gameObj->smallTarget == nullptr)
+						gameObj->smallTarget = gameObj->target;
+
+					if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= test_map->GetTileSize() * gameObj->smallTarget->scale.x * 0.5f)
 					{
-						gameObj->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
-						gameObj->target = Nexus;
+						gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
+						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
 					}
 				}
-					break;
-				case (INNER_STATE::ISTATE_EXIT):
+				else if (gameObj->target == nullptr)
 				{
-					// clean up
-					// always set next state
-					// if next state is the same, as curr then we will just run as usual
-					gameObj->Stats.SetCurrStateFromNext();
-				}
-				break;
-				
+					gameObj->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
+					gameObj->target = Nexus;
 				}
 			}
 			break;
-
-			case (STATE::STATE_ENEMY_ATTACK):
+			case (INNER_STATE::ISTATE_EXIT):
 			{
-				switch (gameObj->Stats.GetCurrInnerState())
-				{
-					case (INNER_STATE::ISTATE_ENTER):
-					{
-						// init
-						// always set next state
-						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
-						std::cout << "attack enter" << std::endl;
-					}
-					break;
-					case (INNER_STATE::ISTATE_UPDATE):
-					{
-						if (!gameObj->Path.size() && gameObj->smallTarget != nullptr) // we are at our target
-						{
-							// whack small target
-							gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE) * AEFrameRateControllerGetFrameTime() * gameObj->Stats.GetStat(STAT_ATTACK_SPEED));
-
-							if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f && gameObj->smallTarget->active)
-							{
-								gameObj->smallTarget->active = false;
-								if (gameObj->smallTarget != player)
-								{
-									test_map->RemoveItem(gameObj->smallTarget->gridIndex.front(), gameObj->smallTarget->gridScale.x, gameObj->smallTarget->gridScale.y);
-									gameObj->smallTarget->gridIndex.clear();
-								}
-							}
-						}
-
-						// whack target if near target
-						// if far from target, move to target,
-						// if target down, choose next target
-						if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f || !gameObj->smallTarget->active) // target is down
-						{
-							switch (gameObj->Stats.target_type)
-							{
-								case (CharacterStats::TARGET_TYPE::TAR_PLAYER):
-									gameObj->target = player;
-									break;
-								case (CharacterStats::TARGET_TYPE::TAR_NEXUS):
-									gameObj->target = Nexus;
-									break;
-								case (CharacterStats::TARGET_TYPE::TAR_TURRET):
-								{
-									GameObject* turret{ FindClosestGO(gameObj, GameObject::GO_TURRET) };
-
-									if (!turret)
-									{
-										gameObj->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
-										gameObj->target = Nexus;
-										break;
-									}
-										
-									gameObj->target = turret;
-								}
-									break;
-							}
-							
-							gameObj->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
-							gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
-							break;
-						}
-					}
-					break;
-					case (INNER_STATE::ISTATE_EXIT):
-					{
-						// clean up
+				// clean up
 				// always set next state
 				// if next state is the same, as curr then we will just run as usual
-						gameObj->Stats.SetCurrStateFromNext();
+				gameObj->Stats.SetCurrStateFromNext();
+			}
+			break;
+
+			}
+		}
+		break;
+
+		case (STATE::STATE_ENEMY_ATTACK):
+		{
+			switch (gameObj->Stats.GetCurrInnerState())
+			{
+			case (INNER_STATE::ISTATE_ENTER):
+			{
+				// init
+				// always set next state
+				gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
+				std::cout << "attack enter" << std::endl;
+			}
+			break;
+			case (INNER_STATE::ISTATE_UPDATE):
+			{
+				if (!gameObj->Path.size() && gameObj->smallTarget != nullptr) // we are at our target
+				{
+					// whack small target
+					gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE) * AEFrameRateControllerGetFrameTime() * gameObj->Stats.GetStat(STAT_ATTACK_SPEED));
+
+					if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f && gameObj->smallTarget->active)
+					{
+						gameObj->smallTarget->active = false;
+						if (gameObj->smallTarget != player)
+						{
+							test_map->RemoveItem(gameObj->smallTarget->gridIndex.front(), gameObj->smallTarget->gridScale.x, gameObj->smallTarget->gridScale.y);
+							gameObj->smallTarget->gridIndex.clear();
+						}
 					}
+				}
+
+				// whack target if near target
+				// if far from target, move to target,
+				// if target down, choose next target
+				if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f || !gameObj->smallTarget->active) // target is down
+				{
+					switch (gameObj->Stats.target_type)
+					{
+					case (CharacterStats::TARGET_TYPE::TAR_PLAYER):
+						gameObj->target = player;
+						break;
+					case (CharacterStats::TARGET_TYPE::TAR_NEXUS):
+						gameObj->target = Nexus;
+						break;
+					case (CharacterStats::TARGET_TYPE::TAR_TURRET):
+					{
+						GameObject* turret{ FindClosestGO(gameObj, GameObject::GO_TURRET) };
+
+						if (!turret)
+						{
+							gameObj->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
+							gameObj->target = Nexus;
+							break;
+						}
+
+						gameObj->target = turret;
+					}
+					break;
+					}
+
+					gameObj->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
+					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
 					break;
 				}
 			}
 			break;
+			case (INNER_STATE::ISTATE_EXIT):
+			{
+				// clean up
+		// always set next state
+		// if next state is the same, as curr then we will just run as usual
+				gameObj->Stats.SetCurrStateFromNext();
+			}
+			break;
+			}
+		}
+		break;
 		}
 	}
 
@@ -1478,25 +1507,25 @@ namespace
 		AEVec2 const buildButtonSize{ screenHeightY * .12f, screenHeightY * .12f };
 		AEVec2 buildButtonPos{ buildButtonStartPos };
 		buildButtonPos.x -= buildButtonSize.y * 0.75f;
-		nexusButton = gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON, 
+		nexusButton = gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON,
 			nullptr, PlaceNexusButton, &textTable->buildNexusHoverText);
 		buildButtonPos.x += buildButtonSize.y * 1.5f;
 		playerButton = gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_PLAYER_BUTTON,
 			nullptr, PlacePlayerButton, &textTable->buildPlayerHoverText);
 		buildButtonPos.x -= buildButtonSize.y * 0.75f;
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON, 
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_WALL_BUTTON,
 			nullptr, PlaceWallButton, &textTable->buildWallHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON, 
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_TOWER_BUTTON,
 			nullptr, PlaceTowerButton, &textTable->buildTowerHoverText);
 		buildButtonPos.y -= buildButtonSize.y * 1.5f;
-		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON, 
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::ERASE_BUTTON,
 			nullptr, EraseButton, &textTable->eraseHoverText);
-		
+
 		// Both skill tree and gameplay layers share same button pos
 		buildButtonPos.x = screenWidthX - buildButtonSize.x;
-		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::SKILL_TREE_BUTTON, 
+		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::SKILL_TREE_BUTTON,
 			nullptr, SkillTreeButton, &textTable->Skill_Tree);
 		skillUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::CLOSE_BUTTON,
 			nullptr, SkillTreeButton, &textTable->Skill_Tree);
@@ -1570,7 +1599,7 @@ namespace
 				//	nullptr, UtilitySkillUpgrade_tier2, &textTable->playButton);
 			}
 		}
-			
+
 	}
 
 	void InitializeUIElements()
@@ -1707,6 +1736,54 @@ namespace
 		currentWave = 1;
 		enemySpawnTimer = 0.f;
 		enemyTankInGame = 0;
+	}
+
+	float RandFloat(float min, float max)
+	{
+		return min + static_cast<float> (rand()) / static_cast<float>(RAND_MAX / max);
+	}
+
+	void SpawnCollideParticles(int numOfParticles, AEVec2 spawnPos, Color color, AEVec2 direction, float spreadAngle, float minSpeed, float maxSpeed, float minLifetime, float maxLifetime, float minScale, float maxScale)
+	{
+		for (int i = 0; i < numOfParticles; i++)
+		{
+			GameObject* temp = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_PARTICLE);
+			temp->position = spawnPos;
+			float tempScale = RandFloat(minScale, maxScale);
+			temp->scale = { tempScale , tempScale };
+
+			AEVec2Normalize(&temp->direction, &direction);
+			AEVec2 tempDir = temp->direction;
+			float tempAngle = RandFloat(-spreadAngle, spreadAngle);
+			tempAngle = AEDegToRad(tempAngle);
+			temp->direction.x = tempDir.x * cosf(tempAngle) - tempDir.y * sinf(tempAngle);
+			temp->direction.y = tempDir.x * sinf(tempAngle) + tempDir.y * cosf(tempAngle);
+			AEVec2Scale(&temp->direction, &temp->direction, RandFloat(minSpeed, maxSpeed));
+			temp->timer = RandFloat(minLifetime, maxLifetime);
+			temp->color = color;
+			
+		}
+	}
+
+	void SpawnDeathParticles(int numOfParticles, AEVec2 spawnPos, Color color, float minSpeed, float maxSpeed, float minLifetime, float maxLifetime, float minScale, float maxScale)
+	{
+		for (int i = 0; i < numOfParticles; i++)
+		{
+			GameObject* temp = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_PARTICLE);
+			temp->position = spawnPos;
+			float tempScale = RandFloat(minScale, maxScale);
+			temp->scale = { tempScale , tempScale };
+
+			AEVec2 tempDir = {0.f, 1.f};
+			float tempAngle = RandFloat(0, 360.f);
+			tempAngle = AEDegToRad(tempAngle);
+			temp->direction.x = tempDir.x * cosf(tempAngle) - tempDir.y * sinf(tempAngle);
+			temp->direction.y = tempDir.x * sinf(tempAngle) + tempDir.y * cosf(tempAngle);
+			AEVec2Scale(&temp->direction, &temp->direction, RandFloat(minSpeed, maxSpeed));
+			temp->timer = RandFloat(minLifetime, maxLifetime);
+			temp->color = color;
+
+		}
 	}
 
 #pragma region UI_CALLBACK_DEFINITIONS
