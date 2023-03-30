@@ -194,6 +194,8 @@ namespace UI
 				// RENDER THE BOX CONTAINING TEXT
 				AEVec2 pos{ static_cast<f32>(mouseX) + curr->hoverText->GetBoxWidth() * 0.25f,
 						static_cast<f32>(-mouseY) - curr->hoverText->GetBoxHeight() * 0.25f };
+				float const xBounds{ m_winDim.x * 0.5f - curr->hoverText->GetBoxWidth() * 0.25f };
+				pos.x = (pos.x > xBounds) ? xBounds : pos.x ;
 				AEVec2 scale{ curr->hoverText->GetBoxWidth() * 0.5f, curr->hoverText->GetBoxHeight() * 0.5f };
 				UI::DrawMesh(pos, scale, TEX_BUTTON, HOVER_RGBA);
 
