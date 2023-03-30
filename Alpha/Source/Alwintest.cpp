@@ -6,10 +6,11 @@
 #include "Pathfinding/pathfinder.h"
 #include "CharacterStats.h"
 #include "Skills.h"
+
+extern bool playerloss{ false };
+
 namespace
 {
-
-
 	std::vector<GameObject*> go_list;
 	game_map* test_map;
 	int object_count;

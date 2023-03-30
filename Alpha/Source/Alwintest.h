@@ -4,6 +4,7 @@
 #include "Map/Map.h"
 #include "UI_Manager.h"
 #include "UI_TextAreaTable.h"
+
 void Alwintest_Load();
 
 void Alwintest_Initialize();
