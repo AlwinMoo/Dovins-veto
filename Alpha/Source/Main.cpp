@@ -32,7 +32,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Changing the window title
 	AESysSetWindowTitle("My New Demo!");
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-	g_fontID = AEGfxCreateFont("Assets/Roboto-Regular.ttf", 16);
+	g_fontID = AEGfxCreateFont("Assets/SignikaNegative-Regular.ttf", 16);
 	// reset the system modules
 	AESysReset();
 	// Enable run-time memory check for debug builds.

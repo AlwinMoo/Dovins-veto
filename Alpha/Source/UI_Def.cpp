@@ -14,8 +14,8 @@ namespace UI
 		TextureList[TEX_WALL]			= AEGfxTextureLoad("Assets/Wall.png");
 		TextureList[TEX_NEXUS_PLACED]	= AEGfxTextureLoad("Assets/NexusPlaced.png");
 		TextureList[TEX_ERASE]			= AEGfxTextureLoad("Assets/Eraser.png");
-		TextureList[TEX_PLAYER]			= AEGfxTextureLoad("Assets/PlayerTexture.png");
-		TextureList[TEX_PLAYER_PLACED]	= AEGfxTextureLoad("Assets/PlayerPlaced.png");
+		TextureList[TEX_PLAYER]			= AEGfxTextureLoad("Assets/standing-still.png");
+		TextureList[TEX_PLAYER_PLACED]	= AEGfxTextureLoad("Assets/player-gone.png");
 		TextureList[TEX_SKILL_MENU]		= AEGfxTextureLoad("Assets/UpgradeIcon.png");
 		TextureList[TEX_CLOSE]			= AEGfxTextureLoad("Assets/Close.png");
 		TextureList[TEX_GUN_SKILL]		= AEGfxTextureLoad("Assets/GunSkill.png");

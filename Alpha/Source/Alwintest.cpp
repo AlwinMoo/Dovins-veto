@@ -1064,7 +1064,7 @@ namespace
 			leng.x = player->position.x - absMousePos.x;
 			leng.y = player->position.y - absMousePos.y;
 
-			if (AEVec2Length(&leng) <= 5)
+			if (AEVec2Length(&leng) <= test_map->GetTileSize())
 			{
 				player->Path.push_back(absMousePos);
 				player_goal = player->Path.front();
@@ -1373,20 +1373,23 @@ namespace
 				if (!gameObj->Path.size() && gameObj->smallTarget != nullptr) // we are at our target
 				{
 					// whack small target
-					gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE) * static_cast<float>(AEFrameRateControllerGetFrameTime()) * gameObj->Stats.GetStat(STAT_ATTACK_SPEED));
-					
-					gameObj->timer -= AEFrameRateControllerGetFrameTime();
-					if (gameObj->timer <= 0)
+					if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= (gameObj->smallTarget->scale.x * gameObj->smallTarget->gridScale.x + gameObj->scale.x) * 0.5f)
 					{
-						AEVec2 collideDir;
-						AEVec2 collidePos;
-						AEVec2Sub(&collideDir, &gameObj->position, &gameObj->smallTarget->position);
-						AEVec2Normalize(&collideDir, &collideDir);
+						gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE) * static_cast<float>(AEFrameRateControllerGetFrameTime()) * gameObj->Stats.GetStat(STAT_ATTACK_SPEED));
 
-						AEVec2Scale(&collidePos, &collideDir, gameObj->smallTarget->scale.x / 2.f);
-						AEVec2Add(&collidePos, &gameObj->smallTarget->position, &collidePos);
-						SpawnCollideParticles(8, collidePos, gameObj->smallTarget->particleColor, collideDir, 30.f, 80.f, 110.f, 0.1f, 0.3f, 3.f, 4.f);
-						gameObj->timer = 1;
+						gameObj->timer -= AEFrameRateControllerGetFrameTime();
+						if (gameObj->timer <= 0)
+						{
+							AEVec2 collideDir;
+							AEVec2 collidePos;
+							AEVec2Sub(&collideDir, &gameObj->position, &gameObj->smallTarget->position);
+							AEVec2Normalize(&collideDir, &collideDir);
+
+							AEVec2Scale(&collidePos, &collideDir, gameObj->smallTarget->scale.x / 2.f);
+							AEVec2Add(&collidePos, &gameObj->smallTarget->position, &collidePos);
+							SpawnCollideParticles(8, collidePos, gameObj->smallTarget->particleColor, collideDir, 30.f, 80.f, 110.f, 0.1f, 0.3f, 3.f, 4.f);
+							gameObj->timer = 1;
+						}
 					}
 
 					if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f && gameObj->smallTarget->active)
@@ -1400,8 +1403,10 @@ namespace
 						}
 					}
 				}
-				else if (gameObj->smallTarget != nullptr)
-				{
+
+				if (gameObj->smallTarget == nullptr)
+					break;
+
 					// whack target if near target
 					// if far from target, move to target,
 					// if target down, choose next target
@@ -1430,12 +1435,11 @@ namespace
 						}
 						break;
 						}
-
-						gameObj->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
-						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
-						break;
 					}
-				}
+
+					gameObj->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
+					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
+					break;
 			}
 			break;
 			case (INNER_STATE::ISTATE_EXIT):
@@ -1463,6 +1467,8 @@ namespace
 
 			player->position.x += out.x * static_cast<float>(AEFrameRateControllerGetFrameTime()) * 600;
 			player->position.y += out.y * static_cast<float>(AEFrameRateControllerGetFrameTime()) * 600;
+
+			player->rotation = AERadToDeg(atan2f(-norm.x, -norm.y));
 		}
 	}
 
@@ -1517,9 +1523,9 @@ namespace
 		bulletTex = AEGfxTextureLoad("Assets/YellowTexture.png");
 		grassBorderlessTex = AEGfxTextureLoad("Assets/GrassTileBorderless.png");
 		playerTex = AEGfxTextureLoad("Assets/standing-still.png");
-		enemyTex = AEGfxTextureLoad("Assets/EnemyTexture.png");
-		enemy_nexusTex = AEGfxTextureLoad("Assets/nexus_enemy.png");
-		enemy_tankTex = AEGfxTextureLoad("Assets/tank.png");
+		enemyTex = AEGfxTextureLoad("Assets/infantry.png");
+		enemy_nexusTex = AEGfxTextureLoad("Assets/infantry.png");
+		enemy_tankTex = AEGfxTextureLoad("Assets/new_tank.png");
 		eraseTex = AEGfxTextureLoad("Assets/Eraser.png");
 		dangerTex = AEGfxTextureLoad("Assets/Danger.png");
 		targetedTex = AEGfxTextureLoad("Assets/Targeted.png");
