@@ -1516,7 +1516,7 @@ namespace
 		wallTex = AEGfxTextureLoad("Assets/Wall.png");
 		bulletTex = AEGfxTextureLoad("Assets/YellowTexture.png");
 		grassBorderlessTex = AEGfxTextureLoad("Assets/GrassTileBorderless.png");
-		playerTex = AEGfxTextureLoad("Assets/PlayerTexture.png");
+		playerTex = AEGfxTextureLoad("Assets/standing-still.png");
 		enemyTex = AEGfxTextureLoad("Assets/EnemyTexture.png");
 		enemy_nexusTex = AEGfxTextureLoad("Assets/nexus_enemy.png");
 		enemy_tankTex = AEGfxTextureLoad("Assets/tank.png");
