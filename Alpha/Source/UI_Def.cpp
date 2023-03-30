@@ -78,6 +78,8 @@ namespace UI
 	}
 	void DrawMesh(AEVec2 const& pos, AEVec2 const& meshScale, UI_TEX texID, UI_Color const& color)
 	{
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetBlendColor(color.r, color.g, color.b, color.a);
 		DrawMesh(pos, meshScale, texID);
 		AEGfxSetBlendColor(0.f, 0.f, 0.f, 0.f);

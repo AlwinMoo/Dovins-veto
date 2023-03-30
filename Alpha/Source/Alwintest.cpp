@@ -8,10 +8,10 @@
 #include "Skills.h"
 #include <ctime>
 
+extern bool playerloss{ false };
+
 namespace
 {
-
-
 	std::vector<GameObject*> go_list;
 	game_map* test_map;
 	int object_count;
@@ -224,22 +224,25 @@ void Alwintest_Update()
 
 	if (buildPhase)
 	{
-		if (AEInputCheckCurr(AEVK_LBUTTON) && hoverStructure->active)
+		if (UICurrLayer == UI::UI_TYPE::UI_TYPE_GAME)
 		{
-			if (hoverStructure->tex == eraseTex)
+			if (AEInputCheckCurr(AEVK_LBUTTON) && hoverStructure->active)
 			{
-				if (!validPlacement && test_map->IsInGrid(mouse_pos))
+				if (hoverStructure->tex == eraseTex)
 				{
-					EraseBuiltStructure();
+					if (!validPlacement && test_map->IsInGrid(mouse_pos))
+					{
+						EraseBuiltStructure();
+					}
+				}
+				else if (validPlacement)
+				{
+					PlaceStructure();
 				}
 			}
-			else if (validPlacement)
-			{
-				PlaceStructure();
-			}
+			UpdateHoverStructure();
 		}
 		skills_upgrade_check(player);
-		UpdateHoverStructure();
 	}
 	else
 	{
@@ -649,49 +652,60 @@ void Alwintest_Draw()
 	//AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	////AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);
 
-	AEGfxSetBackgroundColor(0.3f, 0.3f, 0.3f);
-	for (GameObject* gameObj : go_list)
+	// If not in skill tree, render game objects
+	if (UICurrLayer == UI::UI_TYPE::UI_TYPE_GAME)
 	{
-		//Gameobjects Render
-		if (!gameObj->active)
-			continue;
-
-		gameObj->Render();
-
-		//
-		/*if (gameObj->type == GameObject::GO_ENEMY && gameObj->Stats.GetCurrState() == STATE::STATE_ENEMY_ATTACK)
-			RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);*/
-	}
-
-	if (!buildPhase)
-	for (GameObject* gameObj : go_list)
-	{
-		//Gameobjects Render
-		if (!gameObj->active)
-			continue;
-
-		goHealthBar->SetValue(gameObj->Stats.GetNormalisedRemaining(STAT_HEALTH));
-		if (goHealthBar->GetValue() < 1.f)
+		AEGfxSetBackgroundColor(0.3f, 0.3f, 0.3f);
+		for (GameObject* gameObj : go_list)
 		{
-			float const yOffset = gameObj->scale.y * 0.5f;
-			AEVec2 pos{ gameObj->position.x, -gameObj->position.y };
-			pos.x -= uiManagers[UI::UI_TYPE_GAME]->m_winDim.x * 0.5f;
-			pos.y += uiManagers[UI::UI_TYPE_GAME]->m_winDim.y * 0.5f - yOffset;
-			goHealthBar->SetElementPos(pos);
-			//goHealthBar->CalculatePositions(); TODO
-			goHealthBar->Draw();
+			//Gameobjects Render
+			if (!gameObj->active)
+				continue;
+
+			gameObj->Render();
+
+			//
+			/*if (gameObj->type == GameObject::GO_ENEMY && gameObj->Stats.GetCurrState() == STATE::STATE_ENEMY_ATTACK)
+				RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);*/
 		}
-	}
+		if (!buildPhase)
+		for (GameObject* gameObj : go_list)
+		{
+			//Gameobjects Render
+			if (!gameObj->active)
+				continue;
 
-	//skill cooldown UI
-	if (!buildPhase)
+			goHealthBar->SetValue(gameObj->Stats.GetNormalisedRemaining(STAT_HEALTH));
+			if (goHealthBar->GetValue() < 1.f)
+			{
+				float const yOffset = gameObj->scale.y * 0.5f;
+				AEVec2 pos{ gameObj->position.x, -gameObj->position.y };
+				pos.x -= uiManagers[UI::UI_TYPE_GAME]->m_winDim.x * 0.5f;
+				pos.y += uiManagers[UI::UI_TYPE_GAME]->m_winDim.y * 0.5f - yOffset;
+				goHealthBar->SetElementPos(pos);
+				//goHealthBar->CalculatePositions(); TODO
+				goHealthBar->Draw();
+			}
+		}
+
+		//skill cooldown UI
+		if (!buildPhase)
+		{
+			cooldown_UI(player, cooldown_mesh);
+		}
+
+		// Render above
+		if (hoverStructure->active)
+			hoverStructure->Render();
+	}
+	else // else have a clear background only for skill tree
 	{
-		cooldown_UI(player, cooldown_mesh);
+		AEGfxSetBackgroundColor(0.f, 0.f, 0.f);
 	}
 
-	// Render above
-	if (hoverStructure->active)
-		hoverStructure->Render();
+
+
+	
 
 
 

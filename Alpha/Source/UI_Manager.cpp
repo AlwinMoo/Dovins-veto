@@ -7,7 +7,8 @@ namespace UI
 	/*________________________________________________*/
 	// CONSTANT VARIABLES
 	const float BUTTON_HOVER_ALPHA{ 0.3f };
-	const UI_Color HOVER_RGBA{ 0.541f, 0.376f, 0.f, 1.f };
+	const UI_Color HOVER_RGBA	{ 0.541f, 0.376f, 0.f, 1.f };
+	const UI_Color DISABLED_RGBA{ 0.f, 0.f, 0.f, .5f };
 	//const float BUTTON_NORMAL_ALPHA{ 0.f };
 	/*________________________________________________*/
 	void UI_Manager::ConvertToWS(UI_Button* newButton)
@@ -20,6 +21,7 @@ namespace UI
 		newButton->minWS.y = newButton->min.y + m_winDim.y * 0.5f;
 		newButton->maxWS.y = newButton->max.y + m_winDim.y * 0.5f;
 	}
+
 	UI_Button* UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText, void(*callback)(UI_Button*), UI_TextArea* hoverText)
 	{
 		UI_Button* newButton = new UI_Button();
@@ -141,7 +143,9 @@ namespace UI
 			std::cout << std::endl;
 #endif
 
-			if (mousePos.x > curr->max.x || mousePos.x < curr->min.x || mousePos.y > curr->max.y || mousePos.y < curr->min.y)
+			if (!curr->bEnable || 
+				mousePos.x > curr->max.x || mousePos.x < curr->min.x || 
+				mousePos.y > curr->max.y || mousePos.y < curr->min.y)
 				continue;
 			// CLICKING LOGIC
 			if (lClick)
@@ -160,13 +164,19 @@ namespace UI
 
 	void UI_Manager::Draw(s32 mouseX, s32 mouseY)
 	{
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		f32 const& winX{ m_winDim.x }, &winY{ m_winDim.y };
 		f32 const& mouseXN{ mouseX / winX * 2 - 1.f }, &mouseYN{ mouseY / winY * -2 + 1.f }; // CALCULATE NORMALIZED COORDINATES
 		// Now safe to recalculate mouse pos to worldspace coordinates
 		mouseX -= static_cast<s32>(winX)/ 2;
 		mouseY -= static_cast<s32>(winY) / 2;
 		for (UI_Button* curr : m_buttons) {
-			AEGfxSetBlendColor(1.f, 1.f, 1.f, (curr->bHovering ? BUTTON_HOVER_ALPHA: 0.f));
+			if (curr->bEnable)
+				AEGfxSetBlendColor(1.f, 1.f, 1.f, (curr->bHovering ? BUTTON_HOVER_ALPHA: 0.f));
+			else
+				AEGfxSetBlendColor(DISABLED_RGBA.r, DISABLED_RGBA.g, DISABLED_RGBA.b, DISABLED_RGBA.a);
+
 			DrawMesh(curr->posWS, curr->scale, curr->texID); // Render the mesh
 			// Now render the button text, if any
 			if (curr->buttonText)
@@ -184,6 +194,8 @@ namespace UI
 				// RENDER THE BOX CONTAINING TEXT
 				AEVec2 pos{ static_cast<f32>(mouseX) + curr->hoverText->GetBoxWidth() * 0.25f,
 						static_cast<f32>(-mouseY) - curr->hoverText->GetBoxHeight() * 0.25f };
+				float const xBounds{ m_winDim.x * 0.5f - curr->hoverText->GetBoxWidth() * 0.25f };
+				pos.x = (pos.x > xBounds) ? xBounds : pos.x ;
 				AEVec2 scale{ curr->hoverText->GetBoxWidth() * 0.5f, curr->hoverText->GetBoxHeight() * 0.5f };
 				UI::DrawMesh(pos, scale, TEX_BUTTON, HOVER_RGBA);
 

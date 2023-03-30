@@ -4,6 +4,7 @@
 namespace
 {
 	AEGfxTexture* pTex;
+	AEGfxTexture* titleTex;
 	AEGfxVertexList* pMesh;
 
 	UI::UI_Manager* gameUIManager;
@@ -16,9 +17,12 @@ void tutorial_button(UI::UI_Button*);
 void credits_button(UI::UI_Button*);
 void exit_button(UI::UI_Button*);
 
+
+
 void menu_Load()
 {
 	pTex = AEGfxTextureLoad("Assets/EnemyTexture.png");
+	titleTex = AEGfxTextureLoad("Assets/Badea2_Title.png");
 }
 
 void menu_Initialize()
@@ -65,11 +69,6 @@ void menu_Update()
 		next = GS_QUIT;
 	}
 
-	if (AEInputCheckTriggered(AEVK_LBUTTON))
-	{
-		next = GS_LEVEL3;
-	}
-
 	AEVec2 invert_mouse = { static_cast<f32>(mouseX), static_cast<f32>(mouseY) }; // Getting inverted mouse pos to match world space
 	invert_mouse.y = gameUIManager->m_winDim.y - mouseY;
 	gameUIManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
@@ -78,7 +77,8 @@ void menu_Update()
 void menu_Draw()
 {
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
-	generic_draw(pMesh, pTex, 1.0f, 250.f, 250.f, -300.f, 200.f);
+	generic_draw(pMesh, pTex, 1.0f, 200.f, 200.f, -300.f, 200.f);
+	generic_draw(pMesh, titleTex, 1.0f, 1000.f, 1200.f, 0.f, -50.f);
 
 	s32 cursorX, cursorY;
 	AEInputGetCursorPosition(&cursorX, &cursorY);
@@ -94,6 +94,7 @@ void menu_Free()
 
 void menu_Unload()
 {
+	AEGfxTextureUnload(titleTex);
 	AEGfxTextureUnload(pTex);
 }
 
