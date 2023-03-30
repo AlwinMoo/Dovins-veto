@@ -6,12 +6,12 @@ namespace
 	AEGfxTexture*		logo;
 	AEGfxVertexList*	logo_mesh;
 	//AEGfxTexture*		badea2;
-	//AEGfxVertexList*	badea2_mesh
-	f32					digi_opacity			{ 1.0f };
+
+	f32					digi_opacity;
 	f64					dt;
 	f64					timer;
-	bool				digi_logo		{ true };
-	bool				gam_logo		{ false };
+	bool				digi_logo;
+	bool				gam_logo;
 	
 	f32					win_X;
 	f32					win_Y;
@@ -24,22 +24,16 @@ void splashscreen_Load()
 
 void splashscreen_Initialize()
 {
-	AEGfxMeshStart();
 
-	AEGfxTriAdd(
-		 0.5f,  0.5f, 0xFFFF00FF, 1.0f, 0.0f,
-		-0.5f, -0.5f, 0xFFFFFF00, 0.0f, 1.0f,
-		 0.5f, -0.5f,  0xFF00FFFF, 1.0f, 1.0f);
-
-	AEGfxTriAdd(
-		-0.5f,  0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		 0.5f,  0.5f, 0xFFFFFFFF, 1.0f, 0.0f);
-
-	logo_mesh = AEGfxMeshEnd();
+	logo_mesh = basic_mesh();
 	
 	win_X = static_cast<f32>(AEGetWindowWidth());
 	win_Y = static_cast<f32>(AEGetWindowHeight());
+
+	digi_opacity = 1.0f;
+
+	digi_logo = true;
+	gam_logo = false;
 }
 
 void splashscreen_Update()
@@ -70,6 +64,8 @@ void splashscreen_Update()
 
 void splashscreen_Draw()
 {
+	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+
 	if (digi_logo)
 		generic_draw(logo_mesh, logo, digi_opacity, win_X, win_Y, 0, 0);
 

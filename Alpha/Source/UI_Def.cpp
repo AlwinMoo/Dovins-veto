@@ -20,6 +20,7 @@ namespace UI
 		TextureList[TEX_CLOSE]			= AEGfxTextureLoad("Assets/Close.png");
 		TextureList[TEX_GUN_SKILL]		= AEGfxTextureLoad("Assets/GunSkill.png");
 		TextureList[TEX_AOE_SKILL]		= AEGfxTextureLoad("Assets/AOESkill.png");
+		TextureList[TEX_READY] = AEGfxTextureLoad("Assets/Ready.png");
 
 		MeshList[MESH_BOX] = render::GenerateQuad();
 	}

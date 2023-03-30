@@ -44,6 +44,7 @@ namespace UI
 		// SKILL TEXTURES
 		TEX_GUN_SKILL,
 		TEX_AOE_SKILL,
+		TEX_READY,
 		NUM_TEX
 	};
 
