@@ -80,11 +80,21 @@ namespace UI
 			newButton->meshID = MESH_BOX;
 			break;
 		case GUN_SKILL_BUTTON:
-			newButton->texID = TEX_GUN_SKILL;
+			newButton->scale.x = 100.f;
+			newButton->scale.y = 60.f;
+			newButton->texID = TEX_BLUE_NODE;
 			newButton->meshID = MESH_BOX;
 			break;
 		case AOE_SKILL_BUTTON:
-			newButton->texID = TEX_AOE_SKILL;
+			newButton->scale.x = 100.f;
+			newButton->scale.y = 60.f;
+			newButton->texID = TEX_YELLOW_NODE;
+			newButton->meshID = MESH_BOX;
+			break;
+		case UTILITY_SKILL_BUTTON:
+			newButton->scale.x = 100.f;
+			newButton->scale.y = 60.f;
+			newButton-> texID = TEX_GREEN_NODE;
 			newButton->meshID = MESH_BOX;
 			break;
 		default:

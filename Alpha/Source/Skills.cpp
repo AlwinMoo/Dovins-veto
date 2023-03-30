@@ -63,7 +63,14 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 {
 	double bullet_ang;
 	s32 mouseX, mouseY;
+
+	AEVec2 out{};
+	AEVec2 norm{};
+
 	AEInputGetCursorPosition(&mouseX, &mouseY);
+	AEVec2Set(&norm, (Player->position.x - mouseX), (Player->position.y - mouseY));
+	AEVec2Normalize(&out, &norm);
+	Player->rotation = AERadToDeg(atan2f(norm.x, norm.y));
 	
 	skill_inst->type = GameObject::GAMEOBJECT_TYPE::GO_BULLET;
 	skill_inst->position.x = Player->position.x;
@@ -101,8 +108,7 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 				break;
 		}
 		std::cout << skill_inst->Range.damage << "\n";
-	//	break;
-	//}
+		
 }
 
 void spreadshot(GameObject* parent, GameObject* skill_inst, int times)
@@ -217,6 +223,13 @@ void AOE_ready(GameObject* player, GameObject* AOE)
 			s32 mouseX, mouseY;
 			AEInputGetCursorPosition(&mouseX, &mouseY);
 			double AOE_ang;
+			AEVec2 out{};
+			AEVec2 norm{};
+
+			AEVec2Set(&norm, (player->position.x - mouseX), (player->position.y - mouseY));
+			AEVec2Normalize(&out, &norm);
+			player->rotation = AERadToDeg(atan2f(norm.x, norm.y));
+
 			AOE_ang = atan2(static_cast<double>(AOE->position.y - mouseY), static_cast<double> (AOE->position.x - mouseX));
 			AEVec2Set(&AOE->direction, -cos(AOE_ang), -sin(AOE_ang));
 			AEVec2 norm_direc;
@@ -296,6 +309,7 @@ void afterimage(GameObject* clone, GameObject* player)
 	clone->active	  = true;
 	clone->timer	  = 0.0;
 	clone->direction  = { 0,0 };
+	clone->rotation = player->rotation;
 }
 
 //skill UI stuff

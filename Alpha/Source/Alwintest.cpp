@@ -1612,8 +1612,8 @@ namespace
 			AEVec2 Begin{ screenWidthX * .5f , screenHeightY * 0.3f};
 
 			float Yoffset{ screenHeightY * 0.2f };
-			float tier1YOffset{ screenHeightY * 0.1f };
-			float xOffset{ screenWidthX * 0.1f };
+			float tier1YOffset{ screenHeightY * 0.075f };
+			float xOffset{ screenWidthX * 0.075f };
 
 			AEVec2 RangePath	{ Begin };
 			AEVec2 MeleePath	{ Begin.x - xOffset, Begin.y + tier1YOffset };
@@ -1651,19 +1651,19 @@ namespace
 				// TIER 1
 				skillUIManager.CreateButton(Begin, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier0, &textTable->RangeBase);
-				RangePath.y += Yoffset;
+				RangePath.y += tier1YOffset;
 				// TIER 2
 				skillUIManager.CreateButton(RangePath, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier1, &textTable->RangeTier1);
-				RangePath.y += Yoffset;
+				RangePath.y += tier1YOffset;
 				// TIER 3
 				skillUIManager.CreateButton(RangePath, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier2, &textTable->RangeTier2);
-				RangePath.y += Yoffset;
+				RangePath.y += tier1YOffset;
 				// TIER 4
 				skillUIManager.CreateButton(RangePath, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier3, &textTable->RangeTier3);
-				RangePath.y += Yoffset;
+				RangePath.y += tier1YOffset;
 				// TIER 5
 				skillUIManager.CreateButton(RangePath, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier4, &textTable->RangeTier4);
@@ -1673,12 +1673,12 @@ namespace
 			// THIRD SKILL
 			{
 				// TIER 1
-				skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::SKILL_TREE_BUTTON,
+				skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
 					nullptr, UtilitySkillUpgrade_tier0, &textTable->UtiliyBase);
 				UtilityPath.x += xOffset;
 				UtilityPath.y += tier1YOffset;
 				// TIER 2
-				skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::SKILL_TREE_BUTTON,
+				skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
 					nullptr, UtilitySkillUpgrade_tier1, &textTable->UtilityTier1);
 				UtilityPath.x += xOffset;
 				UtilityPath.y += tier1YOffset;
