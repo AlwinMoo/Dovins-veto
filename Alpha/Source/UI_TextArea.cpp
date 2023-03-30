@@ -3,6 +3,14 @@
 #include <algorithm>
 namespace UI{
 	const s8 FONT_ID{ 1 };
+
+	namespace 
+	{
+		bool is_whitespace(char ch) {
+			return ch == ' ';
+		}
+	}
+
 	// TODO: STORE COLOR IN TEXTAREA
 	void UI_TextArea::GetPrintSize(std::string const& str, f32& width, f32& height)
 	{
@@ -13,17 +21,45 @@ namespace UI{
 	{
 		f32 width, height;
 		GetPrintSize(line, width, height);
+
+		// Add height of this line first to total box height
 		m_boxHeight += height * static_cast<f32>(AEGfxGetWinMaxY() - AEGfxGetWinMinY());
+
+		// Check if the entire string fits in line
 		if (width < m_boxWidthN)
 			return 0;
 
 		std::string lineCpy(line);
-
-		do 
+		std::string::const_reverse_iterator rIt{ line.rbegin() };
+		std::string::size_type index{line.size()};
+		bool isWord{};
+		// Find suitable substring that fits width
+		// If word is longer than actual width limit, string is cut within word
+		do
 		{
 			lineCpy.erase(lineCpy.end() - 1);
+			++rIt; // Decrease the reference iterator to index to cut
+			if (!is_whitespace(*rIt))
+				isWord = true;
+			else
+				isWord = false;
 			GetPrintSize(lineCpy, width, height);
 		} while (width >= m_boxWidthN);
+
+		// Now iterate down to a whitespace if within a word
+		if (isWord)
+			while (isWord && rIt != line.rend())
+			{
+				isWord = is_whitespace(*rIt) ? false : true;
+				++rIt;
+			}
+		if (int index = line.rend() - rIt)
+			return static_cast<u32>(index);
+		//do 
+		//{
+		//	lineCpy.erase(lineCpy.end() - 1);		// erasing one
+		//	GetPrintSize(lineCpy, width, height);	// and checking if fits
+		//} while (width >= m_boxWidthN);
 		return static_cast<u32>(lineCpy.size());
 	}
 
