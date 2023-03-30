@@ -13,6 +13,7 @@
 #include <iostream>
 #include "Pathfinding/pathfinder.h"
 #include <cmath>
+#include "Menu.h"
 
 namespace skill_vals
 {
@@ -60,6 +61,11 @@ using skill_func = void (*)(GameObject*, GameObject*);
 void skills_upgrade_check(GameObject*);
 void skills_update(GameObject*, GameObject*);
 int skill_input_check(GameObject*);
+
+//UI stuff
+void basic_mesh(AEGfxVertexList*);
+void cooldown_UI(GameObject*, AEGfxVertexList*);
+void cooldown_check(GameObject*);
 
 //range functions
 void shoot_bullet(GameObject*, GameObject*);

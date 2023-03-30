@@ -16,3 +16,5 @@ void menu_Free();
 void menu_Unload();
 
 void generic_draw(AEGfxVertexList*, AEGfxTexture*, f32, f32, f32, f32, f32);
+
+AEGfxVertexList* basic_mesh();

@@ -51,19 +51,8 @@ void menu_Initialize()
 		gameUIManager->CreateButton(buttonPos, buttonSize, UI::SKILL_TREE_BUTTON,
 			&textTable->quitButton, exit_button, nullptr);
 	}
-	AEGfxMeshStart();
 
-	AEGfxTriAdd(
-		0.5f, 0.5f, 0xFFFF00FF, 1.0f, 0.0f,
-		-0.5f, -0.5f, 0xFFFFFF00, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFF00FFFF, 1.0f, 1.0f);
-
-	AEGfxTriAdd(
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f);
-
-	pMesh = AEGfxMeshEnd();
+	pMesh = basic_mesh();
 }
 
 void menu_Update()
@@ -88,6 +77,7 @@ void menu_Update()
 
 void menu_Draw()
 {
+	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
 	generic_draw(pMesh, pTex, 1.0f, 250.f, 250.f, -300.f, 200.f);
 
 	s32 cursorX, cursorY;
@@ -127,7 +117,7 @@ void exit_button(UI::UI_Button*)
 
 void generic_draw(AEGfxVertexList* mesh, AEGfxTexture* tex, f32 opacity, f32 width, f32 height, f32 x, f32 y)
 {
-	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetTintColor(1.0f, 1.0f, 1.0f, opacity);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
@@ -148,4 +138,21 @@ void generic_draw(AEGfxVertexList* mesh, AEGfxTexture* tex, f32 opacity, f32 wid
 
 	AEGfxSetTransform(transform.m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+}
+
+AEGfxVertexList* basic_mesh()
+{
+	AEGfxMeshStart();
+
+	AEGfxTriAdd(
+		0.5f, 0.5f, 0xFFFF00FF, 1.0f, 0.0f,
+		-0.5f, -0.5f, 0xFFFFFF00, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFF00FFFF, 1.0f, 1.0f);
+
+	AEGfxTriAdd(
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f);
+
+	return AEGfxMeshEnd();
 }

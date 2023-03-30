@@ -2,6 +2,12 @@
 #include "Rendering.hpp"
 #include <iostream>
 
+namespace
+{
+	f32 AOE_opcty;
+	f32 DASH_opcty;
+	f32 CAR_opcty;
+}
 
 void skills_upgrade_check(GameObject* player)
 {
@@ -236,66 +242,15 @@ void player_blink(GameObject* player)
 
 	player->position.x = mousex;
 	player->position.y = mousey;
+
+	player->Utility.first_tier.on_cd = true;
+	DASH_opcty = 0.5f;
+	player->Path.clear();
 }
 
 
 int skill_input_check(GameObject* player)
 {
-	if (player->Melee.first_tier.on_cd) //AOE cooldown
-	{
-		player->Melee.first_tier.cooldown += AEFrameRateControllerGetFrameTime();
-		double timer;
-		timer = (player->Melee.skill_bit & tier3) ? 5.0f : 7.5f;
-		if (player->Melee.first_tier.cooldown >= timer)
-		{
-			player->Melee.first_tier.cooldown = 0.0;
-			player->Melee.first_tier.on_cd = false;
-		}
-	}
-
-	if (player->Range.second_tier.on_cd) //car cooldown
-	{
-		player->Range.second_tier.cooldown += AEFrameRateControllerGetFrameTime();
-		if (player->Range.second_tier.cooldown >= 10.0)
-		{
-			player->Range.second_tier.cooldown = 0.0;
-			player->Range.second_tier.on_cd = false;
-
-		}
-	}
-
-	if (player->Range.first_tier.on_cd) //shoot cooldown
-	{
-		player->Range.first_tier.cooldown += AEFrameRateControllerGetFrameTime();
-		if (player->Range.first_tier.cooldown >= player->Range.timer)
-		{
-			player->Range.first_tier.cooldown = 0.0;
-			player->Range.first_tier.on_cd = false;
-		}
-	}
-
-	if (player->Utility.first_tier.on_cd)
-	{
-		player->Utility.first_tier.cooldown += AEFrameRateControllerGetFrameTime();
-
-		if (player->Utility.first_tier.cooldown >= 3.0)
-		{
-			player->Utility.first_tier.cooldown = 0.0;
-			player->Utility.first_tier.on_cd = false;
-		}
-	}
-
-	if (player->Utility.second_tier.on_cd)
-	{
-		player->Utility.second_tier.cooldown += AEFrameRateControllerGetFrameTime();
-
-		if (player->Utility.second_tier.cooldown >= 5.0)
-		{
-			player->Utility.second_tier.cooldown = 0.0;
-			player->Utility.second_tier.on_cd = false;
-		}
-	}
-
 	if (AEInputCheckCurr(AEVK_LBUTTON) && (player->Range.skill_bit & base) == base && !player->Range.first_tier.on_cd)
 	{
 		player->Range.first_tier.on_cd = true;
@@ -306,6 +261,7 @@ int skill_input_check(GameObject* player)
 	{
 		player->Melee.first_tier.active = true;
 		player->Melee.first_tier.on_cd = true;
+		AOE_opcty = 0.5f;
 		return AOEing;
 	}
 
@@ -324,7 +280,6 @@ int skill_input_check(GameObject* player)
 
 	if (AEInputCheckTriggered(AEVK_LSHIFT) && player->Utility.skill_bit & base)
 	{
-		player->Utility.first_tier.on_cd = true;
 		return blink;
 	}
 	return -1;
@@ -341,6 +296,108 @@ void afterimage(GameObject* clone, GameObject* player)
 	clone->active	  = true;
 	clone->timer	  = 0.0;
 	clone->direction  = { 0,0 };
+}
+
+//skill UI stuff
+void cooldown_check(GameObject* player)
+{
+	if (player->Melee.first_tier.on_cd) //AOE cooldown
+	{
+		player->Melee.first_tier.cooldown += AEFrameRateControllerGetFrameTime();
+		double timer;
+		timer = (player->Melee.skill_bit & tier3) ? 5.0 : 7.5;
+		AOE_opcty += (player->Melee.skill_bit & tier3) ? 0.00166667f : 0.00111111f;
+		if (player->Melee.first_tier.cooldown >= timer)
+		{
+			player->Melee.first_tier.cooldown = 0.0;
+			player->Melee.first_tier.on_cd = false;
+			AOE_opcty = 1.f;
+		}
+	}
+
+	if (player->Range.second_tier.on_cd) //car cooldown
+	{
+		player->Range.second_tier.cooldown += AEFrameRateControllerGetFrameTime();
+		CAR_opcty += 0.00083333;
+		if (player->Range.second_tier.cooldown >= 10.0)
+		{
+			player->Range.second_tier.cooldown = 0.0;
+			player->Range.second_tier.on_cd = false;
+			CAR_opcty = 1.f;
+
+		}
+	}
+
+	if (player->Range.first_tier.on_cd) //shoot cooldown
+	{
+		player->Range.first_tier.cooldown += AEFrameRateControllerGetFrameTime();
+		if (player->Range.first_tier.cooldown >= player->Range.timer)
+		{
+			player->Range.first_tier.cooldown = 0.0;
+			player->Range.first_tier.on_cd = false;
+		}
+	}
+
+	if (player->Utility.first_tier.on_cd)
+	{
+		player->Utility.first_tier.cooldown += AEFrameRateControllerGetFrameTime();
+		DASH_opcty += 0.0027778;
+		if (player->Utility.first_tier.cooldown >= 3.0)
+		{
+			player->Utility.first_tier.cooldown = 0.0;
+			player->Utility.first_tier.on_cd = false;
+		}
+	}
+
+	if (player->Utility.second_tier.on_cd)
+	{
+		player->Utility.second_tier.cooldown += AEFrameRateControllerGetFrameTime();
+
+		if (player->Utility.second_tier.cooldown >= 5.0)
+		{
+			player->Utility.second_tier.cooldown = 0.0;
+			player->Utility.second_tier.on_cd = false;
+		}
+	}
+}
+
+void cooldown_UI(GameObject* player, AEGfxVertexList* pMesh)
+{
+	if (player->Melee.skill_bit & base)
+	{
+		if (!player->Melee.first_tier.on_cd)
+		{
+			AOE_opcty = 1.f;
+			generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_READY], 1.f, 350.f, 300.f, -450.f, -325.f);
+		}
+
+		generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_AOE_SKILL], AOE_opcty, 100.f, 100.f, -450.f, -400.f);
+	}
+		
+
+	if (player->Utility.skill_bit & base)
+	{
+		if (!player->Utility.first_tier.on_cd)
+		{
+			DASH_opcty = 1.f;
+			generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_READY], 1.f, 350.f, 300.f, -300.f, -325.f);
+		}
+		generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_SKILL_MENU], DASH_opcty, 100.f, 100.f, -300.f, -400.f);
+	}
+		
+
+	if (player->Range.skill_bit & tier4)
+	{
+		if (!player->Range.second_tier.on_cd)
+		{
+			CAR_opcty = 1.f;
+			generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_READY], 1.f, 350.f, 300.f, -150.f, -325.f);
+		}
+
+		generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_GUN_SKILL], CAR_opcty, 100.f, 100.f, -150.f, -400.f);
+
+	}
+		
 }
 
 

@@ -99,6 +99,7 @@ namespace
 	int tank_count;
 
 	//Skills
+	AEGfxVertexList* cooldown_mesh;
 	int skill_input;
 	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move, taunt_move};
 
@@ -207,6 +208,9 @@ void Alwintest_Initialize()
 	InitialFetchGos();
 
 	InitializeVariables();
+
+	//skill UI stuff
+	cooldown_mesh = basic_mesh();
 }
 
 void Alwintest_Update()
@@ -261,6 +265,7 @@ void Alwintest_Update()
 
 		//skill stuff
 		skill_input = skill_input_check(player);
+		cooldown_check(player);
 
 		if (skill_input >= 0)
 		{
@@ -677,6 +682,12 @@ void Alwintest_Draw()
 		}
 	}
 
+	//skill cooldown UI
+	if (!buildPhase)
+	{
+		cooldown_UI(player, cooldown_mesh);
+	}
+
 	// Render above
 	if (hoverStructure->active)
 		hoverStructure->Render();
@@ -738,6 +749,8 @@ void Alwintest_Free()
 	delete uiManagers[UI::UI_TYPE_GAME];
 	delete uiManagers[UI::UI_TYPE_SKILL];
 	delete test_map;
+
+	AEGfxMeshFree(cooldown_mesh);
 }
 
 void Alwintest_Unload()
