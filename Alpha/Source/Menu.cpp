@@ -4,6 +4,7 @@
 namespace
 {
 	AEGfxTexture* pTex;
+	AEGfxTexture* titleTex;
 	AEGfxVertexList* pMesh;
 
 	UI::UI_Manager* gameUIManager;
@@ -21,6 +22,7 @@ void exit_button(UI::UI_Button*);
 void menu_Load()
 {
 	pTex = AEGfxTextureLoad("Assets/EnemyTexture.png");
+	titleTex = AEGfxTextureLoad("Assets/Badea2_Title.png");
 }
 
 void menu_Initialize()
@@ -75,7 +77,8 @@ void menu_Update()
 void menu_Draw()
 {
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
-	generic_draw(pMesh, pTex, 1.0f, 250.f, 250.f, -300.f, 200.f);
+	generic_draw(pMesh, pTex, 1.0f, 200.f, 200.f, -300.f, 200.f);
+	generic_draw(pMesh, titleTex, 1.0f, 1000.f, 1200.f, 0.f, -50.f);
 
 	s32 cursorX, cursorY;
 	AEInputGetCursorPosition(&cursorX, &cursorY);
@@ -91,6 +94,7 @@ void menu_Free()
 
 void menu_Unload()
 {
+	AEGfxTextureUnload(titleTex);
 	AEGfxTextureUnload(pTex);
 }
 
