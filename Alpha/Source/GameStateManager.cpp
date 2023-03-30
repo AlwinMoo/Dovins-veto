@@ -7,6 +7,7 @@
 #include "Splashscreen.h"
 #include "Menu.h"
 #include "Credits.h"
+#include "GameLoss.h"
 
 int current = 0, previous = 0, next = 0;
 
@@ -68,6 +69,14 @@ void GSM_Update()
 			fpDraw = credits_Draw;
 			fpFree = credits_Free;
 			fpUnload = credits_Unload;
+			break;
+		case GS_GAMELOSS:
+			fpLoad = gameLoss_Load;
+			fpInitialize = gameLoss_Initialize;
+			fpUpdate = gameLoss_Update;
+			fpDraw = gameLoss_Draw;
+			fpFree = gameLoss_Free;
+			fpUnload = gameLoss_Unload;
 			break;
 		case GS_RESTART:
 			break;
