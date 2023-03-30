@@ -65,11 +65,6 @@ void menu_Update()
 		next = GS_QUIT;
 	}
 
-	if (AEInputCheckTriggered(AEVK_LBUTTON))
-	{
-		next = GS_LEVEL3;
-	}
-
 	AEVec2 invert_mouse = { static_cast<f32>(mouseX), static_cast<f32>(mouseY) }; // Getting inverted mouse pos to match world space
 	invert_mouse.y = gameUIManager->m_winDim.y - mouseY;
 	gameUIManager->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
