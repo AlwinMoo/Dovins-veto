@@ -435,7 +435,7 @@ void Alwintest_Update()
 								AEVec2Scale(&collidePos, &collideDir, go->scale.x / 2.f);
 								AEVec2Add(&collidePos, &go->position, &collidePos);
 
-								SpawnCollideParticles(5, collidePos, Color{ 1.f, 0.f, 0.f }, collideDir, 30.f, 70.f, 100.f, 0.1f, 0.3f, 2.f, 3.f);
+								SpawnCollideParticles(8, collidePos, go->particleColor, collideDir, 30.f, 80.f, 110.f, 0.1f, 0.3f, 3.f, 4.f);
 
 								if ((gameObj->Range.skill_bit & tier2))
 								{
@@ -453,7 +453,7 @@ void Alwintest_Update()
 									go->active = false;
 									enemiesRemaining--;
 									uiEnemiesCount--;
-									SpawnDeathParticles(20, go->position, Color{ 1.f, 0.f, 0.f } , 10.f, 30.f, 0.3f, 0.5f, 2.f, 3.f);
+									SpawnDeathParticles(20, go->position, go->particleColor , 10.f, 30.f, 0.3f, 0.5f, 3.f, 4.f);
 								}
 							}
 						}
@@ -483,7 +483,7 @@ void Alwintest_Update()
 								enemiesRemaining--;
 								uiEnemiesCount--;
 								go->active = false;
-								SpawnDeathParticles(20, go->position, Color{ 1.f, 0.f, 0.f }, 10.f, 30.f, 0.3f, 0.5f, 2.f, 3.f);
+								SpawnDeathParticles(20, go->position, go->particleColor, 10.f, 30.f, 0.3f, 0.5f, 3.f, 4.f);
 							}
 						}
 					}
@@ -662,12 +662,25 @@ void Alwintest_Draw()
 			if (!gameObj->active)
 				continue;
 
-			gameObj->Render();
+			if (gameObj->type != GameObject::GO_PARTICLE)
+				gameObj->Render();
 
 			//
 			/*if (gameObj->type == GameObject::GO_ENEMY && gameObj->Stats.GetCurrState() == STATE::STATE_ENEMY_ATTACK)
 				RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);*/
 		}
+
+		// Render particles on top
+		for (GameObject* gameObj : go_list)
+		{
+			//Gameobjects Render
+			if (!gameObj->active)
+				continue;
+
+			if(gameObj->type == GameObject::GO_PARTICLE)
+				gameObj->Render();
+		}
+
 		if (!buildPhase)
 		for (GameObject* gameObj : go_list)
 		{
@@ -898,7 +911,7 @@ namespace
 				return;
 			temp = FetchGO(GameObject::GO_WALL);
 			buildResource -= WALL_COST;
-
+			temp->particleColor.Set(0.79f, 0.53f, 0.37f);
 			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), static_cast<int>(hoverStructure->gridScale.x), static_cast<int>(hoverStructure->gridScale.y));
 		}
 		else if (hoverStructure->tex == turretTex)
@@ -907,7 +920,7 @@ namespace
 				return;
 			temp = FetchGO(GameObject::GO_TURRET);
 			buildResource -= TOWER_COST;
-
+			temp->particleColor.Set(0.4f, 0.4f, 0.4f);
 			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), static_cast<int>(hoverStructure->gridScale.x), static_cast<int>(hoverStructure->gridScale.y));
 		}
 		else if (hoverStructure->tex == nexusTex)
@@ -916,14 +929,14 @@ namespace
 
 			//duplicate with nexus object below
 			Nexus = temp;
-
+			temp->particleColor.Set(0.35f, 0.35f, 0.35f);
 			test_map->AddItem(game_map::TILE_TYPE::TILE_NEXUS, test_map->WorldToIndex(hoverTopLeftPos), static_cast<int>(hoverStructure->gridScale.x), static_cast<int>(hoverStructure->gridScale.y));
 		}
 		else if (hoverStructure->tex == playerTex)
 		{
 			player->active = true;
 			temp = player;
-
+			temp->particleColor.Set(1.f, 0.74f, 0.84f);
 			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(hoverTopLeftPos), static_cast<int>(hoverStructure->gridScale.x), static_cast<int>(hoverStructure->gridScale.y));
 		}
 
@@ -1139,6 +1152,8 @@ namespace
 					temp->Stats.SetDefault(TANK_HEALTH, TANK_MOVE_SPEED, TANK_ATTACK_SPEED, TANK_DAMAGE);
 					temp->tex = enemy_tankTex;
 
+					temp->particleColor.Set(0.3f, 0.3f, 0.3f);
+
 					++enemyTankInGame;
 				}
 				else
@@ -1152,6 +1167,8 @@ namespace
 						temp->Stats.SetStat(STAT_ATTACK_SPEED, INFANTRY_ATTACK_SPEED);
 
 						temp->tex = enemy_nexusTex;
+
+						temp->particleColor.Set(0.5f, 0.25f, 0.3f);
 					}
 					else
 					{
@@ -1160,6 +1177,8 @@ namespace
 						temp->Stats.SetStat(STAT_HEALTH, INFANTRY_HEALTH);
 						temp->Stats.SetStat(STAT_DAMAGE, INFANTRY_DAMAGE);
 						temp->Stats.SetStat(STAT_ATTACK_SPEED, INFANTRY_ATTACK_SPEED);
+
+						temp->particleColor.Set(0.f, 0.32f, 0.21f);
 					}
 				}
 
@@ -1355,6 +1374,20 @@ namespace
 				{
 					// whack small target
 					gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE) * static_cast<float>(AEFrameRateControllerGetFrameTime()) * gameObj->Stats.GetStat(STAT_ATTACK_SPEED));
+					
+					gameObj->timer -= AEFrameRateControllerGetFrameTime();
+					if (gameObj->timer <= 0)
+					{
+						AEVec2 collideDir;
+						AEVec2 collidePos;
+						AEVec2Sub(&collideDir, &gameObj->position, &gameObj->smallTarget->position);
+						AEVec2Normalize(&collideDir, &collideDir);
+
+						AEVec2Scale(&collidePos, &collideDir, gameObj->smallTarget->scale.x / 2.f);
+						AEVec2Add(&collidePos, &gameObj->smallTarget->position, &collidePos);
+						SpawnCollideParticles(8, collidePos, gameObj->smallTarget->particleColor, collideDir, 30.f, 80.f, 110.f, 0.1f, 0.3f, 3.f, 4.f);
+						gameObj->timer = 1;
+					}
 
 					if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f && gameObj->smallTarget->active)
 					{
@@ -1363,6 +1396,7 @@ namespace
 						{
 							test_map->RemoveItem(gameObj->smallTarget->gridIndex.front(), static_cast<int>(gameObj->smallTarget->gridScale.x), static_cast<int>(gameObj->smallTarget->gridScale.y));
 							gameObj->smallTarget->gridIndex.clear();
+							SpawnDeathParticles(25, gameObj->smallTarget->position, gameObj->smallTarget->particleColor, 10.f, 30.f, 0.3f, 0.5f, 3.f, 4.f);
 						}
 					}
 				}

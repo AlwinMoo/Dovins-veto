@@ -63,6 +63,7 @@ public:
 	bool active;
 	float alpha;
 	Color color;
+	Color particleColor;
 	f64	  timer;
 	u32	  skill_flag;
 
