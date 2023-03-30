@@ -25,19 +25,19 @@ int game_map::GetIndex(int x, int y)
 AEVec2 game_map::GetWorldPos(int index)
 {
 	AEVec2 rtn{};
-	AEVec2Set(&rtn, GetX(index) * this->GetTileSize() + world_offset + (this->GetTileSize() * 0.5), GetY(index) * this->GetTileSize() + (this->GetTileSize() * 0.5));
+	AEVec2Set(&rtn, GetX(index) * this->GetTileSize() + world_offset + (this->GetTileSize() * 0.5f), GetY(index) * this->GetTileSize() + (this->GetTileSize() * 0.5f));
 	
 	return rtn;
 }
 
 float game_map::GetWorldX(int x)
 {
-	return x * this->GetTileSize() + (this->GetTileSize() * 0.5) + world_offset;
+	return x * this->GetTileSize() + (this->GetTileSize() * 0.5f) + world_offset;
 }
 
 float game_map::GetWorldY(int y)
 {
-	return y * this->GetTileSize() + (this->GetTileSize() * 0.5);
+	return y * this->GetTileSize() + (this->GetTileSize() * 0.5f);
 }
 
 bool game_map::IsInGrid(AEVec2 coord, int gridSizeX, int gridSizeY)
@@ -51,13 +51,13 @@ bool game_map::IsInGrid(AEVec2 coord, int gridSizeX, int gridSizeY)
 	int maxXIndex = minXIndex + gridSizeX - 1;
 	int maxYIndex = minYIndex + gridSizeY - 1;
 
-	return(minXIndex >= 0 && minYIndex >= 0 && maxXIndex < width && maxYIndex < height);
+	return(minXIndex >= 0 && minYIndex >= 0 && static_cast<unsigned int>(maxXIndex) < width && static_cast<unsigned int>(maxYIndex) < height);
 }
 
 AEVec2 game_map::SnapCoordinates(AEVec2 coord)
 {
 	AEVec2 rtn{};
-	AEVec2Set(&rtn, std::floor(coord.x / GetTileSize()) * GetTileSize() + (GetTileSize() * 0.5), std::floor(coord.y / GetTileSize()) * GetTileSize() + (GetTileSize() * 0.5));
+	AEVec2Set(&rtn, std::floor(coord.x / GetTileSize()) * GetTileSize() + (GetTileSize() * 0.5f), std::floor(coord.y / GetTileSize()) * GetTileSize() + (GetTileSize() * 0.5f));
 
 	return rtn;
 }
@@ -83,7 +83,7 @@ int game_map::WorldToIndex(AEVec2 pos)
 		return -1;
 
 	AEVec2 gridPos = SnapCoordinates(pos);
-	return GetIndex(gridPos.x / GetTileSize() - tile_offset, gridPos.y / GetTileSize());
+	return GetIndex(static_cast<int>(gridPos.x / GetTileSize()) - tile_offset, static_cast<int>(gridPos.y / GetTileSize()));
 }
 
 void game_map::AddItem(TILE_TYPE tile, int index, int gridScalex, int gridScaleY)

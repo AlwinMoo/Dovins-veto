@@ -72,7 +72,7 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 	skill_inst->scale.y = skill_vals::BULLET_SIZE;
 	bullet_ang = atan2(static_cast<double> (skill_inst->position.y - mouseY), static_cast<double> (skill_inst->position.x - mouseX));
 
-	AEVec2Set(&skill_inst->direction, -cos(bullet_ang), -sin(bullet_ang));
+	AEVec2Set(&skill_inst->direction, static_cast<float>(-cos(bullet_ang)), static_cast<float>(-sin(bullet_ang)));
 	AEVec2Normalize(&skill_inst->direction, &skill_inst->direction);
 		switch (Player->Range.skill_bit)
 		{
@@ -117,16 +117,16 @@ void spreadshot(GameObject* parent, GameObject* skill_inst, int times)
 	switch(times)
 	{ 
 	case 0 :
-		AEVec2Set(&skill_inst->direction, cos(PI), sin(PI));
-		break;
-	case 1:
-		AEVec2Set(&skill_inst->direction, -cos(PI), sin(PI));
+		AEVec2Set(&skill_inst->direction, static_cast<float>(cos(PI)), static_cast<float>(sin(PI)));
+		break;																					  
+	case 1:																						  
+		AEVec2Set(&skill_inst->direction, static_cast<float>(-cos(PI)), static_cast<float>(sin(PI)));
 		break;
 	case 2:
-		AEVec2Set(&skill_inst->direction, cos(0.5 * PI), sin(0.5 * PI));
+		AEVec2Set(&skill_inst->direction, static_cast<float>(cos(0.5 * PI)), static_cast<float>(sin(0.5 * PI)));
 		break;
 	case 3:
-		AEVec2Set(&skill_inst->direction, cos(0.5 * PI), -sin(0.5 * PI));
+		AEVec2Set(&skill_inst->direction, static_cast<float>(cos(0.5 * PI)), static_cast<float>(-sin(0.5 * PI)));
 		break;
 	default:
 		break;

@@ -23,8 +23,8 @@ void GameObject::Update()
 					AEVec2Set(&norm, (Path[0].x - position.x), (Path[0].y - position.y));
 					AEVec2Normalize(&out, &norm);
 
-					position.x += out.x * AEFrameRateControllerGetFrameTime() * Stats.GetStat(STAT_MOVE_SPEED);
-					position.y += out.y * AEFrameRateControllerGetFrameTime() * Stats.GetStat(STAT_MOVE_SPEED);
+					position.x += out.x * static_cast<float>(AEFrameRateControllerGetFrameTime()) * Stats.GetStat(STAT_MOVE_SPEED);
+					position.y += out.y * static_cast<float>(AEFrameRateControllerGetFrameTime()) * Stats.GetStat(STAT_MOVE_SPEED);
 
 
 					AEVec2 leng{};
@@ -61,7 +61,7 @@ void GameObject::Render()
 	AEMtx33Scale(&scale, this->scale.x, this->scale.x);
 
 	AEMtx33 rotate = { 0 };
-	AEMtx33Rot(&rotate, AEDegToRad(rotation + 180.f));
+	AEMtx33Rot(&rotate, AEDegToRad(static_cast<float>(rotation) + 180.f));
 
 	AEMtx33 translate = { 0 };
 	AEMtx33Trans(&translate, position.x - AEGetWindowWidth() / 2.f, -position.y + AEGetWindowHeight() / 2.f);

@@ -5,18 +5,18 @@ constexpr static unsigned int MAX_ITER{ 10000 };
 PathManager::PathManager(game_map* Map, bool player) : Map(Map), is_player(player), iterations(0)
 {
 	closedList.clear();
-	for (int i = 0; i < Map->height; ++i)
+	for (unsigned int i = 0; i < Map->height; ++i)
 	{
-		for (int j = 0; j < Map->width; ++j)
+		for (unsigned int j = 0; j < Map->width; ++j)
 		{
 			closedList.insert(std::make_pair(VectorToString(AEVec2{ (float)i,(float)j }), false)); // add every single point in
 		}
 	}
 
 	cellData.clear();
-	for (int i = 0; i < Map->height; ++i)
+	for (unsigned int i = 0; i < Map->height; ++i)
 	{
-		for (int j = 0; j < Map->width; ++j)
+		for (unsigned int j = 0; j < Map->width; ++j)
 		{
 			cell empty;
 
@@ -52,31 +52,31 @@ AEVec2 PathManager::StringToVector(std::string buf)
 		}
 		else
 		{
-			result.x = std::stoi(num);
+			result.x = std::stof(num);
 			num.clear();
 			continue;
 		}
 	}
-	result.y = std::stoi(num);
+	result.y = std::stof(num);
 
 	return result;
 }
 
 bool PathManager::IsPositionValid(AEVec2 coord)
 {
-	if (coord.x < 0 || coord.y < 0 || coord.x >= Map->width || coord.y >= Map->height)
+	if (coord.x < 0 || coord.y < 0 || static_cast<unsigned int>(coord.x) >= Map->width || static_cast<unsigned int>(coord.y) >= Map->height)
 		return false;
 
 	if (!is_player)
 		return 
-			Map->map_arr[Map->GetIndex(coord.x, coord.y)] != game_map::TILE_TYPE::TILE_NONE ||
-			Map->map_arr[Map->GetIndex(coord.x, coord.y)] < game_map::TILE_TYPE::NUM_TYPES_TILE ||
-			static_cast<int>(Map->map_arr[Map->GetIndex(coord.x, coord.y)]) < 0; // is it ground
+			Map->map_arr[Map->GetIndex(static_cast<int>(coord.x), static_cast<int>(coord.y))] != game_map::TILE_TYPE::TILE_NONE ||
+			Map->map_arr[Map->GetIndex(static_cast<int>(coord.x), static_cast<int>(coord.y))] < game_map::TILE_TYPE::NUM_TYPES_TILE ||
+			static_cast<int>(Map->map_arr[Map->GetIndex(static_cast<int>(coord.x), static_cast<int>(coord.y))]) < 0; // is it ground
 	else
 		return
-			Map->map_arr[Map->GetIndex(coord.x, coord.y)] == game_map::TILE_TYPE::TILE_NONE ||
-			Map->map_arr[Map->GetIndex(coord.x, coord.y)] >= game_map::TILE_TYPE::NUM_TYPES_TILE ||
-			static_cast<int>(Map->map_arr[Map->GetIndex(coord.x, coord.y)]) < 0; // is it ground
+			Map->map_arr[Map->GetIndex(static_cast<int>(coord.x), static_cast<int>(coord.y))] == game_map::TILE_TYPE::TILE_NONE ||
+			Map->map_arr[Map->GetIndex(static_cast<int>(coord.x), static_cast<int>(coord.y))] >= game_map::TILE_TYPE::NUM_TYPES_TILE ||
+			static_cast<int>(Map->map_arr[Map->GetIndex(static_cast<int>(coord.x), static_cast<int>(coord.y))]) < 0; // is it ground
 }
 
 // A Utility Function to calculate the 'h' heuristics.
@@ -280,7 +280,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 	NewPos = AEVec2{ parent.x - 1, parent.y + 1};
 	sPos = VectorToString(NewPos);
 
-	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(parent.x, parent.y + 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(parent.x - 1, parent.y)] == game_map::TILE_TYPE::TILE_NONE))
+	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(static_cast<int>(parent.x), static_cast<int>(parent.y) + 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(static_cast<int>(parent.x) - 1, static_cast<int>(parent.y))] == game_map::TILE_TYPE::TILE_NONE))
 	{
 		++iterations;
 		// if destination is same as current
@@ -325,7 +325,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 	NewPos = AEVec2{ parent.x + 1, parent.y + 1};
 	sPos = VectorToString(NewPos);
 
-	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(parent.x, parent.y + 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(parent.x + 1, parent.y)] == game_map::TILE_TYPE::TILE_NONE))
+	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(static_cast<int>(parent.x), static_cast<int>(parent.y) + 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(static_cast<int>(parent.x) + 1, static_cast<int>(parent.y))] == game_map::TILE_TYPE::TILE_NONE))
 	{
 		++iterations;
 		// if destination is same as current
@@ -370,7 +370,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 	NewPos = AEVec2{ parent.x - 1, parent.y - 1 };
 	sPos = VectorToString(NewPos);
 
-	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(parent.x, parent.y - 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(parent.x - 1, parent.y)] == game_map::TILE_TYPE::TILE_NONE))
+	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(static_cast<int>(parent.x), static_cast<int>(parent.y) - 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(static_cast<int>(parent.x) - 1, static_cast<int>(parent.y))] == game_map::TILE_TYPE::TILE_NONE))
 	{
 		++iterations;
 		// if destination is same as current
@@ -415,7 +415,7 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 	NewPos = AEVec2{ parent.x + 1, parent.y - 1 };
 	sPos = VectorToString(NewPos);
 
-	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(parent.x, parent.y - 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(parent.x + 1, parent.y)] == game_map::TILE_TYPE::TILE_NONE))
+	if (IsPositionValid(NewPos) && (Map->map_arr[Map->GetIndex(static_cast<int>(parent.x), static_cast<int>(parent.y) - 1)] == game_map::TILE_TYPE::TILE_NONE || Map->map_arr[Map->GetIndex(static_cast<int>(parent.x) + 1, static_cast<int>(parent.y))] == game_map::TILE_TYPE::TILE_NONE))
 	{
 		++iterations;
 		// if destination is same as current
@@ -510,10 +510,10 @@ std::vector<AEVec2> PathManager::GetPath(AEVec2 const& startPos, AEVec2 const& g
 	openList.clear();
 	openList.insert(std::make_pair(0.0, VectorToString(startPos)));
 
-	auto& ref1 = Map->map_arr[Map->GetIndex(startPos.x, startPos.y + 1)];
-	auto& ref2 = Map->map_arr[Map->GetIndex(startPos.x + 1, startPos.y)];
-	auto& ref3 = Map->map_arr[Map->GetIndex(startPos.x, startPos.y - 1)];
-	auto& ref4 = Map->map_arr[Map->GetIndex(startPos.x - 1, startPos.y)];
+	auto& ref1 = Map->map_arr[Map->GetIndex(static_cast<const int>(startPos.x), static_cast<const int>(startPos.y) + 1)];
+	auto& ref2 = Map->map_arr[Map->GetIndex(static_cast<const int>(startPos.x) + 1, static_cast<const int>(startPos.y))];
+	auto& ref3 = Map->map_arr[Map->GetIndex(static_cast<const int>(startPos.x), static_cast<const int>(startPos.y) - 1)];
+	auto& ref4 = Map->map_arr[Map->GetIndex(static_cast<const int>(startPos.x) - 1, static_cast<const int>(startPos.y))];
 
 	bool foundDest = false;
 	while (!openList.empty())
