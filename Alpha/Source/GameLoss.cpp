@@ -6,6 +6,8 @@ namespace
 	AEGfxTexture* player_defeat;
 	AEGfxTexture* nexus_defeat;
 	AEGfxTexture* Message;
+
+	UI::UI_Manager* gameUIManager;
 }
 
 void gameLoss_Load()
@@ -17,6 +19,20 @@ void gameLoss_Load()
 void gameLoss_Initialize()
 {
 	pMesh = basic_mesh();
+	gameUIManager = new UI::UI_Manager{};
+	gameUIManager->SetWinDim(AEGetWindowWidth(), AEGetWindowHeight());
+	AEVec2 const buildButtonStartPos{ gameUIManager->m_winDim.x * .115f, 
+										gameUIManager->m_winDim.y * .9f };
+	AEVec2 const buildButtonSize{ gameUIManager->m_winDim.y * 0.2f, gameUIManager->m_winDim.y * .1f };
+	AEVec2 buildButtonPos{ buildButtonStartPos };
+	gameUIManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON,
+		nullptr, nullptr, nullptr); // second last param - > callback. No need hover text
+	buildButtonPos.x -= buildButtonSize.y * 0.75f;
+	gameUIManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON,
+		nullptr, nullptr, nullptr); // second last param - > callback. No need hover text
+	buildButtonPos.x -= buildButtonSize.y * 0.75f;
+	gameUIManager->CreateButton(buildButtonPos, buildButtonSize, UI::BUILD_NEXUS_BUTTON,
+		nullptr, nullptr, nullptr); // second last param - > callback. No need hover text
 }
 
 void gameLoss_Update()
@@ -43,6 +59,7 @@ void gameLoss_Draw()
 void gameLoss_Free()
 {
 	AEGfxMeshFree(pMesh);
+	delete gameUIManager;
 }
 
 void gameLoss_Unload()
