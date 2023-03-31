@@ -75,6 +75,7 @@ public:
 	AEVec2 scale;
 	AEVec2 gridScale;
 	AEVec2 direction;
+	AEVec2 acceleration;
 	double rotation;
 
 	std::vector<int> gridIndex;

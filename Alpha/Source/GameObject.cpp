@@ -47,13 +47,15 @@ void GameObject::Render()
 	if (tex)
 	{
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxTextureSet(tex, 0, 0);
+		AEGfxTextureSet(tex, 0, 0);	
 	}
 	else
 	{
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxTextureSet(NULL, 0, 0);
+
 	}
-	AEGfxSetTintColor(color.r, color.g, color.b, 1.0f);
+	AEGfxSetTintColor(color.r, color.g, color.b, 1.f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(alpha);
 

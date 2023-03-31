@@ -28,6 +28,8 @@ namespace
 	UI::UI_Manager*		gameUiManager;
 	UI::UI_Manager*		skillTreeManager;
 
+	UI::UI_Manager*		emptyUI;
+
 	// Input
 	AEVec2 mouse_pos{};
 	AEVec2 absMousePos{};
@@ -52,7 +54,15 @@ namespace
 	UI::UI_Button* playerButton;
 	bool nexusPlaced;
 	bool playerPlaced;
-	bool buildPhase;
+
+	enum class GAMESTATE
+	{
+		BUILD_PHASE,
+		DEFEND_PHASE,
+		DEATH_PHASE
+	};
+
+	GAMESTATE currGameState;
 
 	int buildResource;
 
@@ -77,6 +87,10 @@ namespace
 	static const float TURRET_DAMAGE = 5.0f;
 
 	static const int PLAYER_HEALTH = 20;
+
+	static const float BLACK_SCREEN_FADE_SPEED = 0.2f;
+	static const float SPAWN_COLLIDE_WHEN_DYING_TIME = 0.4f;
+	static const float TIME_TO_STAY_AFTER_DESTROYED = 1.f;
 
 	//player
 	GameObject* player;
@@ -121,6 +135,12 @@ namespace
 	const int UtilityTier1_cost		{ 200 };
 	// TEXT TEST
 	UI::UI_TextAreaTable* textTable;
+
+	// Death animation
+	GameObject* blackScreen;
+	GameObject* loseObj;
+	float timeToDeath;
+	float deathCollideSpawnTime;
 	
 	//Helper Functions
 #pragma region Helper functions
@@ -158,6 +178,8 @@ namespace
 	float RandFloat(float min, float max);
 	void SpawnCollideParticles(int numOfParticles, AEVec2 spawnPos, Color color, AEVec2 direction, float spreadAngle, float minSpeed, float maxSpeed, float minLifetime, float maxLifetime, float minScale, float maxScale);
 	void SpawnDeathParticles(int numOfParticles, AEVec2 spawnPos, Color color, float minSpeed, float maxSpeed, float minLifetime, float maxLifetime, float minScale, float maxScale);
+
+	void GameOver(GameObject* destroyedCondition);
 
 	void RenderTexture(AEGfxTexture* texture, AEVec2 pos_, AEVec2 scale_, float rotation_);
 	
@@ -222,7 +244,9 @@ void Alwintest_Update()
 	UpdateMousePos();
 	UpdateUIManager();
 
-	if (buildPhase)
+	switch (currGameState)
+	{
+	case GAMESTATE::BUILD_PHASE:
 	{
 		if (UICurrLayer == UI::UI_TYPE::UI_TYPE_GAME)
 		{
@@ -243,13 +267,23 @@ void Alwintest_Update()
 			UpdateHoverStructure();
 		}
 		skills_upgrade_check(player);
+		break;
 	}
-	else
+	case GAMESTATE::DEFEND_PHASE:
 	{
 		if (AEInputCheckTriggered(AEVK_RBUTTON) && !test_map->IsOccupied(test_map->WorldToIndex(mouse_pos)))
 		{
 			if (test_map->IsInGrid(absMousePos))
 				SetPlayerGoal();
+		}
+
+		if (AEInputCheckTriggered(AEVK_P))
+		{
+			GameOver(player);
+		}
+		if (AEInputCheckTriggered(AEVK_N))
+		{
+			GameOver(Nexus);
 		}
 
 		if (player_moving && !player->Path.empty())
@@ -265,7 +299,7 @@ void Alwintest_Update()
 		SpawnEnemies();
 		NextWaveCheck();
 
-		
+
 
 		//skill stuff
 		skill_input = skill_input_check(player);
@@ -338,237 +372,278 @@ void Alwintest_Update()
 
 			switch (gameObj->type)
 			{
-				case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
+			case (GameObject::GAMEOBJECT_TYPE::GO_ENEMY):
+			{
+				if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+					gameObj->active = false;
+
+				//if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
+				//{
+				//	//NexusEnemyUpdate(gameObj);
+				//	gameObj->target = Nexus;
+				//}
+				//else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
+				//{
+				//	gameObj->target = player;
+				//}
+
+				UpdateEnemyState(gameObj);
+
+				if (gameObj->smallTarget != nullptr)
 				{
-					if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
-						gameObj->active = false;
-
-					//if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_NEXUS)
-					//{
-					//	//NexusEnemyUpdate(gameObj);
-					//	gameObj->target = Nexus;
-					//}
-					//else if (gameObj->Stats.target_type == CharacterStats::TARGET_TYPE::TAR_PLAYER)
-					//{
-					//	gameObj->target = player;
-					//}
-
-					UpdateEnemyState(gameObj);
-
-					if (gameObj->smallTarget != nullptr)
-					{
-						AEVec2 target{ gameObj->smallTarget->position };
-						AEVec2Sub(&target, &gameObj->position, &target);
-						gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
-					}
-					else
-					{
-						if (gameObj->target == nullptr)
-							gameObj->target = Nexus;
-
-						AEVec2 target{ gameObj->target->position };
-						AEVec2Sub(&target, &gameObj->position, &target);
-						gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
-					}
-
-					//UpdateEnemyPath(gameObj);
-					//UpdateEnemyRotation(gameObj);
-					//UpdateEnemyPosition(gameObj);
-
-					break;
+					AEVec2 target{ gameObj->smallTarget->position };
+					AEVec2Sub(&target, &gameObj->position, &target);
+					gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
 				}
-				case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
+				else
 				{
-					UpdatePlayerPosition();
+					if (gameObj->target == nullptr)
+						gameObj->target = Nexus;
 
-					/*for (GameObject* go : go_list)
+					AEVec2 target{ gameObj->target->position };
+					AEVec2Sub(&target, &gameObj->position, &target);
+					gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
+				}
+
+				//UpdateEnemyPath(gameObj);
+				//UpdateEnemyRotation(gameObj);
+				//UpdateEnemyPosition(gameObj);
+
+				break;
+			}
+			case (GameObject::GAMEOBJECT_TYPE::GO_PLAYER):
+			{
+				UpdatePlayerPosition();
+
+				/*for (GameObject* go : go_list)
+				{
+					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
 					{
-						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 						{
-							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+							std::cout << "Remain: " << enemiesRemaining << std::endl;
+							enemiesRemaining--;
+							go->active = false;
+						}
+					}
+				}*/
+				break;
+			}
+			case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
+			{
+				gameObj->Stats.SetStat(STAT_ATTACK_SPEED, gameObj->Stats.GetStat(STAT_ATTACK_SPEED) + static_cast<float>(AEFrameRateControllerGetFrameTime()));
+
+				GameObject* temp = FindClosestGO(gameObj, GameObject::GO_ENEMY);
+				if (!temp)
+					break;
+
+				AEVec2 result = temp->position;
+				UpdateTurretShooting(result, gameObj);
+
+				break;
+			}
+			case (GameObject::GAMEOBJECT_TYPE::GO_BULLET):
+			{
+				gameObj->position.x += gameObj->direction.x * static_cast<f32>(AEFrameRateControllerGetFrameTime()) * skill_vals::BULLET_VEL;
+				gameObj->position.y += gameObj->direction.y * static_cast<f32>(AEFrameRateControllerGetFrameTime()) * skill_vals::BULLET_VEL;
+
+				if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+					gameObj->active = false;
+
+				for (GameObject* go : go_list)
+				{
+					if (!go->active)
+						continue;
+					if (go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					{
+						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
+						{
+							std::cout << "Remain: " << enemiesRemaining << std::endl;
+							go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - gameObj->Range.damage);//gameObj->Stats.GetStat(STAT_DAMAGE)); // we just say 1 bullet does 1 damage for now
+							gameObj->active = false;
+							AEVec2 collideDir;
+							AEVec2 collidePos;
+							AEVec2Sub(&collideDir, &gameObj->position, &go->position);
+							AEVec2Normalize(&collideDir, &collideDir);
+
+							AEVec2Scale(&collidePos, &collideDir, go->scale.x / 2.f);
+							AEVec2Add(&collidePos, &go->position, &collidePos);
+
+							SpawnCollideParticles(8, collidePos, go->particleColor, collideDir, 30.f, 100.f, 150.f, 0.2f, 0.5f, 3.f, 7.f);
+
+							if ((gameObj->Range.skill_bit & tier2))
 							{
-								std::cout << "Remain: " << enemiesRemaining << std::endl;
-								enemiesRemaining--;
+								//implement spread shot function here
+								for (int i{}; i < skill_vals::MAX_SPREAD; ++i)
+								{
+									GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+									skill_inst->tex = bulletTex;
+									spreadshot(gameObj, skill_inst, i);
+								}
+							}
+
+							if (go->Stats.GetStat(STAT_HEALTH) <= 0)
+							{
 								go->active = false;
-							}
-						}
-					}*/
-					break;
-				}
-				case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
-				{
-					gameObj->Stats.SetStat(STAT_ATTACK_SPEED, gameObj->Stats.GetStat(STAT_ATTACK_SPEED) + static_cast<float>(AEFrameRateControllerGetFrameTime()));
-
-					GameObject* temp = FindClosestGO(gameObj, GameObject::GO_ENEMY);
-					if (!temp)
-						break;
-
-					AEVec2 result = temp->position;
-					UpdateTurretShooting(result, gameObj);
-
-					break;
-				}
-				case (GameObject::GAMEOBJECT_TYPE::GO_BULLET):
-				{
-					gameObj->position.x += gameObj->direction.x * static_cast<f32>(AEFrameRateControllerGetFrameTime()) * skill_vals::BULLET_VEL;
-					gameObj->position.y += gameObj->direction.y * static_cast<f32>(AEFrameRateControllerGetFrameTime()) * skill_vals::BULLET_VEL;
-
-					if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
-						gameObj->active = false;
-
-					for (GameObject* go : go_list)
-					{
-						if (!go->active)
-							continue;
-						if (go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
-						{
-							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
-							{
-								std::cout << "Remain: " << enemiesRemaining << std::endl;
-								go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - gameObj->Range.damage);//gameObj->Stats.GetStat(STAT_DAMAGE)); // we just say 1 bullet does 1 damage for now
-								gameObj->active = false;
-								AEVec2 collideDir;
-								AEVec2 collidePos;
-								AEVec2Sub(&collideDir, &gameObj->position, &go->position);
-								AEVec2Normalize(&collideDir, &collideDir);
-
-								AEVec2Scale(&collidePos, &collideDir, go->scale.x / 2.f);
-								AEVec2Add(&collidePos, &go->position, &collidePos);
-
-								SpawnCollideParticles(8, collidePos, go->particleColor, collideDir, 30.f, 80.f, 110.f, 0.1f, 0.3f, 3.f, 4.f);
-
-								if ((gameObj->Range.skill_bit & tier2))
-								{
-									//implement spread shot function here
-									for (int i{}; i < skill_vals::MAX_SPREAD; ++i)
-									{
-										GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
-										skill_inst->tex = bulletTex;
-										spreadshot(gameObj, skill_inst, i);
-									}
-								}
-
-								if (go->Stats.GetStat(STAT_HEALTH) <= 0)
-								{
-									go->active = false;
-									enemiesRemaining--;
-									uiEnemiesCount--;
-									SpawnDeathParticles(20, go->position, go->particleColor , 10.f, 30.f, 0.3f, 0.5f, 3.f, 4.f);
-								}
-							}
-						}
-						else if (go->type == GameObject::GAMEOBJECT_TYPE::GO_WALL || go->type == GameObject::GAMEOBJECT_TYPE::GO_TURRET || go->type == GameObject::GAMEOBJECT_TYPE::GO_NEXUS)
-						{
-							if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
-								gameObj->active = false;
-						}
-					}
-
-					break;
-				}
-				case (GameObject::GAMEOBJECT_TYPE::GO_AOE):
-				{
-					//update positions
-
-					player->Melee.lifetime += AEFrameRateControllerGetFrameTime();
-
-					//check collision
-					for (GameObject* go : go_list)
-					{
-						if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
-						{
-							if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
-							{
-								std::cout << "Remain: " << enemiesRemaining << std::endl;
 								enemiesRemaining--;
 								uiEnemiesCount--;
-								go->active = false;
-								SpawnDeathParticles(20, go->position, go->particleColor, 10.f, 30.f, 0.3f, 0.5f, 3.f, 4.f);
+								SpawnDeathParticles(20, go->position, go->particleColor, 20.f, 50.f, 0.3f, 0.8f, 3.f, 7.f);
 							}
 						}
 					}
-
-					if (player->Melee.skill_bit & tier4)
+					else if (go->type == GameObject::GAMEOBJECT_TYPE::GO_WALL || go->type == GameObject::GAMEOBJECT_TYPE::GO_TURRET || go->type == GameObject::GAMEOBJECT_TYPE::GO_NEXUS)
 					{
-						AOE_ready(player, gameObj);
-						if (gameObj->skill_flag)
-						{
-							gameObj->position.x += skill_vals::AOE_VEL * gameObj->direction.x * static_cast<float>(AEFrameRateControllerGetFrameTime());
-							gameObj->position.y += skill_vals::AOE_VEL * gameObj->direction.y * static_cast<float>(AEFrameRateControllerGetFrameTime());
-						}
-						else
-						{
-							gameObj->position.x = player->position.x;
-							gameObj->position.y = player->position.y;
-						}
-
-
-						if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
-						{
+						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 							gameObj->active = false;
-							gameObj->skill_flag = false;
-							std::cout << "AOE destroyed";
+					}
+				}
+
+				break;
+			}
+			case (GameObject::GAMEOBJECT_TYPE::GO_AOE):
+			{
+				//update positions
+
+				player->Melee.lifetime += AEFrameRateControllerGetFrameTime();
+
+				//check collision
+				for (GameObject* go : go_list)
+				{
+					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
+					{
+						if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
+						{
+							std::cout << "Remain: " << enemiesRemaining << std::endl;
+							enemiesRemaining--;
+							uiEnemiesCount--;
+							go->active = false;
+							SpawnDeathParticles(20, go->position, go->particleColor, 20.f, 50.f, 0.3f, 0.8f, 3.f, 7.f);
 						}
 					}
+				}
 
+				if (player->Melee.skill_bit & tier4)
+				{
+					AOE_ready(player, gameObj);
+					if (gameObj->skill_flag)
+					{
+						gameObj->position.x += skill_vals::AOE_VEL * gameObj->direction.x * static_cast<float>(AEFrameRateControllerGetFrameTime());
+						gameObj->position.y += skill_vals::AOE_VEL * gameObj->direction.y * static_cast<float>(AEFrameRateControllerGetFrameTime());
+					}
 					else
 					{
 						gameObj->position.x = player->position.x;
 						gameObj->position.y = player->position.y;
-						if (player->Melee.lifetime > static_cast<f64> (0.2f))
-						{
-							gameObj->alpha -= 0.10f;
-							player->Melee.lifetime = 0;
-						}
-
-						if (gameObj->alpha < 0)
-						{
-							gameObj->active = false;
-						}
 					}
-					break;
 
 
-				}
-				case (GameObject::GAMEOBJECT_TYPE::GO_CAR):
-				{
-					gameObj->position.x += gameObj->direction.x * skill_vals::CAR_VEL * static_cast<float>(AEFrameRateControllerGetFrameTime());
-					gameObj->position.y += gameObj->direction.y * skill_vals::CAR_VEL * static_cast<float>(AEFrameRateControllerGetFrameTime());
-
-					if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+					if (gameObj->position.x > AEGetWindowWidth() || gameObj->position.x < 0 || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 					{
 						gameObj->active = false;
-						player->Range.second_tier.active = false;
-						//std::cout << "car destroyed";
+						gameObj->skill_flag = false;
+						std::cout << "AOE destroyed";
 					}
-					break;
 				}
-				case(GameObject::GAMEOBJECT_TYPE::GO_CLONE):
-				{
-					gameObj->timer += AEFrameRateControllerGetFrameTime();
 
-					if (gameObj->timer > 0.2)
+				else
+				{
+					gameObj->position.x = player->position.x;
+					gameObj->position.y = player->position.y;
+					if (player->Melee.lifetime > static_cast<f64> (0.2f))
 					{
-						gameObj->timer = 0.0;
-						gameObj->alpha -= 0.25f;
+						gameObj->alpha -= 0.10f;
+						player->Melee.lifetime = 0;
 					}
 
-					if (gameObj->alpha < 0.f)
+					if (gameObj->alpha < 0)
 					{
 						gameObj->active = false;
 					}
-					break;
 				}
+				break;
+
+
+			}
+			case (GameObject::GAMEOBJECT_TYPE::GO_CAR):
+			{
+				gameObj->position.x += gameObj->direction.x * skill_vals::CAR_VEL * static_cast<float>(AEFrameRateControllerGetFrameTime());
+				gameObj->position.y += gameObj->direction.y * skill_vals::CAR_VEL * static_cast<float>(AEFrameRateControllerGetFrameTime());
+
+				if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
+				{
+					gameObj->active = false;
+					player->Range.second_tier.active = false;
+					//std::cout << "car destroyed";
+				}
+				break;
+			}
+			case(GameObject::GAMEOBJECT_TYPE::GO_CLONE):
+			{
+				gameObj->timer += AEFrameRateControllerGetFrameTime();
+
+				if (gameObj->timer > 0.2)
+				{
+					gameObj->timer = 0.0;
+					gameObj->alpha -= 0.25f;
+				}
+
+				if (gameObj->alpha < 0.f)
+				{
+					gameObj->active = false;
+				}
+				break;
+			}
 			}
 		}
+		break;
+	}
+	case GAMESTATE::DEATH_PHASE:
+	{
+		if (blackScreen->alpha < 1.f)
+		{
+			blackScreen->alpha += BLACK_SCREEN_FADE_SPEED * AEFrameRateControllerGetFrameTime();
+
+			deathCollideSpawnTime += AEFrameRateControllerGetFrameTime();
+			if (deathCollideSpawnTime >= SPAWN_COLLIDE_WHEN_DYING_TIME)
+			{
+				deathCollideSpawnTime = 0.f;
+				AEVec2 randomDir{RandFloat(-1.f, 1.f), RandFloat(-1.f, 1.f)};
+				AEVec2 loseObjEdge;
+				AEVec2Normalize(&randomDir, &randomDir);
+
+				AEVec2Scale(&loseObjEdge, &randomDir, loseObj->scale.x / 2.f);
+				AEVec2Add(&loseObjEdge, &loseObj->position, &loseObjEdge);
+
+				SpawnCollideParticles(10, loseObjEdge, loseObj->particleColor, randomDir, 40.f, 100.f, 150.f, 1.f, 1.5f, 2.f, 5.f);
+			}
+
+			
+		}
+		else if (blackScreen->alpha > 1.f)
+		{
+			blackScreen->alpha = 1.f;
+			SpawnDeathParticles(50, loseObj->position, loseObj->particleColor, 60.f, 140.f, 5.f, 15.f, 3.f, 6.f);
+			loseObj->active = false;
+		}
+		else
+		{
+			timeToDeath += AEFrameRateControllerGetFrameTime();
+			if (timeToDeath >= TIME_TO_STAY_AFTER_DESTROYED)
+				next = GS_MENU;
+
+		}
+		break;
+	}
 	}
 
-	// Gameobjects to update no matter what phase
+	// Particles to update no matter what phase
 	for (auto gameObj : go_list)
 	{
 		switch (gameObj->type)
 		{
 		case(GameObject::GAMEOBJECT_TYPE::GO_PARTICLE):
+			gameObj->direction.x += gameObj->acceleration.x * static_cast<float>(AEFrameRateControllerGetFrameTime());
+			gameObj->direction.y += gameObj->acceleration.y * static_cast<float>(AEFrameRateControllerGetFrameTime());
 			gameObj->position.x += gameObj->direction.x * static_cast<float>(AEFrameRateControllerGetFrameTime());
 			gameObj->position.y += gameObj->direction.y * static_cast<float>(AEFrameRateControllerGetFrameTime());
 			gameObj->timer -= AEFrameRateControllerGetFrameTime();
@@ -653,7 +728,7 @@ void Alwintest_Draw()
 	////AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);
 
 	// If not in skill tree, render game objects
-	if (UICurrLayer == UI::UI_TYPE::UI_TYPE_GAME)
+	if (UICurrLayer == UI::UI_TYPE::UI_TYPE_GAME || currGameState == GAMESTATE::DEATH_PHASE)
 	{
 		AEGfxSetBackgroundColor(0.3f, 0.3f, 0.3f);
 		for (GameObject* gameObj : go_list)
@@ -670,18 +745,7 @@ void Alwintest_Draw()
 				RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);*/
 		}
 
-		// Render particles on top
-		for (GameObject* gameObj : go_list)
-		{
-			//Gameobjects Render
-			if (!gameObj->active)
-				continue;
-
-			if(gameObj->type == GameObject::GO_PARTICLE)
-				gameObj->Render();
-		}
-
-		if (!buildPhase)
+		if (currGameState == GAMESTATE::DEFEND_PHASE)
 		for (GameObject* gameObj : go_list)
 		{
 			//Gameobjects Render
@@ -702,7 +766,7 @@ void Alwintest_Draw()
 		}
 
 		//skill cooldown UI
-		if (!buildPhase)
+		if (currGameState == GAMESTATE::DEFEND_PHASE)
 		{
 			cooldown_UI(player, cooldown_mesh);
 		}
@@ -710,17 +774,29 @@ void Alwintest_Draw()
 		// Render above
 		if (hoverStructure->active)
 			hoverStructure->Render();
+
+		if (currGameState == GAMESTATE::DEATH_PHASE)
+		{
+			blackScreen->Render();
+			if(loseObj->active)
+				loseObj->Render();
+		}
+
+		// Render particles on top
+		for (GameObject* gameObj : go_list)
+		{
+			//Gameobjects Render
+			if (!gameObj->active)
+				continue;
+
+			if (gameObj->type == GameObject::GO_PARTICLE)
+				gameObj->Render();
+		}
 	}
-	else // else have a clear background only for skill tree
+	else if(UICurrLayer == UI::UI_TYPE_SKILL)
 	{
 		AEGfxSetBackgroundColor(0.f, 0.f, 0.f);
 	}
-
-
-
-	
-
-
 
 	{
 #ifdef CURSOR_TEST
@@ -751,16 +827,19 @@ void Alwintest_Draw()
 		// Render UI
 		uiManagers[UICurrLayer]->Draw(cursorX, cursorY);
 
-		char buff[30]{};
-		sprintf_s(buff, "Resources Left: %d", buildResource);
-		AEGfxPrint(1, buff, .65f, .9f, 1.5f, 1.f, 1.f, 0.f);
+		if (currGameState != GAMESTATE::DEATH_PHASE)
+		{
+			char buff[30]{};
+			sprintf_s(buff, "Resources Left: %d", buildResource);
+			AEGfxPrint(1, buff, .65f, .9f, 1.5f, 1.f, 1.f, 0.f);
 
-		sprintf_s(buff, "Current Wave: %d", currentWave);
-		AEGfxPrint(1, buff, .65f, .7f, 1.5f, 1.f, 1.f, 0.f);
+			sprintf_s(buff, "Current Wave: %d", currentWave);
+			AEGfxPrint(1, buff, .65f, .7f, 1.5f, 1.f, 1.f, 0.f);
 
-		sprintf_s(buff, "Enemies Remaining: %d", uiEnemiesCount);
-		AEGfxPrint(1, buff, .65f, .5f, 1.5f, 1.f, 1.f, 0.f);
-		//std::cout << "Resource Left:" << buildResource << std::endl;
+			sprintf_s(buff, "Enemies Remaining: %d", uiEnemiesCount);
+			AEGfxPrint(1, buff, .65f, .5f, 1.5f, 1.f, 1.f, 0.f);
+			//std::cout << "Resource Left:" << buildResource << std::endl;
+		}
 	}
 }
 
@@ -774,9 +853,11 @@ void Alwintest_Free()
 
 	delete goHealthBar;
 	delete textTable;
-	delete uiManagers[UI::UI_TYPE_GAME];
-	delete uiManagers[UI::UI_TYPE_SKILL];
+	for (UI::UI_Manager* manager : uiManagers)
+		delete manager;
 	delete test_map;
+	delete blackScreen;
+	blackScreen = nullptr;
 
 	AEGfxMeshFree(cooldown_mesh);
 }
@@ -1217,7 +1298,7 @@ namespace
 			currentWave++;
 			enemiesSpawned = 0;
 			enemyTankInGame = 0;
-			buildPhase = true;
+			currGameState = GAMESTATE::BUILD_PHASE;
 			buildResource += static_cast<int>(std::round(easeInOutSine(normCurrentWave / 20) * 1500));
 			for (GameObject* tile : go_list)
 			{
@@ -1388,17 +1469,21 @@ namespace
 						SpawnCollideParticles(8, collidePos, gameObj->smallTarget->particleColor, collideDir, 30.f, 80.f, 110.f, 0.1f, 0.3f, 3.f, 4.f);
 						gameObj->timer = 1;
 					}
-					
+
 
 					if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f && gameObj->smallTarget->active)
 					{
-						gameObj->smallTarget->active = false;
-						if (gameObj->smallTarget != player)
+						if (gameObj->smallTarget != player && gameObj->smallTarget != Nexus)
 						{
+							gameObj->smallTarget->active = false;
 							test_map->RemoveItem(gameObj->smallTarget->gridIndex.front(), static_cast<int>(gameObj->smallTarget->gridScale.x), static_cast<int>(gameObj->smallTarget->gridScale.y));
 							gameObj->smallTarget->gridIndex.clear();
 							SpawnDeathParticles(25, gameObj->smallTarget->position, gameObj->smallTarget->particleColor, 10.f, 30.f, 0.3f, 0.5f, 3.f, 4.f);
 						}
+						else if (gameObj->smallTarget == player)
+							GameOver(player);
+						else if (gameObj->smallTarget == Nexus)
+							GameOver(Nexus);
 					}
 				}
 
@@ -1412,26 +1497,26 @@ namespace
 				{
 					switch (gameObj->Stats.target_type)
 					{
-						case (CharacterStats::TARGET_TYPE::TAR_PLAYER):
-							gameObj->target = player;
-							break;
-						case (CharacterStats::TARGET_TYPE::TAR_NEXUS):
+					case (CharacterStats::TARGET_TYPE::TAR_PLAYER):
+						gameObj->target = player;
+						break;
+					case (CharacterStats::TARGET_TYPE::TAR_NEXUS):
+						gameObj->target = Nexus;
+						break;
+					case (CharacterStats::TARGET_TYPE::TAR_TURRET):
+					{
+						GameObject* turret{ FindClosestGO(gameObj, GameObject::GO_TURRET) };
+
+						if (!turret)
+						{
+							gameObj->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
 							gameObj->target = Nexus;
 							break;
-						case (CharacterStats::TARGET_TYPE::TAR_TURRET):
-						{
-							GameObject* turret{ FindClosestGO(gameObj, GameObject::GO_TURRET) };
-
-							if (!turret)
-							{
-								gameObj->Stats.target_type = CharacterStats::TARGET_TYPE::TAR_NEXUS;
-								gameObj->target = Nexus;
-								break;
-							}
-
-							gameObj->target = turret;
 						}
-							break;
+
+						gameObj->target = turret;
+					}
+					break;
 					}
 
 					//if enemy ded move
@@ -1571,6 +1656,8 @@ namespace
 		uiManagers[UI::UI_TYPE_GAME]->SetWinDim(screenWidthX, screenHeightY);
 		uiManagers[UI::UI_TYPE_SKILL] = new UI::UI_Manager{};	// New ui manager for skill tree
 		uiManagers[UI::UI_TYPE_SKILL]->SetWinDim(screenWidthX, screenHeightY);
+		uiManagers[UI::UI_TYPE_BLANK] = new UI::UI_Manager{};	// New ui manager for blank
+		uiManagers[UI::UI_TYPE_BLANK]->SetWinDim(screenWidthX, screenHeightY);
 		textTable = new UI::UI_TextAreaTable{};	// Set up all UI button text description info
 		UICurrLayer = UI::UI_TYPE_GAME;							// Display gameplay UI first
 	}
@@ -1584,6 +1671,7 @@ namespace
 
 		UI::UI_Manager& gameUIManager{ *uiManagers[UI::UI_TYPE_GAME] };
 		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
+		UI::UI_Manager& blankUIManager{ *uiManagers[UI::UI_TYPE_BLANK] };
 
 		uiManagers[UI::UI_TYPE_GAME]->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &textTable->endTurnHoverText);
 
@@ -1820,8 +1908,9 @@ namespace
 
 	void InitializeVariables()
 	{
-		buildPhase = true;
+		currGameState = GAMESTATE::BUILD_PHASE;
 		nexusPlaced = false;
+		playerPlaced = false;
 		buildResource = 3000;
 		enemiesToSpawn = 10;
 		uiEnemiesCount = enemiesToSpawn;
@@ -1836,7 +1925,7 @@ namespace
 
 	float RandFloat(float min, float max)
 	{
-		return min + static_cast<float> (rand()) / static_cast<float>(RAND_MAX / max);
+		return min + static_cast<float> (rand()) / static_cast<float>(RAND_MAX / (max - min));
 	}
 
 	void SpawnCollideParticles(int numOfParticles, AEVec2 spawnPos, Color color, AEVec2 direction, float spreadAngle, float minSpeed, float maxSpeed, float minLifetime, float maxLifetime, float minScale, float maxScale)
@@ -1847,6 +1936,7 @@ namespace
 			temp->position = spawnPos;
 			float tempScale = RandFloat(minScale, maxScale);
 			temp->scale = { tempScale , tempScale };
+			temp->tex = NULL;
 
 			AEVec2Normalize(&temp->direction, &direction);
 			AEVec2 tempDir = temp->direction;
@@ -1869,6 +1959,7 @@ namespace
 			temp->position = spawnPos;
 			float tempScale = RandFloat(minScale, maxScale);
 			temp->scale = { tempScale , tempScale };
+			temp->tex = NULL;
 
 			AEVec2 tempDir = {0.f, 1.f};
 			float tempAngle = RandFloat(0, 360.f);
@@ -1882,11 +1973,32 @@ namespace
 		}
 	}
 
+	void GameOver(GameObject* destroyedCondition)
+	{
+		currGameState = GAMESTATE::DEATH_PHASE;
+		UICurrLayer = UI::UI_TYPE_BLANK;
+		loseObj = destroyedCondition;
+		timeToDeath = 0.f;
+		deathCollideSpawnTime = 0.f;
+		if (!blackScreen)
+		{
+			blackScreen = new GameObject;
+			blackScreen->color.Set(0.f, 0.f, 0.f);
+			blackScreen->alpha = 0.f;
+			blackScreen->scale.x = AEGetWindowWidth();
+			blackScreen->scale.y = AEGetWindowWidth();
+			blackScreen->position.x = AEGetWindowWidth() / 2.f;
+			blackScreen->position.y = AEGetWindowHeight() / 2.f;
+			blackScreen->tex = NULL;
+		}
+		blackScreen->alpha = 0.f;
+	}
+
 #pragma region UI_CALLBACK_DEFINITIONS
 	void EndTurnButton(UI::UI_Button*) {
 		if (nexusPlaced && playerPlaced)
 		{
-			buildPhase = false;
+			currGameState = GAMESTATE::DEFEND_PHASE;
 			hoverStructure->active = false;
 			for (GameObject* tile : go_list)
 			{

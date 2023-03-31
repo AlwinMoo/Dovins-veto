@@ -66,6 +66,7 @@ namespace UI
 	{
 		UI_TYPE_GAME,
 		UI_TYPE_SKILL,
+		UI_TYPE_BLANK,
 		NUM_UI_TYPE
 	};
 
