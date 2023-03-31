@@ -1330,7 +1330,7 @@ namespace
 					if (gameObj->smallTarget == nullptr)
 						gameObj->smallTarget = gameObj->target;
 
-					if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= test_map->GetTileSize() * gameObj->smallTarget->scale.x * 0.5f)
+					if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= (gameObj->smallTarget->scale.x * gameObj->smallTarget->gridScale.x + gameObj->scale.x) * 0.8f)
 					{
 						gameObj->Stats.SetNextState(STATE::STATE_ENEMY_ATTACK);
 						gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
@@ -1373,24 +1373,22 @@ namespace
 				if (!gameObj->Path.size() && gameObj->smallTarget != nullptr) // we are at our target
 				{
 					// whack small target
-					if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= (gameObj->smallTarget->scale.x * gameObj->smallTarget->gridScale.x + gameObj->scale.x) * 0.5f)
+					gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE) * static_cast<float>(AEFrameRateControllerGetFrameTime()) * gameObj->Stats.GetStat(STAT_ATTACK_SPEED));
+
+					gameObj->timer -= AEFrameRateControllerGetFrameTime();
+					if (gameObj->timer <= 0)
 					{
-						gameObj->smallTarget->Stats.SetStat(STAT_HEALTH, gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) - gameObj->Stats.GetStat(STAT_DAMAGE) * static_cast<float>(AEFrameRateControllerGetFrameTime()) * gameObj->Stats.GetStat(STAT_ATTACK_SPEED));
+						AEVec2 collideDir;
+						AEVec2 collidePos;
+						AEVec2Sub(&collideDir, &gameObj->position, &gameObj->smallTarget->position);
+						AEVec2Normalize(&collideDir, &collideDir);
 
-						gameObj->timer -= AEFrameRateControllerGetFrameTime();
-						if (gameObj->timer <= 0)
-						{
-							AEVec2 collideDir;
-							AEVec2 collidePos;
-							AEVec2Sub(&collideDir, &gameObj->position, &gameObj->smallTarget->position);
-							AEVec2Normalize(&collideDir, &collideDir);
-
-							AEVec2Scale(&collidePos, &collideDir, gameObj->smallTarget->scale.x / 2.f);
-							AEVec2Add(&collidePos, &gameObj->smallTarget->position, &collidePos);
-							SpawnCollideParticles(8, collidePos, gameObj->smallTarget->particleColor, collideDir, 30.f, 80.f, 110.f, 0.1f, 0.3f, 3.f, 4.f);
-							gameObj->timer = 1;
-						}
+						AEVec2Scale(&collidePos, &collideDir, gameObj->smallTarget->scale.x / 2.f);
+						AEVec2Add(&collidePos, &gameObj->smallTarget->position, &collidePos);
+						SpawnCollideParticles(8, collidePos, gameObj->smallTarget->particleColor, collideDir, 30.f, 80.f, 110.f, 0.1f, 0.3f, 3.f, 4.f);
+						gameObj->timer = 1;
 					}
+					
 
 					if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f && gameObj->smallTarget->active)
 					{
@@ -1407,13 +1405,13 @@ namespace
 				if (gameObj->smallTarget == nullptr)
 					break;
 
-					// whack target if near target
-					// if far from target, move to target,
-					// if target down, choose next target
-					if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f || !gameObj->smallTarget->active) // target is down
+				// whack target if near target
+				// if far from target, move to target,
+				// if target down, choose next target
+				if (gameObj->smallTarget->Stats.GetStat(STAT_HEALTH) <= 0.0f || !gameObj->smallTarget->active) // target is down
+				{
+					switch (gameObj->Stats.target_type)
 					{
-						switch (gameObj->Stats.target_type)
-						{
 						case (CharacterStats::TARGET_TYPE::TAR_PLAYER):
 							gameObj->target = player;
 							break;
@@ -1433,13 +1431,21 @@ namespace
 
 							gameObj->target = turret;
 						}
-						break;
-						}
+							break;
 					}
 
+					//if enemy ded move
 					gameObj->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
 					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
 					break;
+				}
+
+				if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) > (gameObj->smallTarget->scale.x * gameObj->smallTarget->gridScale.x + gameObj->scale.x) * 0.8f)
+				{
+					gameObj->Stats.SetNextState(STATE::STATE_ENEMY_MOVE);
+					gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_EXIT);
+					break;
+				}
 			}
 			break;
 			case (INNER_STATE::ISTATE_EXIT):
@@ -1447,6 +1453,9 @@ namespace
 				// clean up
 		// always set next state
 		// if next state is the same, as curr then we will just run as usual
+
+				gameObj->Stats.path_timer = 1.5f;
+
 				gameObj->Stats.SetCurrStateFromNext();
 			}
 			break;
@@ -1523,7 +1532,7 @@ namespace
 		bulletTex = AEGfxTextureLoad("Assets/YellowTexture.png");
 		grassBorderlessTex = AEGfxTextureLoad("Assets/GrassTileBorderless.png");
 		playerTex = AEGfxTextureLoad("Assets/standing-still.png");
-		enemyTex = AEGfxTextureLoad("Assets/infantry.png");
+		enemyTex = AEGfxTextureLoad("Assets/infantry_player.png");
 		enemy_nexusTex = AEGfxTextureLoad("Assets/infantry.png");
 		enemy_tankTex = AEGfxTextureLoad("Assets/new_tank.png");
 		eraseTex = AEGfxTextureLoad("Assets/Eraser.png");
