@@ -91,6 +91,7 @@ namespace
 	static const float BLACK_SCREEN_FADE_SPEED = 0.2f;
 	static const float SPAWN_COLLIDE_WHEN_DYING_TIME = 0.4f;
 	static const float TIME_TO_STAY_AFTER_DESTROYED = 1.f;
+	static const float OBJ_SHAKE_INCREMENT = 1.f;
 
 	//player
 	GameObject* player;
@@ -141,6 +142,7 @@ namespace
 	GameObject* loseObj;
 	float timeToDeath;
 	float deathCollideSpawnTime;
+	float deathShakeAmount;
 	
 	//Helper Functions
 #pragma region Helper functions
@@ -617,7 +619,9 @@ void Alwintest_Update()
 				SpawnCollideParticles(10, loseObjEdge, loseObj->particleColor, randomDir, 40.f, 100.f, 150.f, 1.f, 1.5f, 2.f, 5.f);
 			}
 
-			
+			deathShakeAmount += OBJ_SHAKE_INCREMENT * AEFrameRateControllerGetFrameTime();
+			loseObj->position.x = RandFloat(loseObj->originalPosition.x - deathShakeAmount, loseObj->originalPosition.x + deathShakeAmount);
+			loseObj->position.y = RandFloat(loseObj->originalPosition.y - deathShakeAmount, loseObj->originalPosition.y + deathShakeAmount);
 		}
 		else if (blackScreen->alpha > 1.f)
 		{
@@ -1978,8 +1982,10 @@ namespace
 		currGameState = GAMESTATE::DEATH_PHASE;
 		UICurrLayer = UI::UI_TYPE_BLANK;
 		loseObj = destroyedCondition;
+		loseObj->originalPosition = loseObj->position;
 		timeToDeath = 0.f;
 		deathCollideSpawnTime = 0.f;
+		deathShakeAmount = 0.f;
 		if (!blackScreen)
 		{
 			blackScreen = new GameObject;

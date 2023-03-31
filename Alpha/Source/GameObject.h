@@ -72,6 +72,7 @@ public:
 	skill_stuff Melee;
 
 	AEVec2 position;
+	AEVec2 originalPosition;
 	AEVec2 scale;
 	AEVec2 gridScale;
 	AEVec2 direction;
