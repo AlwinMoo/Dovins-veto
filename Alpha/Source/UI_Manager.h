@@ -6,6 +6,7 @@
 #include "UI_Def.h"
 #include "UI_Button.h"
 #include "UI_StatElement.h"
+#include "UI_Panel.h"
 namespace UI 
 {
 	class UI_Manager
@@ -13,28 +14,19 @@ namespace UI
 		// Call this after setting position, scale or bounds
 		void ConvertToWS(UI_Button* newButton);
 	public:
-		std::vector<UI_Button*> m_buttons;
-		std::vector<UI_StatElement*> m_statElements; //!< UI elements
+		// creating ui stat without using ui manager: manual rendering
+		static UI_StatElement* GenerateUIStat(AEVec2 pos, AEVec2 meshDim, UI_TextArea* text = nullptr);
+
+		std::vector<UI_Panel*> m_panels;			//!< UI panels
+		std::vector<UI_Button*> m_buttons;				//!< UI buttons
+		std::vector<UI_StatElement*> m_statElements;	//!< UI elements
 		AEVec2 m_winDim;
 		s8 m_fontID;
 
-		
+		void CreatePanel(AEVec2 pos, AEVec2 scale, UI_TEX tex);
 		UI_Button* CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText = nullptr, void(*callback)(UI_Button*) = nullptr, UI_TextArea* hoverText = nullptr);
-		
-		/// <summary>
-		/// Creates a UI stat and returns. User has to call RenderUIElement to render it
-		/// </summary>
-		/// <param name="pos"></param>
-		/// <param name="meshDim"></param>
-		/// <param name="text"></param>
-		/// <returns></returns>
 		UI_StatElement* CreateUIStat(AEVec2 pos, AEVec2 meshDim, UI_TextArea* text = nullptr);
-
 		void RenderUIElement(UI_StatElement& element);
-
-		void Load();
-
-		
 		void Unload();
 		void SetWinDim(f32 x, f32 y);
 

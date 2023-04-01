@@ -21,6 +21,11 @@ namespace UI
 		UI::UI_TextArea quitButton					= { .2f, 0.f, "QUIT" };
 		UI::UI_TextArea restartButton				= { .2f, 0.f, "TRY AGAIN ? " };
 		UI::UI_TextArea MenuButton					= { .2f, 0.f, "MENU" };
+
+		// This is for UI quit prompt
+		UI::UI_TextArea confirmText					= { .5f, 0.f, "ARE YOU SURE YOU WANT TO QUIT?" };
+		UI::UI_TextArea yesButton					= { .2f, 0.f, "YES" };
+		UI::UI_TextArea noButton					= { .2f, 0.f, "NO" };
 		/*
 			start
 			how to play

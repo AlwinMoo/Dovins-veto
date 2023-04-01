@@ -23,6 +23,11 @@ namespace UI
 		newButton->maxWS.y = newButton->max.y + m_winDim.y * 0.5f;
 	}
 
+	void UI_Manager::CreatePanel(AEVec2 pos, AEVec2 scale, UI_TEX tex)
+	{
+		m_panels.push_back(new UI_Panel{ {pos.x - m_winDim.x * 0.5f, pos.y - m_winDim.y * 0.5f}, scale, tex });
+	}
+
 	UI_Button* UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText, void(*callback)(UI_Button*), UI_TextArea* hoverText)
 	{
 		UI_Button* newButton = new UI_Button();
@@ -110,6 +115,10 @@ namespace UI
 			newButton->texID = TEX_MENU;
 			newButton->meshID = MESH_BOX;
 			break;
+		case UI_BUTTON:
+			newButton->texID = TEX_UI_BUTTON;
+			newButton->meshID = MESH_BOX;
+			break;
 		default:
 			break;
 		}
@@ -120,7 +129,14 @@ namespace UI
 
 	UI_StatElement* UI_Manager::CreateUIStat(AEVec2 pos, AEVec2 meshDim, UI_TextArea* text)
 	{
-		UI_StatElement* newStat{ new UI_StatElement{text, meshDim} };
+		UI_StatElement* element = GenerateUIStat(pos, meshDim, text);
+		m_statElements.push_back(element);
+		return element;
+	}
+
+	UI_StatElement* UI_Manager::GenerateUIStat(AEVec2 pos, AEVec2 meshDim, UI_TextArea* text)
+	{
+		UI_StatElement* newStat{ new UI_StatElement{pos, text, meshDim} };
 		newStat->CalculatePositions();
 		return newStat;
 	}
@@ -130,20 +146,20 @@ namespace UI
 		element.Draw();
 	}
 
-	void UI_Manager::Load()
-	{
-		
-	}
-
 	void UI_Manager::Unload()
 	{
+		// Clear all stat elements
+		for (UI_StatElement* curr : m_statElements)
+		{
+			delete curr;
+		}
 		// Clear all buttons
 		for (UI_Button* curr : m_buttons)
 		{
 			delete curr;
 		}
-		// Clear all stat elements
-		for (UI_StatElement* curr : m_statElements)
+		// Clear all panels
+		for (UI_Panel* curr : m_panels)
 		{
 			delete curr;
 		}
@@ -194,16 +210,24 @@ namespace UI
 		// Now safe to recalculate mouse pos to worldspace coordinates
 		mouseX -= static_cast<s32>(winX)/ 2;
 		mouseY -= static_cast<s32>(winY) / 2;
+
+		// DRAW PANELS
+		for (UI_Panel* curr : m_panels)
+		{
+			curr->Draw();
+		}
+
+		// DRAW UI BUTTONS
 		for (UI_Button* curr : m_buttons) {
 			if (curr->bEnable)
-				AEGfxSetBlendColor(1.f, 1.f, 1.f, (curr->bHovering ? BUTTON_HOVER_ALPHA: 0.f));
+				AEGfxSetBlendColor(1.f, 1.f, 1.f, (curr->bHovering ? BUTTON_HOVER_ALPHA : 0.f));
 			else
 				AEGfxSetBlendColor(DISABLED_RGBA.r, DISABLED_RGBA.g, DISABLED_RGBA.b, DISABLED_RGBA.a);
 
 			DrawMesh(curr->posWS, curr->scale, curr->texID); // Render the mesh
 			// Now render the button text, if any
 			if (curr->buttonText)
-				curr->buttonText->Draw(curr->posN.x, curr->posN.y, 1.f, 0.f, 0.f);
+				curr->buttonText->Draw({curr->posN.x, curr->posN.y});
 			AEGfxSetBlendColor(0.f, 0.f, 0.f, 0.f);
 		}
 
@@ -223,7 +247,7 @@ namespace UI
 				UI::DrawMesh(pos, scale, TEX_BUTTON, HOVER_RGBA);
 
 				// NOW DRAW THE TEXT
-				curr->hoverText->Draw(mouseXN, mouseYN, 0.f, 0.f, 0.f);
+				curr->hoverText->Draw({ mouseXN, mouseYN });
 			}
 		}
 
@@ -236,7 +260,6 @@ namespace UI
 	}
 	UI_Manager::UI_Manager()
 	{
-		Load();
 		m_buttons = {};
 	}
 

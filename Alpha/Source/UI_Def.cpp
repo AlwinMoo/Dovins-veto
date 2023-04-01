@@ -1,6 +1,6 @@
 #include "UI_Def.h"
 #include "Rendering.hpp"
-
+#include "Menu.h"
 namespace UI
 {
 	std::array<AEGfxTexture*, NUM_TEX> TextureList;
@@ -28,8 +28,10 @@ namespace UI
 		TextureList[TEX_CREDIT]			= AEGfxTextureLoad("Assets/CREDITS_TEX.png");
 		TextureList[TEX_MENU]			= AEGfxTextureLoad("Assets/MENU_TEX.png");
 		TextureList[TEX_RESTART]		= AEGfxTextureLoad("Assets/RESTART_TEX.png");
+		TextureList[TEX_UI_BUTTON]		= AEGfxTextureLoad("Assets/UIButton.png");
+		TextureList[TEX_PANEL]			= AEGfxTextureLoad("Assets/UIPanel.png");
 
-		MeshList[MESH_BOX] = render::GenerateQuad();
+		MeshList[MESH_BOX] = basic_mesh();
 	}
 
 	void UnloadUI()
@@ -83,6 +85,7 @@ namespace UI
 		AEGfxSetTransform(transform.m);
 		AEGfxMeshDraw(MeshList[MESH_BOX], AE_GFX_MDM_TRIANGLES);
 	}
+
 	void DrawMesh(AEVec2 const& pos, AEVec2 const& meshScale, UI_TEX texID, UI_Color const& color)
 	{
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);

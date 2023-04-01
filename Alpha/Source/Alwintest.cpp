@@ -12,6 +12,14 @@ extern bool playerloss{ false };
 
 namespace
 {
+	enum UI_TYPE
+	{
+		UI_TYPE_GAME,
+		UI_TYPE_SKILL,
+		UI_TYPE_BLANK,
+		UI_TYPE_PAUSE,
+		NUM_UI_TYPE
+	};
 	std::vector<GameObject*> go_list;
 	game_map* test_map;
 	int object_count;
@@ -22,7 +30,7 @@ namespace
 	UI::UI_StatElement*	goHealthBar;
 
 	// UI MANAGERS
-	UI::UI_TYPE			UICurrLayer;	// Current layer to update & render
+	UI_TYPE				UICurrLayer;	// Current layer to update & render
 	UI::UI_Manager*		uiManagers[UI::NUM_UI_TYPE]; // Array of pointers to UI managers
 
 	UI::UI_Manager*		gameUiManager;
@@ -692,7 +700,7 @@ void Alwintest_Update()
 	if (AEInputCheckTriggered(AEVK_Q))
 	{
 		// Open the main menu screen layer
-		UICurrLayer = UI::UI_TYPE_PAUSE;
+		UICurrLayer = UI_TYPE_PAUSE;
 		
 	}
 
@@ -1678,8 +1686,10 @@ namespace
 		uiManagers[UI::UI_TYPE_SKILL]->SetWinDim(screenWidthX, screenHeightY);
 		uiManagers[UI::UI_TYPE_BLANK] = new UI::UI_Manager{};	// New ui manager for blank
 		uiManagers[UI::UI_TYPE_BLANK]->SetWinDim(screenWidthX, screenHeightY);
+		uiManagers[UI::UI_TYPE_PAUSE] = new UI::UI_Manager{};	// New ui manager for pause
+		uiManagers[UI::UI_TYPE_PAUSE]->SetWinDim(screenWidthX, screenHeightY);
 		textTable = new UI::UI_TextAreaTable{};	// Set up all UI button text description info
-		UICurrLayer = UI::UI_TYPE_GAME;							// Display gameplay UI first
+		UICurrLayer = UI_TYPE_GAME;							// Display gameplay UI first
 	}
 
 	void InitializeUIButtons()
@@ -1692,6 +1702,7 @@ namespace
 		UI::UI_Manager& gameUIManager{ *uiManagers[UI::UI_TYPE_GAME] };
 		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
 		UI::UI_Manager& blankUIManager{ *uiManagers[UI::UI_TYPE_BLANK] };
+		UI::UI_Manager& pauseUIManager{ *uiManagers[UI::UI_TYPE_PAUSE] };
 
 		uiManagers[UI::UI_TYPE_GAME]->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &textTable->endTurnHoverText);
 
@@ -1780,7 +1791,7 @@ namespace
 				MeleePath.x -= 0.75 * xOffset;
 				//TIER 7
 				skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
-					nullptr, MeleeSkillUpgrade_tier7, &textTable->MeleeTier7);
+nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7);
 			}
 			skillPos.x = tier1XPos;		// Reset to x pos
 			skillPos.y -= tier1YOffset; // Offset y for skill 2
@@ -1797,7 +1808,7 @@ namespace
 				// TIER 1
 				skillUIManager.CreateButton(RangePath_Branch1, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier1, &textTable->RangeTier1);
-				AEVec2 RangePath_Branch3	{ RangePath_Branch1 };
+				AEVec2 RangePath_Branch3{ RangePath_Branch1 };
 				RangePath_Branch1.x += xsmallOffset;
 				RangePath_Branch1.y += tier1YOffset;
 
@@ -1852,7 +1863,7 @@ namespace
 				// TIER 0
 				skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
 					nullptr, UtilitySkillUpgrade_tier0, &textTable->UtiliyBase);
-				AEVec2 UtilityPath_Branch	{ UtilityPath };
+				AEVec2 UtilityPath_Branch{ UtilityPath };
 
 				UtilityPath.x += xsmallOffset;
 				UtilityPath.y -= tier1YOffset;
@@ -1879,14 +1890,20 @@ namespace
 			}
 		}
 
+		// Initialize pause menu buttons
+		{
+			AEVec2 pauseButtonPos{ screenWidthX * .5f, screenHeightY * .7f };
+			AEVec2 pauseButtonSize{ screenHeightY * .25f, screenHeightY * .15f };
+			pauseUIManager.CreateButton(pauseButtonPos, pauseButtonSize, UI::UI_BUTTON,
+				&textTable->quitButton, SkillTreeButton, nullptr);
+		}
 	}
 
 	void InitializeUIElements()
 	{
 		AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 50.f, 5.f };
 		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
-		//skillUIManager.CreateUIStat(healthBarPos, healthBarScale, &textTable->elementTestText);
-		goHealthBar = skillUIManager.CreateUIStat(healthBarPos, healthBarScale, nullptr);
+		goHealthBar = UI::UI_Manager::GenerateUIStat(healthBarPos, healthBarScale, nullptr);
 		goHealthBar->SetValue(1.f);
 		goHealthBar->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, 1.f });
 	}
@@ -2070,7 +2087,7 @@ namespace
 	void GameOver(GameObject* destroyedCondition)
 	{
 		currGameState = GAMESTATE::DEATH_PHASE;
-		UICurrLayer = UI::UI_TYPE_BLANK;
+		UICurrLayer = UI_TYPE_BLANK;
 		loseObj = destroyedCondition;
 		loseObj->originalPosition = loseObj->position;
 		timeToDeath = 0.f;
@@ -2190,7 +2207,7 @@ namespace
 
 	void SkillTreeButton(UI::UI_Button*) 
 	{
-		UICurrLayer = (UICurrLayer == UI::UI_TYPE_SKILL? UI::UI_TYPE_GAME : UI::UI_TYPE_SKILL);
+		UICurrLayer = (UICurrLayer == UI_TYPE_SKILL? UI_TYPE_GAME : UI_TYPE_SKILL);
 	}
 
 	void MeleeSkillUpgrade_tier0(UI::UI_Button*)

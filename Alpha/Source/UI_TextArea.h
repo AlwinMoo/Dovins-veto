@@ -15,6 +15,7 @@ private:
 	f32 m_boxWidthN,	m_boxHeightN;		//!< NORMALIZED DIMENSIONS
 	f32 m_boxWidth,		m_boxHeight;		//!< WORLD SPACE DIMENSIONS
 	f32 m_scale;
+	UI::UI_Color m_color;
 	// Helper functions
 	//!< Returns 0 if no break needed, otherwise returns size
 	void GetPrintSize(std::string const& str, f32& width, f32& height);
@@ -26,11 +27,12 @@ public:
 
 	// Constructors
 	UI_TextArea();
-	UI_TextArea(f32 w, f32 h,					f32 scale = 1.5f);
-	UI_TextArea(f32 w, f32 h, std::string str,	f32 scale = 1.5f);
+	UI_TextArea(f32 w, f32 h,					UI::UI_Color color  = {0.f,0.f,0.f,1.f},f32 scale = 1.5f);
+	UI_TextArea(f32 w, f32 h, std::string str,	UI::UI_Color color  = {0.f,0.f,0.f,1.f},f32 scale = 1.5f);
 
 	void Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b)const;
 	void Draw(AEVec2 screenPosN, UI_Color color)const;
+	void Draw(AEVec2 screenPosN)const;
 
 	// Getters
 	f32 GetBoxWidth();

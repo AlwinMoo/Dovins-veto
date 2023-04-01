@@ -45,7 +45,7 @@ namespace UI {
 
 		// Private Methods
 	public:
-		UI_StatElement(UI_TextArea* text = nullptr, AEVec2 const& meshDims = {});
+		UI_StatElement(AEVec2 pos, UI_TextArea* text = nullptr, AEVec2 const& meshDims = {});
 		~UI_StatElement() = default;
 		UI_StatElement& operator=(const UI_StatElement&) = delete;
 		void SetElementPos(AEVec2 const& pos);		//!< Set element position and calculate text/mesh pos

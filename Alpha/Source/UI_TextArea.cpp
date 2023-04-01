@@ -85,14 +85,15 @@ namespace UI{
 	{
 	}
 
-	UI_TextArea::UI_TextArea(f32 w, f32 h, f32 scale) : m_boxWidthN(w), m_boxHeightN(h), m_boxHeight(0.f), m_scale(scale)
+	UI_TextArea::UI_TextArea(f32 w, f32 h, UI::UI_Color color, f32 scale) : 
+		m_boxWidthN(w), m_boxHeightN(h), m_boxHeight(0.f), m_color(color), m_scale(scale)
 	{
 		m_boxWidth = AEGetWindowWidth() * m_boxWidthN; // Width is determined before splitting lines
 		//m_boxHeight = AEGetWindowHeight() * m_boxHeightN;
 	}
 
 
-	UI_TextArea::UI_TextArea(f32 w, f32 h, std::string str, f32 scale)  : UI_TextArea(w,h, scale)
+	UI_TextArea::UI_TextArea(f32 w, f32 h, std::string str, UI::UI_Color color, f32 scale)  : UI_TextArea(w,h,color,scale)
 	{
 		// automatically calculate and sort strings
 
@@ -124,6 +125,11 @@ namespace UI{
 	void UI_TextArea::Draw(AEVec2 screenPosN, UI_Color color) const
 	{
 		Draw(screenPosN.x, screenPosN.y, color.r, color.g, color.b);
+	}
+
+	void UI_TextArea::Draw(AEVec2 screenPosN) const
+	{
+		Draw(screenPosN, m_color);
 	}
 
 	f32 UI_TextArea::GetBoxWidth()

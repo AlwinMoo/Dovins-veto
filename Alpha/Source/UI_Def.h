@@ -24,6 +24,7 @@ namespace UI
 		CREDIT_BUTTON,
 		RESTART_BUTTON,
 		MENU_BUTTON,
+		UI_BUTTON,
 		NUM_BUTTONS
 	};
 
@@ -56,7 +57,9 @@ namespace UI
 		TEX_READY,
 		TEX_CREDIT,
 		TEX_MENU,
+		TEX_UI_BUTTON,
 		TEX_RESTART,
+		TEX_PANEL,
 		NUM_TEX
 	};
 
