@@ -84,15 +84,15 @@ void menu_Initialize()
 			// The confirmation message
 			{
 				AEVec2 const textPos{ gameUIManager->m_winDim.x * 0.38f, gameUIManager->m_winDim.y * 0.48f };
-				quitUIManager->CreateUIStat(textPos, {}, &textTable->confirmText);
+				quitUIManager->CreateUIStat(textPos, {}, &textTable->menuConfirmText);
 			}
-			// The yes button
-			quitUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
-				&textTable->yesButton, confirmExit_button, nullptr);
-			buttonPos.y += yOffset;
 			// The no button
 			quitUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
 				&textTable->noButton, cancelExit_button, nullptr);
+			buttonPos.y += yOffset;
+			// The yes button
+			quitUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
+				&textTable->yesButton, confirmExit_button, nullptr);
 		}
 	}
 

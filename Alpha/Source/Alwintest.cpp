@@ -18,8 +18,10 @@ namespace
 		UI_TYPE_SKILL,
 		UI_TYPE_BLANK,
 		UI_TYPE_PAUSE,
+		UI_TYPE_QUIT,
 		NUM_UI_TYPE
 	};
+	// THE ENUMERATIONS FOR ALL SKILLS AND THEIR TIERS
 	enum UI_SKILL {
 		AOE_SKILL_0,
 		AOE_SKILL_1,
@@ -55,12 +57,14 @@ namespace
 	// UI BUTTONS AND ELEMENTS
 		// BUTTONS: SKILLS
 	UI::UI_Button* skillBtns[NUM_SKILL]; // FOR LEVELLING SKILLS
+	UI::UI_Button* skillMenuBtn; // SKILL TREE MENU BUTTON
+
 		// ELEMENT: Health bars
 	UI::UI_StatElement*	goHealthBar;
 
 	// UI MANAGERS
-	UI_TYPE				UICurrLayer;	// Current layer to update & render
-	UI::UI_Manager*		uiManagers[UI::NUM_UI_TYPE]; // Array of pointers to UI managers
+	UI_TYPE				currUILayer;	// Current layer to update & render
+	UI::UI_Manager*		uiManagers[NUM_UI_TYPE]; // Array of pointers to UI managers
 
 	UI::UI_Manager*		gameUiManager;
 	UI::UI_Manager*		skillTreeManager;
@@ -242,6 +246,11 @@ namespace
 	void PlaceWallButton(UI::UI_Button*);
 	void EraseButton(UI::UI_Button*);
 	void SkillTreeButton(UI::UI_Button*);
+	// Pause menu buttons
+	void resume_button(UI::UI_Button*);
+	void mainMenu_button(UI::UI_Button*);
+	void confirmExit_button(UI::UI_Button*);
+	void cancelExit_button(UI::UI_Button*);
 
 	void MeleeSkillUpgrade_tier0(UI::UI_Button*);
 	void MeleeSkillUpgrade_tier1(UI::UI_Button*);
@@ -305,7 +314,7 @@ void Alwintest_Update()
 	{
 	case GAMESTATE::BUILD_PHASE:
 	{
-		if (UICurrLayer == UI::UI_TYPE::UI_TYPE_GAME)
+		if (currUILayer == UI_TYPE::UI_TYPE_GAME)
 		{
 			if (AEInputCheckCurr(AEVK_LBUTTON) && hoverStructure->active)
 			{
@@ -725,14 +734,32 @@ void Alwintest_Update()
 
 	// end skill stuff
 	// 
-	// Quit Game
-	if (AEInputCheckTriggered(AEVK_Q))
+	// Quit Game or pause game
+	if (currUILayer != UI_TYPE_BLANK)
 	{
-		// Open the main menu screen layer
-		UICurrLayer = UI_TYPE_PAUSE;
-		
-	}
+		if (AEInputCheckTriggered(AEVK_Q) && currUILayer != UI_TYPE_QUIT)
+		{
+			// Open the main menu screen layer
+			currUILayer = UI_TYPE_QUIT;
+			// TODO: PAUSE THE GAME HERE
+		}
 
+		if (AEInputCheckTriggered(AEVK_ESCAPE))
+		{
+			switch (currUILayer)
+			{
+			case UI_TYPE_PAUSE:
+			case UI_TYPE_QUIT:
+			case UI_TYPE_SKILL:
+				currUILayer = UI_TYPE_GAME;
+				break;
+			case UI_TYPE_GAME:
+				// TODO: PAUSE THE GAME HERE
+				currUILayer = UI_TYPE_PAUSE;
+				break;
+			}
+		}
+	}
 	// GameObject Collision (NON-GRID BASED, SHOULD CHANGE)
 	//bool hoverCollided = false;
 	//for (GameObject* gameObj : go_list)
@@ -785,7 +812,7 @@ void Alwintest_Draw()
 	////AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);
 
 	// If not in skill tree, render game objects
-	if (UICurrLayer == UI::UI_TYPE::UI_TYPE_GAME || currGameState == GAMESTATE::DEATH_PHASE)
+	if (currUILayer == UI_TYPE::UI_TYPE_GAME || currGameState == GAMESTATE::DEATH_PHASE)
 	{
 		AEGfxSetBackgroundColor(0.3f, 0.3f, 0.3f);
 		for (GameObject* gameObj : go_list)
@@ -814,10 +841,9 @@ void Alwintest_Draw()
 			{
 				float const yOffset = gameObj->scale.y * 0.5f;
 				AEVec2 pos{ gameObj->position.x, -gameObj->position.y };
-				pos.x -= uiManagers[UI::UI_TYPE_GAME]->m_winDim.x * 0.5f;
-				pos.y += uiManagers[UI::UI_TYPE_GAME]->m_winDim.y * 0.5f - yOffset;
+				pos.x -= uiManagers[UI_TYPE_GAME]->m_winDim.x * 0.5f;
+				pos.y += uiManagers[UI_TYPE_GAME]->m_winDim.y * 0.5f - yOffset;
 				goHealthBar->SetElementPos(pos);
-				//goHealthBar->CalculatePositions(); TODO
 				goHealthBar->Draw();
 			}
 		}
@@ -850,7 +876,7 @@ void Alwintest_Draw()
 				gameObj->Render();
 		}
 	}
-	else if(UICurrLayer == UI::UI_TYPE_SKILL)
+	else if(currUILayer == UI_TYPE_SKILL)
 	{
 		AEGfxSetBackgroundColor(0.f, 0.f, 0.f);
 	}
@@ -882,7 +908,7 @@ void Alwintest_Draw()
 		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
 #endif
 		// Render UI
-		uiManagers[UICurrLayer]->Draw(cursorX, cursorY);
+		uiManagers[currUILayer]->Draw(cursorX, cursorY);
 
 		if (currGameState != GAMESTATE::DEATH_PHASE)
 		{
@@ -998,8 +1024,8 @@ namespace
 	void UpdateUIManager()
 	{
 		AEVec2 invert_mouse = mouse_pos; // Getting inverted mouse pos to match world space
-		invert_mouse.y = uiManagers[UI::UI_TYPE_GAME]->m_winDim.y - mouse_pos.y;
-		uiManagers[UICurrLayer]->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
+		invert_mouse.y = uiManagers[UI_TYPE_GAME]->m_winDim.y - mouse_pos.y;
+		uiManagers[currUILayer]->Update(invert_mouse, AEInputCheckTriggered(AEVK_LBUTTON));
 	}
 
 	GameObject* IndexToGO(int index)
@@ -1356,6 +1382,7 @@ namespace
 			enemiesSpawned = 0;
 			enemyTankInGame = 0;
 			currGameState = GAMESTATE::BUILD_PHASE;
+			skillMenuBtn->bEnable = true;
 			buildResource += static_cast<int>(std::round(easeInOutSine(normCurrentWave / 20) * 1500));
 			for (GameObject* tile : go_list)
 			{
@@ -1709,16 +1736,18 @@ namespace
 	{
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
-		uiManagers[UI::UI_TYPE_GAME] = new UI::UI_Manager{};	// New ui manager for gameplay
-		uiManagers[UI::UI_TYPE_GAME]->SetWinDim(screenWidthX, screenHeightY);
-		uiManagers[UI::UI_TYPE_SKILL] = new UI::UI_Manager{};	// New ui manager for skill tree
-		uiManagers[UI::UI_TYPE_SKILL]->SetWinDim(screenWidthX, screenHeightY);
-		uiManagers[UI::UI_TYPE_BLANK] = new UI::UI_Manager{};	// New ui manager for blank
-		uiManagers[UI::UI_TYPE_BLANK]->SetWinDim(screenWidthX, screenHeightY);
-		uiManagers[UI::UI_TYPE_PAUSE] = new UI::UI_Manager{};	// New ui manager for pause
-		uiManagers[UI::UI_TYPE_PAUSE]->SetWinDim(screenWidthX, screenHeightY);
+		uiManagers[UI_TYPE_GAME] = new UI::UI_Manager{};	// New ui manager for gameplay
+		uiManagers[UI_TYPE_GAME]->SetWinDim(screenWidthX, screenHeightY);
+		uiManagers[UI_TYPE_SKILL] = new UI::UI_Manager{};	// New ui manager for skill tree
+		uiManagers[UI_TYPE_SKILL]->SetWinDim(screenWidthX, screenHeightY);
+		uiManagers[UI_TYPE_BLANK] = new UI::UI_Manager{};	// New ui manager for blank
+		uiManagers[UI_TYPE_BLANK]->SetWinDim(screenWidthX, screenHeightY);
+		uiManagers[UI_TYPE_PAUSE] = new UI::UI_Manager{};	// New ui manager for pause
+		uiManagers[UI_TYPE_PAUSE]->SetWinDim(screenWidthX, screenHeightY);
+		uiManagers[UI_TYPE_QUIT]  = new UI::UI_Manager{};	// New ui manager for quit
+		uiManagers[UI_TYPE_QUIT]->SetWinDim(screenWidthX, screenHeightY);
 		textTable = new UI::UI_TextAreaTable{};	// Set up all UI button text description info
-		UICurrLayer = UI_TYPE_GAME;							// Display gameplay UI first
+		currUILayer = UI_TYPE_GAME;							// Display gameplay UI first
 	}
 
 	void InitializeUIButtons()
@@ -1728,12 +1757,13 @@ namespace
 		AEVec2 const endButtonPos{ screenWidthX * .115f, screenHeightY * .2f };
 		AEVec2 const endButtonSize{ screenWidthX * .2f, screenHeightY * .15f };
 
-		UI::UI_Manager& gameUIManager{ *uiManagers[UI::UI_TYPE_GAME] };
-		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
-		UI::UI_Manager& blankUIManager{ *uiManagers[UI::UI_TYPE_BLANK] };
-		UI::UI_Manager& pauseUIManager{ *uiManagers[UI::UI_TYPE_PAUSE] };
+		UI::UI_Manager& gameUIManager{ *uiManagers[UI_TYPE_GAME] };
+		UI::UI_Manager& skillUIManager{ *uiManagers[UI_TYPE_SKILL] };
+		UI::UI_Manager& blankUIManager{ *uiManagers[UI_TYPE_BLANK] };
+		UI::UI_Manager& pauseUIManager{ *uiManagers[UI_TYPE_PAUSE] };
+		UI::UI_Manager& quitUIManager{ *uiManagers[UI_TYPE_QUIT] };
 
-		uiManagers[UI::UI_TYPE_GAME]->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &textTable->endTurnHoverText);
+		uiManagers[UI_TYPE_GAME]->CreateButton(endButtonPos, endButtonSize, UI::END_PHASE_BUTTON, nullptr, EndTurnButton, &textTable->endTurnHoverText);
 
 		AEVec2 const buildButtonStartPos{ screenWidthX * .115f, screenHeightY * .9f };
 		AEVec2 const buildButtonSize{ screenHeightY * .12f, screenHeightY * .12f };
@@ -1757,7 +1787,7 @@ namespace
 
 		// Both skill tree and gameplay layers share same button pos
 		buildButtonPos.x = screenWidthX - buildButtonSize.x;
-		gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::SKILL_TREE_BUTTON,
+		skillMenuBtn = gameUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::SKILL_TREE_BUTTON,
 			nullptr, SkillTreeButton, &textTable->Skill_Tree);
 		skillUIManager.CreateButton(buildButtonPos, buildButtonSize, UI::CLOSE_BUTTON,
 			nullptr, SkillTreeButton, &textTable->Skill_Tree);
@@ -1921,19 +1951,55 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			}
 		}
 
-		// Initialize pause menu buttons
+		// Initialize pause and quit menu buttons
+
+		// PAUSE
 		{
-			AEVec2 pauseButtonPos{ screenWidthX * .5f, screenHeightY * .7f };
-			AEVec2 pauseButtonSize{ screenHeightY * .25f, screenHeightY * .15f };
-			pauseUIManager.CreateButton(pauseButtonPos, pauseButtonSize, UI::UI_MENU_BUTTON,
-				&textTable->quitButton, SkillTreeButton, nullptr);
+			// BUTTONS
+			AEVec2 const buttonSize{ 200.f, 70.f };
+			float const yOffset{ quitUIManager.m_winDim.y * 0.1f };
+			AEVec2 buttonPos{ quitUIManager.m_winDim.x * 0.5f, quitUIManager.m_winDim.y * 0.5f };
+			// The paused message
+			{
+				AEVec2 const textPos{ quitUIManager.m_winDim.x * .47f, quitUIManager.m_winDim.y * .75f };
+				pauseUIManager.CreateUIStat(textPos, {}, &textTable->pausedText);
+			}
+			// Main menu button
+			pauseUIManager.CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
+				&textTable->MenuButton, mainMenu_button, nullptr);
+			buttonPos.y += yOffset;
+			// Resume button
+			pauseUIManager.CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
+				&textTable->resumeButton, resume_button, nullptr);
+		}
+		// QUIT
+		{
+			AEVec2 const panelPos{ quitUIManager.m_winDim.x * 0.5f, quitUIManager.m_winDim.y * .6f },
+				panelScale{ quitUIManager.m_winDim.x * 0.25f, quitUIManager.m_winDim.y * 0.35f };
+			quitUIManager.CreatePanel(panelPos, panelScale, UI::TEX_PANEL);
+			// The confirmation message
+			{
+				AEVec2 const textPos{ quitUIManager.m_winDim.x * 0.38f, quitUIManager.m_winDim.y * .75f };
+				quitUIManager.CreateUIStat(textPos, {}, &textTable->gameConfirmText);
+			}
+			// BUTTONS
+			AEVec2 const buttonSize{ 200.f, 70.f };
+			float const yOffset{ quitUIManager.m_winDim.y * 0.1f };
+			AEVec2 buttonPos{ quitUIManager.m_winDim.x * 0.5f, quitUIManager.m_winDim.y * 0.5f };
+			// The no button
+			quitUIManager.CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
+				&textTable->noButton, cancelExit_button, nullptr);
+			buttonPos.y += yOffset;
+			// The yes button
+			quitUIManager.CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
+				&textTable->yesButton, confirmExit_button, nullptr);
 		}
 	}
 
 	void InitializeUIElements()
 	{
 		AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 50.f, 5.f };
-		UI::UI_Manager& skillUIManager{ *uiManagers[UI::UI_TYPE_SKILL] };
+		UI::UI_Manager& skillUIManager{ *uiManagers[UI_TYPE_SKILL] };
 		goHealthBar = UI::UI_Manager::GenerateUIStat(healthBarPos, healthBarScale, nullptr);
 		goHealthBar->SetValue(1.f);
 		goHealthBar->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, 1.f });
@@ -2118,7 +2184,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 	void GameOver(GameObject* destroyedCondition)
 	{
 		currGameState = GAMESTATE::DEATH_PHASE;
-		UICurrLayer = UI_TYPE_BLANK;
+		currUILayer = UI_TYPE_BLANK;
 		loseObj = destroyedCondition;
 		loseObj->originalPosition = loseObj->position;
 		timeToDeath = 0.f;
@@ -2142,6 +2208,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 
 #pragma region UI_CALLBACK_DEFINITIONS
 	void EndTurnButton(UI::UI_Button*) {
+		skillMenuBtn->bEnable = false; // disable skill tree
 		if (nexusPlaced && playerPlaced)
 		{
 			currGameState = GAMESTATE::DEFEND_PHASE;
@@ -2178,10 +2245,6 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 					go->Stats.SetDefault(NEXUS_HEALTH, 0.0f, 0.0f, 0.0f);
 				}
 			}
-		}
-		else
-		{
-			//TODO: FEEDBACK IF PLAYER TRIES TO END TURN WITHOUT PLACING NEXUS
 		}
 	}
 
@@ -2238,7 +2301,28 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 
 	void SkillTreeButton(UI::UI_Button*) 
 	{
-		UICurrLayer = (UICurrLayer == UI_TYPE_SKILL? UI_TYPE_GAME : UI_TYPE_SKILL);
+		currUILayer = (currUILayer == UI_TYPE_SKILL? UI_TYPE_GAME : UI_TYPE_SKILL);
+	}
+
+	void resume_button(UI::UI_Button*)
+	{
+		currUILayer = UI_TYPE_GAME;
+		// TODO: UNPAUSE GAME
+	}
+
+	void mainMenu_button(UI::UI_Button*)
+	{
+		currUILayer = UI_TYPE_QUIT;
+	}
+
+	void confirmExit_button(UI::UI_Button*)
+	{
+		next = GS_MENU;
+	}
+
+	void cancelExit_button(UI::UI_Button*)
+	{
+		currUILayer = UI_TYPE_PAUSE;
 	}
 
 	void MeleeSkillUpgrade_tier0(UI::UI_Button*)
