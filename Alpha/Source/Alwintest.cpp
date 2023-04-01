@@ -1784,14 +1784,14 @@ namespace
 			{
 				// TIER base
 				*currButton++ = skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
-					nullptr, MeleeSkillUpgrade_tier0, &textTable->MeleeBase);
+					nullptr, MeleeSkillUpgrade_tier0, &textTable->MeleeBase, false);
 				MeleePath.x -= xsmallOffset;
 				MeleePath.y -= tier1YOffset;
 				// TIER 1
 				*currButton++ = skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
 					nullptr, MeleeSkillUpgrade_tier1, &textTable->MeleeTier1, false);
 				
-				AEVec2 MeleePath_Branch1{ MeleePath };
+				AEVec2 MeleePath_Branch1{ MeleePath }; //branching
 
 				MeleePath.x -= xsmallOffset;
 				MeleePath.y += tier1YOffset;
@@ -1893,7 +1893,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			{
 				// TIER 0
 				*currButton++ = skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
-					nullptr, UtilitySkillUpgrade_tier0, &textTable->UtiliyBase);
+					nullptr, UtilitySkillUpgrade_tier0, &textTable->UtiliyBase, false);
 				AEVec2 UtilityPath_Branch{ UtilityPath };
 
 				UtilityPath.x += xsmallOffset;
@@ -2321,7 +2321,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		}
 	}
 
-	void RangeSkillUpgrade_tier0(UI::UI_Button*)
+	void RangeSkillUpgrade_tier0(UI::UI_Button* button)
 	{
 		if ((player->Range.skill_bit & base) != base && buildResource >= RangeBase_cost)
 		{
@@ -2331,6 +2331,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			buildResource -= RangeBase_cost;
 			std::cout << "shoot active\n";
 		}
+
+		button->bEnable = true;
 	}
 
 	void RangeSkillUpgrade_tier1(UI::UI_Button*)
