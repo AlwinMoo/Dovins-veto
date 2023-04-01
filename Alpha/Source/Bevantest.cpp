@@ -74,7 +74,7 @@ namespace
 	f64 blink_cd{};
 
 	//skill stuff
-	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move , taunt_move};
+	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move};
 	int skill_input{};
 
 
@@ -236,7 +236,7 @@ void Bevantest_Update()
 			skill_inst->tex = Bullet;
 			to_exec(player, skill_inst);
 			break;
-		case(taunt):
+		case(heal):
 			for (int i{}; i < 5; ++i) // taunt nearest five
 			{
 				for (GameObject* gameobj : go_list)

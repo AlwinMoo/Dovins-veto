@@ -1,5 +1,6 @@
 #include "UI_Manager.h"
 #include "Rendering.hpp"
+#include "Menu.h"
 #include <iostream>
 extern s8 g_fontID;
 namespace UI
@@ -95,6 +96,18 @@ namespace UI
 			newButton->scale.x = 100.f;
 			newButton->scale.y = 60.f;
 			newButton-> texID = TEX_GREEN_NODE;
+			newButton->meshID = MESH_BOX;
+			break;
+		case CREDIT_BUTTON:
+			newButton->texID = TEX_CREDIT;
+			newButton->meshID = MESH_BOX;
+			break;
+		case RESTART_BUTTON:
+			newButton->texID = TEX_RESTART;
+			newButton->meshID = MESH_BOX;
+			break;
+		case MENU_BUTTON:
+			newButton->texID = TEX_MENU;
 			newButton->meshID = MESH_BOX;
 			break;
 		default:
