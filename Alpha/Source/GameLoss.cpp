@@ -30,7 +30,7 @@ void gameLoss_Initialize()
 	//textTable = new UI::UI_TextAreaTable;
 	gameUIManager->SetWinDim(static_cast<f32> (AEGetWindowWidth()), static_cast<f32> (AEGetWindowHeight()));
 
-	AEVec2 FirstPos{ static_cast<float> (AEGetWindowWidth()) * 0.5f, static_cast<float> (AEGetWindowHeight()) * 0.5 };
+	AEVec2 FirstPos{ static_cast<float> (AEGetWindowWidth()) * 0.5f, static_cast<float> (AEGetWindowHeight()) * 0.5f };
 	AEVec2 const buildButtonStartPos{ gameUIManager->m_winDim.x * .115f, 
 										gameUIManager->m_winDim.y * .9f };
 	AEVec2 const buildButtonSize{ 200.f, 70.f};
