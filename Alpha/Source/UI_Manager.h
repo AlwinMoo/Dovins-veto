@@ -24,7 +24,8 @@ namespace UI
 		s8 m_fontID;
 
 		void CreatePanel(AEVec2 pos, AEVec2 scale, UI_TEX tex);
-		UI_Button* CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText = nullptr, void(*callback)(UI_Button*) = nullptr, UI_TextArea* hoverText = nullptr);
+		UI_Button* CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText = nullptr, 
+			void(*callback)(UI_Button*) = nullptr, UI_TextArea* hoverText = nullptr, bool enabled = true);
 		UI_StatElement* CreateUIStat(AEVec2 pos, AEVec2 meshDim, UI_TextArea* text = nullptr);
 		void RenderUIElement(UI_StatElement& element);
 		void Unload();

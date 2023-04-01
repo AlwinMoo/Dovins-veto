@@ -28,7 +28,7 @@ namespace UI
 		m_panels.push_back(new UI_Panel{ {pos.x - m_winDim.x * 0.5f, pos.y - m_winDim.y * 0.5f}, scale, tex });
 	}
 
-	UI_Button* UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText, void(*callback)(UI_Button*), UI_TextArea* hoverText)
+	UI_Button* UI_Manager::CreateButton(AEVec2 pos, AEVec2 size, BUTTON_TYPE type, UI_TextArea* buttonText, void(*callback)(UI_Button*), UI_TextArea* hoverText, bool enabled)
 	{
 		UI_Button* newButton = new UI_Button();
 		newButton->scale = size;			// Scale of button important for render/collision
@@ -115,14 +115,14 @@ namespace UI
 			newButton->texID = TEX_MENU;
 			newButton->meshID = MESH_BOX;
 			break;
-		case UI_BUTTON:
+		case UI_MENU_BUTTON:
 			newButton->texID = TEX_UI_BUTTON;
 			newButton->meshID = MESH_BOX;
 			break;
 		default:
 			break;
 		}
-		newButton->bEnable = true;
+		newButton->bEnable = enabled;
 		m_buttons.push_back(newButton);
 		return newButton;
 	}

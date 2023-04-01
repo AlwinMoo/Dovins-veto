@@ -57,19 +57,19 @@ void menu_Initialize()
 		{
 			AEVec2 buttonPos{ gameUIManager->m_winDim.x * 0.5f, gameUIManager->m_winDim.y * 0.5f };
 			// PLAY BUTTON
-			gameUIManager->CreateButton(buttonPos, buttonSize, UI::UI_BUTTON,
+			gameUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
 				&textTable->playButton, start_button, nullptr);
 			buttonPos.y -= yOffset;
 			// HOW TO PLAY
-			gameUIManager->CreateButton(buttonPos, buttonSize, UI::UI_BUTTON,
+			gameUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
 				&textTable->howToButton, nullptr, nullptr);
 			// CREDITS
 			buttonPos.y -= yOffset;
-			gameUIManager->CreateButton(buttonPos, buttonSize, UI::UI_BUTTON,
+			gameUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
 				&textTable->creditsButton, credits_button, nullptr);
 			// QUIT
 			buttonPos.y -= yOffset;
-			gameUIManager->CreateButton(buttonPos, buttonSize, UI::UI_BUTTON,
+			gameUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
 				&textTable->quitButton, exit_button, nullptr);
 		}
 		// QUIT PROMPT BUTTONS AND PANEL
@@ -87,11 +87,11 @@ void menu_Initialize()
 				quitUIManager->CreateUIStat(textPos, {}, &textTable->confirmText);
 			}
 			// The yes button
-			quitUIManager->CreateButton(buttonPos, buttonSize, UI::UI_BUTTON,
+			quitUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
 				&textTable->yesButton, confirmExit_button, nullptr);
 			buttonPos.y += yOffset;
 			// The no button
-			quitUIManager->CreateButton(buttonPos, buttonSize, UI::UI_BUTTON,
+			quitUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
 				&textTable->noButton, cancelExit_button, nullptr);
 		}
 	}
