@@ -118,19 +118,27 @@ namespace
 	//Skills
 	AEGfxVertexList* cooldown_mesh;
 	int skill_input;
-	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move, taunt_move};
+	skill_func skills_array[TOTAL_SKILLS]{ shoot_bullet, AOE_move, car_move};
 
 	const int RangeBase_cost		{ 200 };
-	const int RangeTier1_cost		{ 200 };
-	const int RangeTier2_cost		{ 300 };
-	const int RangeTier3_cost		{ 300 };
-	const int RangeTier4_cost		{ 500 };
+	const int RangeTier1_cost		{ 250 };
+	const int RangeTier2_cost		{ 250 };
+	const int RangeTier3_cost		{ 250 };
+	const int RangeTier4_cost		{ 350 };
+	const int RangeTier5_cost		{ 350 };
+	const int RangeTier6_cost		{ 450 }; //car
+	const int RangeTier7_cost		{ 450 };
+	const int RangeTier8_cost		{ 450 }; //spreadshot
+	const int RangeTier9_cost		{ 550 }; //car cd
 
 	const int MeleeBase_cost		{ 200 };
-	const int MeleeTier1_cost		{ 200 };
+	const int MeleeTier1_cost		{ 250 };
 	const int MeleeTier2_cost		{ 300 };
-	const int MeleeTier3_cost		{ 300 };
-	const int MeleeTier4_cost		{ 500 };
+	const int MeleeTier3_cost		{ 350 };
+	const int MeleeTier4_cost		{ 350 };
+	const int MeleeTier5_cost		{ 400 };
+	const int MeleeTier6_cost		{ 400 };
+	const int MeleeTier7_cost		{ 500 };
 	
 	const int UtilityBase_cost		{ 200 };
 	const int UtilityTier1_cost		{ 200 };
@@ -203,16 +211,26 @@ namespace
 	void MeleeSkillUpgrade_tier2(UI::UI_Button*);
 	void MeleeSkillUpgrade_tier3(UI::UI_Button*);
 	void MeleeSkillUpgrade_tier4(UI::UI_Button*);
+	void MeleeSkillUpgrade_tier5(UI::UI_Button*);
+	void MeleeSkillUpgrade_tier6(UI::UI_Button*);
+	void MeleeSkillUpgrade_tier7(UI::UI_Button*);
 
 	void RangeSkillUpgrade_tier0(UI::UI_Button*);
 	void RangeSkillUpgrade_tier1(UI::UI_Button*);
 	void RangeSkillUpgrade_tier2(UI::UI_Button*);
 	void RangeSkillUpgrade_tier3(UI::UI_Button*);
 	void RangeSkillUpgrade_tier4(UI::UI_Button*);
+	void RangeSkillUpgrade_tier5(UI::UI_Button*);
+	void RangeSkillUpgrade_tier6(UI::UI_Button*);
+	void RangeSkillUpgrade_tier7(UI::UI_Button*);
+	void RangeSkillUpgrade_tier8(UI::UI_Button*);
+	void RangeSkillUpgrade_tier9(UI::UI_Button*);
 
 	void UtilitySkillUpgrade_tier0(UI::UI_Button*);
 	void UtilitySkillUpgrade_tier1(UI::UI_Button*);
-	//void UtilitySkillUpgrade_tier2(UI::UI_Button*);
+	void UtilitySkillUpgrade_tier2(UI::UI_Button*);
+	void UtilitySkillUpgrade_tier3(UI::UI_Button*);
+	void UtilitySkillUpgrade_tier4(UI::UI_Button*);
 #pragma endregion
 }
 
@@ -329,17 +347,13 @@ void Alwintest_Update()
 				skill_inst->tex = bulletTex;
 				to_exec(player, skill_inst);
 				break;
-			case(taunt):
-				for (int i{}; i < 5; ++i) // taunt nearest five
+			case(heal):
+				for (GameObject* go : go_list)
 				{
-					for (GameObject* gameobj : go_list)
-					{
-						if (gameobj->active && (gameobj->target != player) && (gameobj->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY))
-						{
-							to_exec(player, gameobj);
-							break;
-						}
-					}
+					if (go->type != GameObject::GAMEOBJECT_TYPE::GO_TURRET)
+						continue;
+
+					go->Stats.SetStat(STAT_HEALTH, 10.f);
 				}
 				break;
 			case(blink):
@@ -524,7 +538,7 @@ void Alwintest_Update()
 					}
 				}
 
-				if (player->Melee.skill_bit & tier4)
+				if (player->Melee.skill_bit & tier7)
 				{
 					AOE_ready(player, gameObj);
 					if (gameObj->skill_flag)
@@ -633,7 +647,7 @@ void Alwintest_Update()
 		{
 			timeToDeath += AEFrameRateControllerGetFrameTime();
 			if (timeToDeath >= TIME_TO_STAY_AFTER_DESTROYED)
-				next = GS_MENU;
+				next = GS_GAMELOSS;
 
 		}
 		break;
@@ -1712,82 +1726,156 @@ namespace
 		{
 			float const tier1XPos{ screenWidthX * .5f };
 			AEVec2 skillPos{ tier1XPos, screenHeightY * 0.3f };
-			AEVec2 Begin{ screenWidthX * .5f , screenHeightY * 0.3f};
+			AEVec2 Begin{ screenWidthX * .5f , screenHeightY * 0.4f };
 
 			float Yoffset{ screenHeightY * 0.2f };
-			float tier1YOffset{ screenHeightY * 0.075f };
-			float xOffset{ screenWidthX * 0.075f };
+			float tier1YOffset	{ screenHeightY * 0.1f };
+			float xOffset		{ screenWidthX * 0.08f };
+			float xsmallOffset	{ screenWidthX * 0.04f };
+			float ysmallOffset	{ screenHeightY * 0.5f };
 
-			AEVec2 RangePath	{ Begin };
-			AEVec2 MeleePath	{ Begin.x - xOffset, Begin.y + tier1YOffset };
-			AEVec2 UtilityPath	{ Begin.x + xOffset, Begin.y + tier1YOffset };
+			AEVec2 RangePath_Branch1	{ Begin };
+			AEVec2 RangePath_Branch2	{ Begin };
+
+			AEVec2 MeleePath	{ Begin.x - xsmallOffset, Begin.y - tier1YOffset};
+			AEVec2 UtilityPath	{ Begin.x + xsmallOffset, Begin.y  - tier1YOffset };
 			// FIRST SKILL
 			{
-				// TIER 1
+				// TIER base
 				skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
 					nullptr, MeleeSkillUpgrade_tier0, &textTable->MeleeBase);
-				MeleePath.x -= xOffset;
-				MeleePath.y += tier1YOffset;
-				// TIER 2
+				MeleePath.x -= xsmallOffset;
+				MeleePath.y -= tier1YOffset;
+				// TIER 1
 				skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
 					nullptr, MeleeSkillUpgrade_tier1, &textTable->MeleeTier1);
-				MeleePath.x -= xOffset;
+				AEVec2 MeleePath_Branch1{ MeleePath };
+
+				MeleePath.x -= xsmallOffset;
 				MeleePath.y += tier1YOffset;
-				// TIER 3
+
+				MeleePath_Branch1.x -= xsmallOffset;
+				MeleePath_Branch1.y -= tier1YOffset;
+				// TIER 2
 				skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
 					nullptr, MeleeSkillUpgrade_tier2, &textTable->MeleeTier2);
-				MeleePath.x -= xOffset;
-				MeleePath.y += tier1YOffset;
+				MeleePath.x -= 0.75 * xOffset;
+
+				// TIER 3
+				skillUIManager.CreateButton(MeleePath_Branch1, buildButtonSize, UI::AOE_SKILL_BUTTON,
+					nullptr, MeleeSkillUpgrade_tier3, &textTable->MeleeTier3);
+				MeleePath_Branch1.x -= 0.75 * xOffset;
+
 				// TIER 4
 				skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
-					nullptr, MeleeSkillUpgrade_tier3, &textTable->MeleeTier3);
-				MeleePath.x -= xOffset;
-				MeleePath.y += tier1YOffset;
-				// TIER 5
-				skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
 					nullptr, MeleeSkillUpgrade_tier4, &textTable->MeleeTier4);
+				MeleePath.x -= xsmallOffset;
+				MeleePath.y -= tier1YOffset;
+				//TIER 5
+				skillUIManager.CreateButton(MeleePath_Branch1, buildButtonSize, UI::AOE_SKILL_BUTTON,
+					nullptr, MeleeSkillUpgrade_tier5, &textTable->MeleeTier5);
+				//TIER 6
+				skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
+					nullptr, MeleeSkillUpgrade_tier6, &textTable->MeleeTier6);
+				MeleePath.x -= 0.75 * xOffset;
+				//TIER 7
+				skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
+					nullptr, MeleeSkillUpgrade_tier7, &textTable->MeleeTier7);
 			}
 			skillPos.x = tier1XPos;		// Reset to x pos
 			skillPos.y -= tier1YOffset; // Offset y for skill 2
 			// SECOND SKILL
 			{
-				// TIER 1
+				// TIER 0
 				skillUIManager.CreateButton(Begin, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier0, &textTable->RangeBase);
-				RangePath.y += tier1YOffset;
-				// TIER 2
-				skillUIManager.CreateButton(RangePath, buildButtonSize, UI::GUN_SKILL_BUTTON,
+				RangePath_Branch1.x -= xsmallOffset;
+				RangePath_Branch1.y += tier1YOffset;
+
+				RangePath_Branch2.x += xsmallOffset;
+				RangePath_Branch2.y += tier1YOffset;
+				// TIER 1
+				skillUIManager.CreateButton(RangePath_Branch1, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier1, &textTable->RangeTier1);
-				RangePath.y += tier1YOffset;
-				// TIER 3
-				skillUIManager.CreateButton(RangePath, buildButtonSize, UI::GUN_SKILL_BUTTON,
+				AEVec2 RangePath_Branch3	{ RangePath_Branch1 };
+				RangePath_Branch1.x += xsmallOffset;
+				RangePath_Branch1.y += tier1YOffset;
+
+				RangePath_Branch3.x -= xsmallOffset;
+				RangePath_Branch3.y += tier1YOffset;
+
+				// TIER 2
+				skillUIManager.CreateButton(RangePath_Branch2, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier2, &textTable->RangeTier2);
-				RangePath.y += tier1YOffset;
-				// TIER 4
-				skillUIManager.CreateButton(RangePath, buildButtonSize, UI::GUN_SKILL_BUTTON,
+				RangePath_Branch2.x += xsmallOffset;
+				RangePath_Branch2.y += tier1YOffset;
+
+				// TIER 3
+				skillUIManager.CreateButton(RangePath_Branch2, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier3, &textTable->RangeTier3);
-				RangePath.y += tier1YOffset;
-				// TIER 5
-				skillUIManager.CreateButton(RangePath, buildButtonSize, UI::GUN_SKILL_BUTTON,
+				AEVec2 RangePath_Branch4{ RangePath_Branch2 };
+				RangePath_Branch4.x -= xsmallOffset;
+				RangePath_Branch4.y += tier1YOffset;
+
+				RangePath_Branch2.x += xsmallOffset;
+				RangePath_Branch2.y += tier1YOffset;
+				// TIER 4
+				skillUIManager.CreateButton(RangePath_Branch1, buildButtonSize, UI::GUN_SKILL_BUTTON,
 					nullptr, RangeSkillUpgrade_tier4, &textTable->RangeTier4);
+				RangePath_Branch1.x -= xsmallOffset;
+				RangePath_Branch1.y += tier1YOffset;
+
+				//TIER 5
+				skillUIManager.CreateButton(RangePath_Branch3, buildButtonSize, UI::GUN_SKILL_BUTTON,
+					nullptr, RangeSkillUpgrade_tier5, &textTable->RangeTier5);
+
+				//TIER 6
+				skillUIManager.CreateButton(RangePath_Branch4, buildButtonSize, UI::GUN_SKILL_BUTTON,
+					nullptr, RangeSkillUpgrade_tier6, &textTable->RangeTier6);
+				//TIER 7
+				skillUIManager.CreateButton(RangePath_Branch2, buildButtonSize, UI::GUN_SKILL_BUTTON,
+					nullptr, RangeSkillUpgrade_tier7, &textTable->RangeTier7);
+				RangePath_Branch2.x -= xsmallOffset;
+				RangePath_Branch2.y += tier1YOffset;
+
+				//TIER 8
+				skillUIManager.CreateButton(RangePath_Branch1, buildButtonSize, UI::GUN_SKILL_BUTTON,
+					nullptr, RangeSkillUpgrade_tier8, &textTable->RangeTier8);
+				//TIER 9
+				skillUIManager.CreateButton(RangePath_Branch2, buildButtonSize, UI::GUN_SKILL_BUTTON,
+					nullptr, RangeSkillUpgrade_tier9, &textTable->RangeTier9);
 			}
 			skillPos.x = tier1XPos;		// Reset to x pos
 			skillPos.y -= tier1YOffset; // Offset y for skill 3
 			// THIRD SKILL
 			{
-				// TIER 1
+				// TIER 0
 				skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
 					nullptr, UtilitySkillUpgrade_tier0, &textTable->UtiliyBase);
-				UtilityPath.x += xOffset;
-				UtilityPath.y += tier1YOffset;
-				// TIER 2
+				AEVec2 UtilityPath_Branch	{ UtilityPath };
+
+				UtilityPath.x += xsmallOffset;
+				UtilityPath.y -= tier1YOffset;
+
+				UtilityPath_Branch.x += 1.5 * xsmallOffset;
+				//UtilityPath_Branch.y += tier1YOffset;
+				// TIER 1
 				skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
 					nullptr, UtilitySkillUpgrade_tier1, &textTable->UtilityTier1);
-				UtilityPath.x += xOffset;
-				UtilityPath.y += tier1YOffset;
-				// TIER 3
-				//skillUIManager.CreateButton(skillPos, buildButtonSize, UI::SKILL_TREE_BUTTON,
-				//	nullptr, UtilitySkillUpgrade_tier2, &textTable->playButton);
+				UtilityPath.x += xsmallOffset;
+				UtilityPath.y -= tier1YOffset;
+				// TIER 2
+				skillUIManager.CreateButton(UtilityPath_Branch, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
+					nullptr, UtilitySkillUpgrade_tier2, &textTable->UtilityTier2);
+				UtilityPath_Branch.x += 1.5 * xsmallOffset;
+				//UtilityPath_Branch.y += tier1YOffset;
+
+				//TIER 3
+				skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
+					nullptr, UtilitySkillUpgrade_tier3, &textTable->UtilityTier3);
+				//TIER 4
+				skillUIManager.CreateButton(UtilityPath_Branch, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
+					nullptr, UtilitySkillUpgrade_tier4, &textTable->UtilityTier4);
 			}
 		}
 
@@ -1988,6 +2076,8 @@ namespace
 		timeToDeath = 0.f;
 		deathCollideSpawnTime = 0.f;
 		deathShakeAmount = 0.f;
+		//playerloss = (destroyedCondition == player) ? true : false;
+
 		if (!blackScreen)
 		{
 			blackScreen = new GameObject;
@@ -2105,7 +2195,7 @@ namespace
 
 	void MeleeSkillUpgrade_tier0(UI::UI_Button*)
 	{
-		if ((player->Melee.skill_bit & base) != base && buildResource >= MeleeBase_cost)
+		if ((player->Melee.skill_bit & base) != base && player->Range.skill_bit & base && buildResource >= MeleeBase_cost)
 		{
 			player->Melee.skill_bit |= base;
 			player->Melee.first_tier.cooldown = 0.0f;
@@ -2145,11 +2235,41 @@ namespace
 	}
 	void MeleeSkillUpgrade_tier4(UI::UI_Button*)
 	{
-		if (!(player->Melee.skill_bit & tier4) && (player->Melee.skill_bit & tier3) && buildResource >= MeleeTier4_cost)
+		if (!(player->Melee.skill_bit & tier4) && (player->Melee.skill_bit & tier2) && buildResource >= MeleeTier4_cost)
 		{
 			buildResource -= MeleeTier4_cost;
 			player->Melee.skill_bit |= tier4;
 			std::cout << "Melee tier4 active\n";
+		}
+	}
+
+	void MeleeSkillUpgrade_tier5(UI::UI_Button*)
+	{
+		if (!(player->Melee.skill_bit & tier5) && (player->Melee.skill_bit & tier3) && buildResource >= MeleeTier5_cost)
+		{
+			buildResource -= MeleeTier5_cost;
+			player->Melee.skill_bit |= tier5;
+			std::cout << "Melee tier5 active\n";
+		}
+	}
+
+	void MeleeSkillUpgrade_tier6(UI::UI_Button*)
+	{
+		if (!(player->Melee.skill_bit & tier6) && (player->Melee.skill_bit & tier4) && buildResource >= MeleeTier6_cost)
+		{
+			buildResource -= MeleeTier6_cost;
+			player->Melee.skill_bit |= tier6;
+			std::cout << "Melee tier6 active\n";
+		}
+	}
+
+	void MeleeSkillUpgrade_tier7(UI::UI_Button*)
+	{
+		if (!(player->Melee.skill_bit & tier7) && ((player->Melee.skill_bit & tier6) || (player->Melee.skill_bit & tier5)) && buildResource >= MeleeTier7_cost)
+		{
+			buildResource -= MeleeTier7_cost;
+			player->Melee.skill_bit |= tier7;
+			std::cout << "Melee tier7 active\n";
 		}
 	}
 
@@ -2177,9 +2297,10 @@ namespace
 
 	void RangeSkillUpgrade_tier2(UI::UI_Button*)
 	{
-		if ((player->Range.skill_bit & tier2) != tier2 && (player->Range.skill_bit & tier1) && buildResource >= RangeTier2_cost)
+		if ((player->Range.skill_bit & tier2) != tier2 && (player->Range.skill_bit & base) && buildResource >= RangeTier2_cost)
 		{
 			buildResource -= RangeBase_cost;
+			player->Range.timer = 0.15f;
 			player->Range.skill_bit |= tier2;
 			std::cout << "Range tier2 active\n";
 		}
@@ -2195,7 +2316,7 @@ namespace
 	}
 	void RangeSkillUpgrade_tier4(UI::UI_Button*)
 	{
-		if ((player->Range.skill_bit & tier4) != tier4 && (player->Range.skill_bit & tier3) && buildResource >= RangeTier4_cost)
+		if ((player->Range.skill_bit & tier4) != tier4 && (player->Range.skill_bit & tier1) && buildResource >= RangeTier4_cost)
 		{
 			buildResource -= RangeTier4_cost;
 			player->Range.skill_bit |= tier4;
@@ -2203,9 +2324,59 @@ namespace
 		}
 	}
 
+	void RangeSkillUpgrade_tier5(UI::UI_Button*)
+	{
+		if ((player->Range.skill_bit & tier5) != tier5 && (player->Range.skill_bit & tier1) && buildResource >= RangeTier5_cost)
+		{
+			buildResource -= RangeTier5_cost;
+			player->Range.skill_bit |= tier5;
+			std::cout << "Range tier5 active\n";
+		}
+	}
+
+	void RangeSkillUpgrade_tier6(UI::UI_Button*)
+	{
+		{
+			if ((player->Range.skill_bit & tier6) != tier6 && (player->Range.skill_bit & tier3) && buildResource >= RangeTier6_cost)
+			{
+				buildResource -= RangeTier6_cost;
+				player->Range.skill_bit |= tier6;
+				std::cout << "Range tier6 active\n";
+			}
+		}
+	}
+
+	void RangeSkillUpgrade_tier7(UI::UI_Button*)
+	{
+			if ((player->Range.skill_bit & tier7) != tier7 && (player->Range.skill_bit & tier3) && buildResource >= RangeTier7_cost)
+			{
+				buildResource -= RangeTier7_cost;
+				player->Range.skill_bit |= tier7;
+				std::cout << "Range tier7 active\n";
+			}
+	}
+	void RangeSkillUpgrade_tier8(UI::UI_Button*)
+	{
+		if ((player->Range.skill_bit & tier8) != tier8 && ((player->Range.skill_bit & tier4) || (player->Range.skill_bit & tier5)) && buildResource >= RangeTier8_cost)
+		{
+			buildResource -= RangeTier8_cost;
+			player->Range.skill_bit |= tier8;
+			std::cout << "Range tier8 active\n";
+		}
+	}
+	void RangeSkillUpgrade_tier9(UI::UI_Button*)
+	{
+		if ((player->Range.skill_bit & tier9) != tier9 && (player->Range.skill_bit & tier6)  && buildResource >= RangeTier9_cost)
+		{
+			buildResource -= RangeTier9_cost;
+			player->Range.skill_bit |= tier9;
+			std::cout << "Range tier9 active\n";
+		}
+	}
+
 	void UtilitySkillUpgrade_tier0(UI::UI_Button*)
 	{
-		if ((player->Utility.skill_bit & base) != base && buildResource >= UtilityBase_cost)
+		if ((player->Utility.skill_bit & base) != base && (player->Range.skill_bit & base) && buildResource >= UtilityBase_cost)
 		{
 			buildResource -= UtilityBase_cost;
 			player->Utility.skill_bit |= base;
@@ -2216,22 +2387,47 @@ namespace
 
 	void UtilitySkillUpgrade_tier1(UI::UI_Button*)
 	{
-		if ((player->Utility.skill_bit & tier1) != tier1 && buildResource >= UtilityTier1_cost)
+		if ((player->Utility.skill_bit & tier1) != tier1 && (player->Utility.skill_bit & base) && buildResource >= UtilityTier1_cost)
 		{
 			buildResource -= UtilityTier1_cost;
 			player->Utility.skill_bit |= tier1;
 			player->Utility.second_tier.cooldown = 0;
-			std::cout << "taunt active\n";
+			std::cout << "heal active\n";
 		}
 	}
-	//void UtilitySkillUpgrade_tier2(UI::UI_Button*)
-	//{
-	//	if ((player->Utility.skill_bit & tier2) != tier2)
-	//	{
-	//		player->Utility.skill_bit |= tier2;
-	//		player->Utility.third_tier.cooldown = 0;
-	//		std::cout << "blink active\n";
-	//	}
-	//}
+
+	void UtilitySkillUpgrade_tier2(UI::UI_Button*)
+	{
+		if ((player->Utility.skill_bit & tier2) != tier2 && (player->Utility.skill_bit & base) && buildResource >= UtilityTier1_cost)
+		{
+			buildResource -= UtilityTier1_cost;
+			player->Utility.skill_bit |= tier2;
+			//player->Utility.third_tier.cooldown = 0;
+			std::cout << "blink active\n";
+		}
+	}
+
+	void UtilitySkillUpgrade_tier3(UI::UI_Button*)
+	{
+		if ((player->Utility.skill_bit & tier3) != tier3 && (player->Utility.skill_bit & tier1) && buildResource >= UtilityTier1_cost)
+		{
+			buildResource -= UtilityTier1_cost;
+			player->Utility.skill_bit |= tier3;
+			//player->Utility.third_tier.cooldown = 0;
+			std::cout << "blink active\n";
+		}
+	}
+
+	void UtilitySkillUpgrade_tier4(UI::UI_Button*)
+	{
+		if ((player->Utility.skill_bit & tier4) != tier4 && (player->Utility.skill_bit & tier2) &&  buildResource >= UtilityTier1_cost)
+		{
+			buildResource -= UtilityTier1_cost;
+			player->Utility.skill_bit |= tier4;
+			//player->Utility.third_tier.cooldown = 0;
+			std::cout << "blink active\n";
+		}
+	}
+
 #pragma endregion
 }

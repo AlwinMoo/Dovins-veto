@@ -7,6 +7,14 @@ namespace
 	f32 AOE_opcty;
 	f32 DASH_opcty;
 	f32 CAR_opcty;
+	f32 HEAL_opcty;
+	int num_tiers{ 10 };
+
+	double CAR_CD{ 10.0 };
+	double DASH_CD{ 5.0 };
+	double UPGRADED_DASH_CD{ 3.0 };
+	double HEAL_CD{ 10.0 };
+	double UPGRADED_HEAL_CD{ 5.0 };
 }
 
 void skills_upgrade_check(GameObject* player)
@@ -66,6 +74,8 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 
 	AEVec2 out{};
 	AEVec2 norm{};
+	
+	u32 tier_checker	{ Player->Range.skill_bit };
 
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 	AEVec2Set(&norm, (Player->position.x - mouseX), (Player->position.y - mouseY));
@@ -75,40 +85,43 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 	skill_inst->type = GameObject::GAMEOBJECT_TYPE::GO_BULLET;
 	skill_inst->position.x = Player->position.x;
 	skill_inst->position.y = Player->position.y;
-	skill_inst->scale.x = skill_vals::BULLET_SIZE;
-	skill_inst->scale.y = skill_vals::BULLET_SIZE;
+	skill_inst->scale.x = skill_vals::BULLET_SIZEX;
+	skill_inst->scale.y = skill_vals::BULLET_SIZEY;
 	bullet_ang = atan2(static_cast<double> (skill_inst->position.y - mouseY), static_cast<double> (skill_inst->position.x - mouseX));
 
 	AEVec2Set(&skill_inst->direction, static_cast<float>(-cos(bullet_ang)), static_cast<float>(-sin(bullet_ang)));
 	AEVec2Normalize(&skill_inst->direction, &skill_inst->direction);
-		switch (Player->Range.skill_bit)
-		{
-			case(0b0000'0001):
-				skill_inst->Range.damage = 1.0f;
-				//can update damage numbers here
-				break;
-			case(0b0000'0011):
-				skill_inst->Range.damage = 2.0f;
-				//here too
-				break;
-			case(0b0000'0111):
-				skill_inst->Range.damage = 2.0f;
-				skill_inst->Range.skill_bit = tier2;
-				//here too
-				break;
-			case(0b0000'1111):
-				skill_inst->Range.damage = 3.0f;
-				skill_inst->Range.skill_bit = tier2;
-				break;
-			case(0b0001'1111):
-				skill_inst->Range.damage = 3.0f;
-				skill_inst->Range.skill_bit = tier2;
-				break;
-			default:
-				break;
-		}
-		std::cout << skill_inst->Range.damage << "\n";
-		
+
+	if (Player->Range.skill_bit & base)
+		skill_inst->Range.damage = 1.f;
+
+	if (Player->Range.skill_bit & tier1)
+		skill_inst->Range.damage += 1.f;
+
+	//if (Player->Range.skill_bit & tier2) just to see that theres a tier but doesnt require any action
+
+	if (Player->Range.skill_bit & tier3)
+		skill_inst->Range.damage += 1.f;
+
+	if (Player->Range.skill_bit & tier4)
+	{
+		skill_inst->scale.x = skill_vals::UPGRADES_BULLET_SIZEX;
+		skill_inst->scale.y = skill_vals::UPGRADES_BULLET_SIZEY;
+	}
+
+	if (Player->Range.skill_bit & tier5)
+		skill_inst->Range.damage += 1.f;
+
+	//if (Player->Range.skill_bit & tier6) just to see that theres a tier but doesnt require any action
+
+	if (Player->Range.skill_bit & tier7)
+		skill_inst->Range.damage += 2.f;
+
+	if (Player->Range.skill_bit & tier8)
+		skill_inst->Range.skill_bit |= tier2;
+
+	if (Player->Range.skill_bit & tier9)
+		CAR_CD = 5.0;
 }
 
 void spreadshot(GameObject* parent, GameObject* skill_inst, int times)
@@ -116,8 +129,8 @@ void spreadshot(GameObject* parent, GameObject* skill_inst, int times)
 	skill_inst->type = GameObject::GAMEOBJECT_TYPE::GO_BULLET;
 	skill_inst->position.x = parent->position.x;
 	skill_inst->position.y = parent->position.y;
-	skill_inst->scale.x = skill_vals::BULLET_SIZE;
-	skill_inst->scale.y = skill_vals::BULLET_SIZE;
+	skill_inst->scale.x = skill_vals::BULLET_SIZEX;
+	skill_inst->scale.y = skill_vals::BULLET_SIZEY;
 	skill_inst->Range.damage = 1.0f;
 	skill_inst->Range.skill_bit = base;
 	switch(times)
@@ -160,8 +173,8 @@ void random_shoot(GameObject* parent, GameObject* skill_inst)
 	skill_inst->type = GameObject::GO_BULLET;
 	skill_inst->position.x = parent->position.x;
 	skill_inst->position.y = parent->position.y;
-	skill_inst->scale.x = skill_vals::BULLET_SIZE;
-	skill_inst->scale.y = skill_vals::BULLET_SIZE;
+	skill_inst->scale.x = skill_vals::BULLET_SIZEX;
+	skill_inst->scale.y = skill_vals::BULLET_SIZEY;
 	skill_inst->alpha = 1.0f;
 	skill_inst->Range.damage = 1.0f;
 	skill_inst->Range.skill_bit = base;
@@ -178,34 +191,33 @@ void AOE_move(GameObject* Player, GameObject* skill_inst)
 	skill_inst->scale.y = skill_vals::AOE_SIZE;
 	skill_inst->alpha = skill_vals::AOE_ALPHA;
 	AEVec2Set(&skill_inst->direction, 0, 0);
-	
-	switch (Player->Melee.skill_bit)
+
+	if (Player->Melee.skill_bit & base)
+		skill_inst->Melee.damage = 1.f;
+
+	if (Player->Melee.skill_bit & tier1)
+		skill_inst->Melee.damage += 1.f;
+
+	if (Player->Melee.skill_bit & tier2)
 	{
-	case(0b0000'0001):
-		skill_inst->Melee.damage = 1.0f;
-		skill_inst->Melee.skill_bit |= base;
-		//can update damage numbers here
-		break;
-	case(0b0000'0011):
-		skill_inst->Melee.damage = 2.0f;
-		skill_inst->Melee.skill_bit |= tier1;
-		//here too
-		break;
-	case(0b0000'0111):
-		skill_inst->Melee.damage = 2.0f;
-		skill_inst->Melee.skill_bit |= tier2;
-		//here too
-	case(0b0000'1111):
-		skill_inst->Melee.damage = 3.0f;
-		skill_inst->Melee.skill_bit |= tier3;
-		break;
-	case(0b0001'1111):
-		skill_inst->Melee.damage = 3.0f;
-		skill_inst->Melee.skill_bit |= tier4;
-		break;
-	default:
-		break;
+		skill_inst->scale.x = skill_vals::UPGRADED_AOE_SIZE;
+		skill_inst->scale.y = skill_vals::UPGRADED_AOE_SIZE;
 	}
+
+	//if (Player->Range.skill_bit & tier3) just to see that theres a tier but doesnt require any action
+
+	if (Player->Melee.skill_bit & tier4)
+		skill_inst->Melee.damage += 0.5f;
+
+	if (Player->Melee.skill_bit & tier5)
+	{
+		skill_inst->scale.x = skill_vals::MAX_AOE_SIZE;
+		skill_inst->scale.y = skill_vals::MAX_AOE_SIZE;
+	}
+
+	if (Player->Range.skill_bit & tier6)
+		skill_inst->Melee.damage += 0.5f;
+	//if (Player->Range.skill_bit & tier7) just to see that theres a tier but doesnt require any action
 
 }
 
@@ -250,8 +262,8 @@ void player_blink(GameObject* player)
 	s32 mousex, mousey;
 	AEInputGetCursorPosition(&mousex, &mousey);
 	AEVec2 Mouse{ mousex, mousey };
-
-	if (AEVec2Distance(&player->position, &Mouse) >= skill_vals::BLINK_RANGE) return;
+	float dist = (player->Utility.skill_bit & tier3) ? skill_vals::UPGRADED_BLINK_RANGE : skill_vals::BLINK_RANGE;
+	if (AEVec2Distance(&player->position, &Mouse) >= dist) return;
 
 	player->position.x = mousex;
 	player->position.y = mousey;
@@ -278,7 +290,7 @@ int skill_input_check(GameObject* player)
 		return AOEing;
 	}
 
-	if (AEInputCheckTriggered(AEVK_C) && (player->Range.skill_bit & tier4) && !player->Range.second_tier.on_cd) //car
+	if (AEInputCheckTriggered(AEVK_C) && (player->Range.skill_bit & tier6) && !player->Range.second_tier.on_cd) //car
 	{
 		player->Range.second_tier.active = true;
 		player->Range.second_tier.on_cd = true;
@@ -288,7 +300,8 @@ int skill_input_check(GameObject* player)
 	if (AEInputCheckTriggered(AEVK_V) && (player->Utility.skill_bit & tier1))
 	{
 		player->Utility.second_tier.on_cd = true;
-		return taunt;
+		HEAL_opcty = 0.5f;
+		return heal;
 	}
 
 	if (AEInputCheckTriggered(AEVK_LSHIFT) && player->Utility.skill_bit & base)
@@ -320,7 +333,7 @@ void cooldown_check(GameObject* player)
 		player->Melee.first_tier.cooldown += AEFrameRateControllerGetFrameTime();
 		double timer;
 		timer = (player->Melee.skill_bit & tier3) ? 5.0 : 7.5;
-		AOE_opcty += (player->Melee.skill_bit & tier3) ? 0.00166667f : 0.00111111f;
+		AOE_opcty += 0.5 / (timer / AEFrameRateControllerGetFrameTime());
 		if (player->Melee.first_tier.cooldown >= timer)
 		{
 			player->Melee.first_tier.cooldown = 0.0;
@@ -332,8 +345,8 @@ void cooldown_check(GameObject* player)
 	if (player->Range.second_tier.on_cd) //car cooldown
 	{
 		player->Range.second_tier.cooldown += AEFrameRateControllerGetFrameTime();
-		CAR_opcty += 0.00083333;
-		if (player->Range.second_tier.cooldown >= 10.0)
+		CAR_opcty += 0.5 / (CAR_CD/ AEFrameRateControllerGetFrameTime());
+		if (player->Range.second_tier.cooldown >= CAR_CD)
 		{
 			player->Range.second_tier.cooldown = 0.0;
 			player->Range.second_tier.on_cd = false;
@@ -355,8 +368,10 @@ void cooldown_check(GameObject* player)
 	if (player->Utility.first_tier.on_cd)
 	{
 		player->Utility.first_tier.cooldown += AEFrameRateControllerGetFrameTime();
-		DASH_opcty += 0.0027778;
-		if (player->Utility.first_tier.cooldown >= 3.0)
+		double timer;
+		timer = (player->Utility.skill_bit & tier1) ? UPGRADED_DASH_CD : DASH_CD;
+		DASH_opcty += 0.5 / (timer / AEFrameRateControllerGetFrameTime());
+		if (player->Utility.first_tier.cooldown >= timer)
 		{
 			player->Utility.first_tier.cooldown = 0.0;
 			player->Utility.first_tier.on_cd = false;
@@ -366,8 +381,9 @@ void cooldown_check(GameObject* player)
 	if (player->Utility.second_tier.on_cd)
 	{
 		player->Utility.second_tier.cooldown += AEFrameRateControllerGetFrameTime();
-
-		if (player->Utility.second_tier.cooldown >= 5.0)
+		double timer = (player->Utility.skill_bit & tier4) ? UPGRADED_HEAL_CD : HEAL_CD;
+		HEAL_opcty += 0.5 / (timer / AEFrameRateControllerGetFrameTime());
+		if (player->Utility.second_tier.cooldown >= timer)
 		{
 			player->Utility.second_tier.cooldown = 0.0;
 			player->Utility.second_tier.on_cd = false;
@@ -398,9 +414,17 @@ void cooldown_UI(GameObject* player, AEGfxVertexList* pMesh)
 		}
 		generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_SKILL_MENU], DASH_opcty, 100.f, 100.f, -300.f, -400.f);
 	}
-		
 
-	if (player->Range.skill_bit & tier4)
+	if (player->Utility.skill_bit & tier2)
+	{
+		if (!player->Utility.second_tier.on_cd)
+		{
+			HEAL_opcty = 1.f;
+			generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_READY], 1.f, 350.f, 300.f, -300.f, -325.f);
+		}
+		generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_HEAL_SKILL], HEAL_opcty, 100.f, 100.f, 0.f, -400.f);
+	}
+	if (player->Range.skill_bit & tier6)
 	{
 		if (!player->Range.second_tier.on_cd)
 		{
