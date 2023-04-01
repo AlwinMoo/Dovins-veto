@@ -62,7 +62,7 @@ void menu_Initialize()
 			buttonPos.y -= yOffset;
 			// HOW TO PLAY
 			gameUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
-				&textTable->howToButton, nullptr, nullptr);
+				&textTable->howToButton, tutorial_button, nullptr);
 			// CREDITS
 			buttonPos.y -= yOffset;
 			gameUIManager->CreateButton(buttonPos, buttonSize, UI::UI_MENU_BUTTON,
@@ -152,7 +152,7 @@ void start_button(UI::UI_Button*)
 }
 void tutorial_button(UI::UI_Button*)
 {
-	//next = tutorial scene
+	next = GS_TUTORIAL;
 }
 void credits_button(UI::UI_Button*)
 {

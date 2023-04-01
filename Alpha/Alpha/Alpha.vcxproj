@@ -102,6 +102,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="..\Source\GameLoss.cpp" />
     <ClCompile Include="..\Source\Menu.cpp" />
     <ClCompile Include="..\Source\Splashscreen.cpp" />
+    <ClCompile Include="..\Source\Tutorial.cpp" />
     <ClCompile Include="..\Source\UI_Button.cpp" />
     <ClCompile Include="..\Source\CharacterStats.cpp" />
     <ClCompile Include="..\Source\Enemy\Enemy.cpp" />
@@ -130,6 +131,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClInclude Include="..\Source\GameLoss.h" />
     <ClInclude Include="..\Source\Menu.h" />
     <ClInclude Include="..\Source\Splashscreen.h" />
+    <ClInclude Include="..\Source\Tutorial.h" />
     <ClInclude Include="..\Source\UI_Button.h" />
     <ClInclude Include="..\Source\CharacterStats.h" />
     <ClInclude Include="..\Source\Enemy\Enemy.h" />

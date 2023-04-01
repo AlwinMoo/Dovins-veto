@@ -79,6 +79,9 @@
     <ClCompile Include="..\Source\GameLoss.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Tutorial.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Bevantest.h">
@@ -175,6 +178,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\UI_Panel.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Tutorial.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

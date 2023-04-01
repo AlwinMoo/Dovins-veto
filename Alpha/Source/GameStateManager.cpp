@@ -8,6 +8,7 @@
 #include "Menu.h"
 #include "Credits.h"
 #include "GameLoss.h"
+#include "Tutorial.h"
 
 int current = 0, previous = 0, next = 0;
 
@@ -77,6 +78,14 @@ void GSM_Update()
 			fpDraw = gameLoss_Draw;
 			fpFree = gameLoss_Free;
 			fpUnload = gameLoss_Unload;
+			break;
+		case GS_TUTORIAL:
+			fpLoad = tutorial_Load;
+			fpInitialize = tutorial_Initialize;
+			fpUpdate = tutorial_Update;
+			fpDraw = tutorial_Draw;
+			fpFree = tutorial_Free;
+			fpUnload = tutorial_Unload;
 			break;
 		case GS_RESTART:
 			break;
