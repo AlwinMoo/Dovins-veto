@@ -241,6 +241,8 @@ namespace
 	
 	GameObject* FindClosestGO(GameObject*, GameObject::GAMEOBJECT_TYPE);
 	void UpdateTurretShooting(AEVec2 target, GameObject* gameObj);
+
+	AEVec2 UIPosToGamePos(const AEVec2& UIPos);
 #pragma endregion
 
 #pragma region UI_CALLBACK_DECLARATIONS
@@ -879,17 +881,6 @@ void Alwintest_Draw()
 			if(loseObj->active)
 				loseObj->Render();
 		}
-
-		// Render particles on top
-		for (GameObject* gameObj : go_list)
-		{
-			//Gameobjects Render
-			if (!gameObj->active)
-				continue;
-
-			if (gameObj->type == GameObject::GO_PARTICLE)
-				gameObj->Render();
-		}
 	}
 	else if(currUILayer == UI_TYPE_SKILL)
 	{
@@ -938,6 +929,17 @@ void Alwintest_Draw()
 			AEGfxPrint(1, buff, .65f, .5f, 1.5f, 1.f, 1.f, 0.f);
 			//std::cout << "Resource Left:" << buildResource << std::endl;
 		}
+	}
+
+	// Render particles on top
+	for (GameObject* gameObj : go_list)
+	{
+		//Gameobjects Render
+		if (!gameObj->active)
+			continue;
+
+		if (gameObj->type == GameObject::GO_PARTICLE)
+			gameObj->Render();
 	}
 }
 
@@ -2227,6 +2229,11 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		blackScreen->alpha = 0.f;
 	}
 
+	AEVec2 UIPosToGamePos(const AEVec2& UIPos)
+	{
+		return AEVec2{ UIPos.x, AEGetWindowHeight() - UIPos.y};
+	}
+
 #pragma region UI_CALLBACK_DEFINITIONS
 	void EndTurnButton(UI::UI_Button*) {
 		skillMenuBtn->bEnable = false; // disable skill tree
@@ -2348,7 +2355,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		currUILayer = UI_TYPE_PAUSE;
 	}
 
-	void MeleeSkillUpgrade_tier0(UI::UI_Button*)
+	void MeleeSkillUpgrade_tier0(UI::UI_Button* button)
 	{
 		if ((player->Melee.skill_bit & base) != base && player->Range.skill_bit & base && buildResource >= MeleeBase_cost)
 		{
@@ -2358,10 +2365,13 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			buildResource -= MeleeBase_cost;
 			//make other buttons active
 			skillBtns[AOE_SKILL_1]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void MeleeSkillUpgrade_tier1(UI::UI_Button*)
+	void MeleeSkillUpgrade_tier1(UI::UI_Button* button)
 	{
 		if (!(player->Melee.skill_bit & tier1) && (player->Melee.skill_bit & base) && buildResource >= MeleeTier1_cost)
 		{
@@ -2370,9 +2380,12 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			//make other buttons active
 			skillBtns[AOE_SKILL_2]->bEnable = true;
 			skillBtns[AOE_SKILL_3]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
-	void MeleeSkillUpgrade_tier2(UI::UI_Button*)
+	void MeleeSkillUpgrade_tier2(UI::UI_Button* button)
 	{
 		if (!(player->Melee.skill_bit & tier2) && (player->Melee.skill_bit & tier1) && buildResource >= MeleeTier2_cost)
 		{
@@ -2381,9 +2394,12 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			buildResource -= MeleeTier2_cost;
 			//make other buttons active
 			skillBtns[AOE_SKILL_4]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
-	void MeleeSkillUpgrade_tier3(UI::UI_Button*)
+	void MeleeSkillUpgrade_tier3(UI::UI_Button* button)
 	{
 		if (!(player->Melee.skill_bit & tier3) && (player->Melee.skill_bit & tier1) && buildResource >= MeleeTier3_cost)
 		{
@@ -2391,9 +2407,12 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			buildResource -= MeleeTier3_cost;
 			//make other buttons active
 			skillBtns[AOE_SKILL_5]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
-	void MeleeSkillUpgrade_tier4(UI::UI_Button*)
+	void MeleeSkillUpgrade_tier4(UI::UI_Button* button)
 	{
 		if (!(player->Melee.skill_bit & tier4) && (player->Melee.skill_bit & tier2) && buildResource >= MeleeTier4_cost)
 		{
@@ -2401,10 +2420,13 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Melee.skill_bit |= tier4;
 			//make other buttons active
 			skillBtns[AOE_SKILL_6]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void MeleeSkillUpgrade_tier5(UI::UI_Button*)
+	void MeleeSkillUpgrade_tier5(UI::UI_Button* button)
 	{
 		if (!(player->Melee.skill_bit & tier5) && (player->Melee.skill_bit & tier3) && buildResource >= MeleeTier5_cost)
 		{
@@ -2412,10 +2434,13 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Melee.skill_bit |= tier5;
 			//make other buttons active
 			skillBtns[AOE_SKILL_6]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void MeleeSkillUpgrade_tier6(UI::UI_Button*)
+	void MeleeSkillUpgrade_tier6(UI::UI_Button* button)
 	{
 		if (!(player->Melee.skill_bit & tier6) && ((player->Melee.skill_bit & tier4) || (player->Melee.skill_bit & tier5)) && buildResource >= MeleeTier6_cost)
 		{
@@ -2423,19 +2448,25 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Melee.skill_bit |= tier6;
 			//make other buttons active
 			skillBtns[AOE_SKILL_7]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void MeleeSkillUpgrade_tier7(UI::UI_Button*)
+	void MeleeSkillUpgrade_tier7(UI::UI_Button* button)
 	{
 		if (!(player->Melee.skill_bit & tier7) && ((player->Melee.skill_bit & tier6) || (player->Melee.skill_bit & tier5)) && buildResource >= MeleeTier7_cost)
 		{
 			buildResource -= MeleeTier7_cost;
 			player->Melee.skill_bit |= tier7;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void RangeSkillUpgrade_tier0(UI::UI_Button*)
+	void RangeSkillUpgrade_tier0(UI::UI_Button* button)
 	{
 		if ((player->Range.skill_bit & base) != base && buildResource >= RangeBase_cost)
 		{
@@ -2448,10 +2479,13 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			skillBtns[RANGE_SKILL_2]->bEnable = true;
 			skillBtns[AOE_SKILL_0]->bEnable = true;
 			skillBtns[UTIL_SKILL_0]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void RangeSkillUpgrade_tier1(UI::UI_Button*)
+	void RangeSkillUpgrade_tier1(UI::UI_Button* button)
 	{
 		if ((player->Range.skill_bit & tier1) != tier1 && (player->Range.skill_bit & base) && buildResource >= RangeTier1_cost)
 		{
@@ -2460,10 +2494,13 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			//set other buttons active
 			skillBtns[RANGE_SKILL_4]->bEnable = true;
 			skillBtns[RANGE_SKILL_5]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void RangeSkillUpgrade_tier2(UI::UI_Button*)
+	void RangeSkillUpgrade_tier2(UI::UI_Button* button)
 	{
 		if ((player->Range.skill_bit & tier2) != tier2 && (player->Range.skill_bit & base) && buildResource >= RangeTier2_cost)
 		{
@@ -2472,9 +2509,12 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Range.skill_bit |= tier2;
 			//set other buttons active
 			skillBtns[RANGE_SKILL_3]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
-	void RangeSkillUpgrade_tier3(UI::UI_Button*)
+	void RangeSkillUpgrade_tier3(UI::UI_Button* button)
 	{
 		if ((player->Range.skill_bit & tier3) != tier3 && (player->Range.skill_bit & tier2) && buildResource >= RangeTier3_cost)
 		{
@@ -2483,9 +2523,12 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			//set other buttons active
 			skillBtns[RANGE_SKILL_6]->bEnable = true;
 			skillBtns[RANGE_SKILL_7]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
-	void RangeSkillUpgrade_tier4(UI::UI_Button*)
+	void RangeSkillUpgrade_tier4(UI::UI_Button* button)
 	{
 		if ((player->Range.skill_bit & tier4) != tier4 && (player->Range.skill_bit & tier1) && buildResource >= RangeTier4_cost)
 		{
@@ -2493,10 +2536,13 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Range.skill_bit |= tier4;
 			//set other buttons active
 			skillBtns[RANGE_SKILL_8]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void RangeSkillUpgrade_tier5(UI::UI_Button*)
+	void RangeSkillUpgrade_tier5(UI::UI_Button* button)
 	{
 		if ((player->Range.skill_bit & tier5) != tier5 && (player->Range.skill_bit & tier1) && buildResource >= RangeTier5_cost)
 		{
@@ -2504,10 +2550,13 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Range.skill_bit |= tier5;
 			//set other buttons active
 			skillBtns[RANGE_SKILL_8]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void RangeSkillUpgrade_tier6(UI::UI_Button*)
+	void RangeSkillUpgrade_tier6(UI::UI_Button* button)
 	{
 		{
 			if ((player->Range.skill_bit & tier6) != tier6 && (player->Range.skill_bit & tier3) && buildResource >= RangeTier6_cost)
@@ -2516,11 +2565,14 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 				player->Range.skill_bit |= tier6;
 				//set other buttons active
 				skillBtns[RANGE_SKILL_9]->bEnable = true;
+				button->bBought = true;
+
+				SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 			}
 		}
 	}
 
-	void RangeSkillUpgrade_tier7(UI::UI_Button*)
+	void RangeSkillUpgrade_tier7(UI::UI_Button* button)
 	{
 			if ((player->Range.skill_bit & tier7) != tier7 && (player->Range.skill_bit & tier3) && buildResource >= RangeTier7_cost)
 			{
@@ -2528,26 +2580,35 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 				player->Range.skill_bit |= tier7;
 				//set other buttons active
 				skillBtns[RANGE_SKILL_9]->bEnable = true;
+				button->bBought = true;
+
+				SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 			}
 	}
-	void RangeSkillUpgrade_tier8(UI::UI_Button*)
+	void RangeSkillUpgrade_tier8(UI::UI_Button* button)
 	{
 		if ((player->Range.skill_bit & tier8) != tier8 && ((player->Range.skill_bit & tier4) || (player->Range.skill_bit & tier5)) && buildResource >= RangeTier8_cost)
 		{
 			buildResource -= RangeTier8_cost;
 			player->Range.skill_bit |= tier8;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
-	void RangeSkillUpgrade_tier9(UI::UI_Button*)
+	void RangeSkillUpgrade_tier9(UI::UI_Button* button)
 	{
 		if ((player->Range.skill_bit & tier9) != tier9 && (player->Range.skill_bit & tier6)  && buildResource >= RangeTier9_cost)
 		{
 			buildResource -= RangeTier9_cost;
 			player->Range.skill_bit |= tier9;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void UtilitySkillUpgrade_tier0(UI::UI_Button*)
+	void UtilitySkillUpgrade_tier0(UI::UI_Button* button)
 	{
 		if ((player->Utility.skill_bit & base) != base && (player->Range.skill_bit & base) && buildResource >= UtilityBase_cost)
 		{
@@ -2557,10 +2618,13 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			//set other buttons active
 			skillBtns[UTIL_SKILL_1]->bEnable = true;
 			skillBtns[UTIL_SKILL_2]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void UtilitySkillUpgrade_tier1(UI::UI_Button*)
+	void UtilitySkillUpgrade_tier1(UI::UI_Button* button)
 	{
 		if ((player->Utility.skill_bit & tier1) != tier1 && (player->Utility.skill_bit & base) && buildResource >= UtilityTier1_cost)
 		{
@@ -2569,10 +2633,13 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Utility.second_tier.cooldown = 0;
 			//set other buttons active
 			skillBtns[UTIL_SKILL_3]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void UtilitySkillUpgrade_tier2(UI::UI_Button*)
+	void UtilitySkillUpgrade_tier2(UI::UI_Button* button)
 	{
 		if ((player->Utility.skill_bit & tier2) != tier2 && (player->Utility.skill_bit & base) && buildResource >= UtilityTier1_cost)
 		{
@@ -2580,24 +2647,33 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Utility.skill_bit |= tier2;
 			//set other buttons active
 			skillBtns[UTIL_SKILL_4]->bEnable = true;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void UtilitySkillUpgrade_tier3(UI::UI_Button*)
+	void UtilitySkillUpgrade_tier3(UI::UI_Button* button)
 	{
 		if ((player->Utility.skill_bit & tier3) != tier3 && (player->Utility.skill_bit & tier1) && buildResource >= UtilityTier1_cost)
 		{
 			buildResource -= UtilityTier1_cost;
 			player->Utility.skill_bit |= tier3;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 
-	void UtilitySkillUpgrade_tier4(UI::UI_Button*)
+	void UtilitySkillUpgrade_tier4(UI::UI_Button* button)
 	{
 		if ((player->Utility.skill_bit & tier4) != tier4 && (player->Utility.skill_bit & tier2) &&  buildResource >= UtilityTier1_cost)
 		{
 			buildResource -= UtilityTier1_cost;
 			player->Utility.skill_bit |= tier4;
+			button->bBought = true;
+
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
 		}
 	}
 

@@ -24,6 +24,7 @@ namespace UI
 		UI_TextArea* hoverText;
 		bool bHovering;
 		bool bEnable;
+		bool bBought;
 		float alpha;			//!< TODO: REMOVE
 		/// <summary>
 		/// Calculates the normalized pos for text based on screen dims

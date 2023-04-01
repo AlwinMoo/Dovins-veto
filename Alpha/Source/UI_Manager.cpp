@@ -9,7 +9,7 @@ namespace UI
 	// CONSTANT VARIABLES
 	const float BUTTON_HOVER_ALPHA{ 0.3f };
 	const UI_Color HOVER_RGBA	{ 0.541f, 0.376f, 0.f, 1.f };
-	const UI_Color DISABLED_RGBA{ 0.f, 0.f, 0.f, .5f };
+	const UI_Color DISABLED_RGBA{ 0.f, 0.f, 0.f, .8f };
 	//const float BUTTON_NORMAL_ALPHA{ 0.f };
 	/*________________________________________________*/
 	void UI_Manager::ConvertToWS(UI_Button* newButton)
@@ -123,6 +123,7 @@ namespace UI
 			break;
 		}
 		newButton->bEnable = enabled;
+		newButton->bBought = false;
 		m_buttons.push_back(newButton);
 		return newButton;
 	}
@@ -219,7 +220,9 @@ namespace UI
 
 		// DRAW UI BUTTONS
 		for (UI_Button* curr : m_buttons) {
-			if (curr->bEnable)
+			if (curr->bBought)
+				AEGfxSetBlendColor(1.f, 1.f, 1.f, 1.f);
+			else if (curr->bEnable)
 				AEGfxSetBlendColor(1.f, 1.f, 1.f, (curr->bHovering ? BUTTON_HOVER_ALPHA : 0.f));
 			else
 				AEGfxSetBlendColor(DISABLED_RGBA.r, DISABLED_RGBA.g, DISABLED_RGBA.b, DISABLED_RGBA.a);
