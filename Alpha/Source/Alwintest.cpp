@@ -100,10 +100,12 @@ namespace
 	{
 		BUILD_PHASE,
 		DEFEND_PHASE,
-		DEATH_PHASE
+		DEATH_PHASE,
+		PAUSE_PHASE
 	};
 
 	GAMESTATE currGameState;
+	GAMESTATE prePauseState;
 
 	int buildResource;
 
@@ -134,6 +136,8 @@ namespace
 	static const float TIME_TO_STAY_AFTER_DESTROYED = 1.f;
 	static const float OBJ_SHAKE_INCREMENT = 1.f;
 
+	static const float TIME_BEFORE_PLACE_STRUCTURE_AFTER_PAUSE = 0.1f;
+
 	//player
 	GameObject* player;
 	GameObject* Nexus;
@@ -145,6 +149,7 @@ namespace
 
 	// UI variables
 	int uiEnemiesCount;
+	float placeStructureClickTimer;
 
 	// Enemies
 	int	enemiesToSpawn;
@@ -318,16 +323,20 @@ void Alwintest_Update()
 		{
 			if (AEInputCheckCurr(AEVK_LBUTTON) && hoverStructure->active)
 			{
-				if (hoverStructure->tex == eraseTex)
+				placeStructureClickTimer -= AEFrameRateControllerGetFrameTime();
+				if (placeStructureClickTimer <= 0.f)
 				{
-					if (!validPlacement && test_map->IsInGrid(mouse_pos))
+					if (hoverStructure->tex == eraseTex)
 					{
-						EraseBuiltStructure();
+						if (!validPlacement && test_map->IsInGrid(mouse_pos))
+						{
+							EraseBuiltStructure();
+						}
 					}
-				}
-				else if (validPlacement)
-				{
-					PlaceStructure();
+					else if (validPlacement)
+					{
+						PlaceStructure();
+					}
 				}
 			}
 			UpdateHoverStructure();
@@ -741,7 +750,9 @@ void Alwintest_Update()
 		{
 			// Open the main menu screen layer
 			currUILayer = UI_TYPE_QUIT;
-			// TODO: PAUSE THE GAME HERE
+			if(currGameState != GAMESTATE::PAUSE_PHASE)
+				prePauseState = currGameState;
+			currGameState = GAMESTATE::PAUSE_PHASE;
 		}
 
 		if (AEInputCheckTriggered(AEVK_ESCAPE))
@@ -751,10 +762,14 @@ void Alwintest_Update()
 			case UI_TYPE_PAUSE:
 			case UI_TYPE_QUIT:
 			case UI_TYPE_SKILL:
+				currGameState = prePauseState;
+				placeStructureClickTimer = TIME_BEFORE_PLACE_STRUCTURE_AFTER_PAUSE;
 				currUILayer = UI_TYPE_GAME;
 				break;
 			case UI_TYPE_GAME:
-				// TODO: PAUSE THE GAME HERE
+				if(currGameState != GAMESTATE::PAUSE_PHASE)
+					prePauseState = currGameState;
+				currGameState = GAMESTATE::PAUSE_PHASE;
 				currUILayer = UI_TYPE_PAUSE;
 				break;
 			}
@@ -812,7 +827,7 @@ void Alwintest_Draw()
 	////AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);
 
 	// If not in skill tree, render game objects
-	if (currUILayer == UI_TYPE::UI_TYPE_GAME || currGameState == GAMESTATE::DEATH_PHASE)
+	if (currUILayer == UI_TYPE::UI_TYPE_GAME || currGameState == GAMESTATE::DEATH_PHASE || currGameState == GAMESTATE::PAUSE_PHASE)
 	{
 		AEGfxSetBackgroundColor(0.3f, 0.3f, 0.3f);
 		for (GameObject* gameObj : go_list)
@@ -2121,6 +2136,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 	void InitializeVariables()
 	{
 		currGameState = GAMESTATE::BUILD_PHASE;
+		prePauseState = currGameState;
 		nexusPlaced = false;
 		playerPlaced = false;
 		buildResource = 3000;
@@ -2133,6 +2149,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		currentWave = 1;
 		enemySpawnTimer = 0.f;
 		enemyTankInGame = 0;
+		placeStructureClickTimer = 0.f;
 	}
 
 	float RandFloat(float min, float max)
@@ -2312,6 +2329,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 	{
 		currUILayer = UI_TYPE_GAME;
 		// TODO: UNPAUSE GAME
+		placeStructureClickTimer = TIME_BEFORE_PLACE_STRUCTURE_AFTER_PAUSE;
+		currGameState = prePauseState;
 	}
 
 	void mainMenu_button(UI::UI_Button*)
