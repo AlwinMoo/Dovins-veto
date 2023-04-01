@@ -677,7 +677,9 @@ void Alwintest_Update()
 	// Quit Game
 	if (AEInputCheckTriggered(AEVK_Q))
 	{
-		next = GS_QUIT;
+		// Open the main menu screen layer
+		UICurrLayer = UI::UI_TYPE_PAUSE;
+		
 	}
 
 	// GameObject Collision (NON-GRID BASED, SHOULD CHANGE)

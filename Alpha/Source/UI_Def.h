@@ -67,6 +67,7 @@ namespace UI
 		UI_TYPE_GAME,
 		UI_TYPE_SKILL,
 		UI_TYPE_BLANK,
+		UI_TYPE_PAUSE,
 		NUM_UI_TYPE
 	};
 
