@@ -25,9 +25,6 @@ namespace UI
 		TextureList[TEX_BLUE_NODE]		= AEGfxTextureLoad("Assets/blueNode_Badea2.png");
 		TextureList[TEX_YELLOW_NODE]	= AEGfxTextureLoad("Assets/yellowNode_Badea2.png");
 		TextureList[TEX_GREEN_NODE]		= AEGfxTextureLoad("Assets/greenNode_Badea2.png");
-		TextureList[TEX_CREDIT]			= AEGfxTextureLoad("Assets/CREDITS_TEX.png");
-		TextureList[TEX_MENU]			= AEGfxTextureLoad("Assets/MENU_TEX.png");
-		TextureList[TEX_RESTART]		= AEGfxTextureLoad("Assets/RESTART_TEX.png");
 		TextureList[TEX_UI_BUTTON]		= AEGfxTextureLoad("Assets/UIButton.png");
 		TextureList[TEX_PANEL]			= AEGfxTextureLoad("Assets/UIPanel.png");
 

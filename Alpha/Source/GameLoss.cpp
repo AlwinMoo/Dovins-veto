@@ -8,6 +8,8 @@ namespace
 	AEGfxTexture* nexus_defeat;
 	AEGfxTexture* Message;
 	AEGfxTexture* credit_button;
+	AEGfxTexture* restart_button;
+	AEGfxTexture* menu_button;
 
 	UI::UI_Manager* gameUIManager;
 	//UI::UI_TextAreaTable* textTable;
@@ -21,6 +23,9 @@ void gameLoss_Load()
 {
 	player_defeat = AEGfxTextureLoad("Assets/playerLoss.png");
 	nexus_defeat = AEGfxTextureLoad("Assets/nexusLoss.png");
+	credit_button = AEGfxTextureLoad("Assets/CREDITS_TEX.png");
+	restart_button = AEGfxTextureLoad("Assets/RESTART_TEX.png");
+	menu_button = AEGfxTextureLoad("Assets/MENU_TEX.png");
 }
 
 void gameLoss_Initialize()
@@ -37,11 +42,11 @@ void gameLoss_Initialize()
 	AEVec2 buildButtonPos{ buildButtonStartPos };
 	gameUIManager->CreateButton(FirstPos, buildButtonSize, UI::RESTART_BUTTON,
 		nullptr, res_button, nullptr); // second last param - > callback. No need hover text
-	FirstPos.y -= 0.15f * AEGetWindowHeight();
+	FirstPos.y -= 0.15f * static_cast<float> (AEGetWindowHeight());
 
 	gameUIManager->CreateButton(FirstPos, buildButtonSize, UI::CREDIT_BUTTON,
 		nullptr, Credits_button, nullptr); // second last param - > callback. No need hover text
-	FirstPos.y -= 0.15f * AEGetWindowHeight();
+	FirstPos.y -= 0.15f * static_cast<float> (AEGetWindowHeight());
 
 	gameUIManager->CreateButton(FirstPos, buildButtonSize, UI::MENU_BUTTON,
 		nullptr, Menu_button, nullptr); // second last param - > callback. No need hover text
@@ -65,7 +70,7 @@ void gameLoss_Update()
 
 void gameLoss_Draw()
 {
-	AEGfxSetBackgroundColor(0.f, 0.f, 0.f);
+	//AEGfxSetBackgroundColor(0.f, 0.f, 0.f);
 
 	if (playerloss)
 	{
@@ -76,8 +81,17 @@ void gameLoss_Draw()
 		generic_draw(pMesh, nexus_defeat, 1.f, 1000.f, 750.f, 0.f, 0.f);
 
 	s32 cursorX, cursorY;
+	AEVec2 FirstPos{ 0.f, 0.f};
 	AEInputGetCursorPosition(&cursorX, &cursorY);
 	gameUIManager->Draw(cursorX, cursorY);
+
+	generic_draw(pMesh, restart_button, 1.f, 200.f, 70.f, FirstPos.x, FirstPos.y);
+	FirstPos.y -= 0.15f * static_cast<float> (AEGetWindowHeight());
+
+	generic_draw(pMesh, credit_button, 1.f, 200.f, 70.f, FirstPos.x, FirstPos.y);
+	FirstPos.y -= 0.15f * static_cast<float> (AEGetWindowHeight());
+
+	generic_draw(pMesh, menu_button, 1.f, 200.f, 70.f, FirstPos.x, FirstPos.y);
 }
 
 void gameLoss_Free()
@@ -89,13 +103,16 @@ void gameLoss_Free()
 
 void gameLoss_Unload()
 {
+	AEGfxTextureUnload(menu_button);
+	AEGfxTextureUnload(credit_button);
+	AEGfxTextureUnload(restart_button);
 	AEGfxTextureUnload(nexus_defeat);
 	AEGfxTextureUnload(player_defeat);
 }
 
 void res_button(UI::UI_Button*)
 {
-	next = GS_RESTART;
+	next = GS_LEVEL3;
 }
 
 void Credits_button(UI::UI_Button*)
