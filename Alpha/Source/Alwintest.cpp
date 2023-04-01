@@ -1814,14 +1814,14 @@ namespace
 			{
 				// TIER base
 				*currButton++ = skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
-					nullptr, MeleeSkillUpgrade_tier0, &textTable->MeleeBase);
+					nullptr, MeleeSkillUpgrade_tier0, &textTable->MeleeBase, false);
 				MeleePath.x -= xsmallOffset;
 				MeleePath.y -= tier1YOffset;
 				// TIER 1
 				*currButton++ = skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
 					nullptr, MeleeSkillUpgrade_tier1, &textTable->MeleeTier1, false);
 				
-				AEVec2 MeleePath_Branch1{ MeleePath };
+				AEVec2 MeleePath_Branch1{ MeleePath }; //branching
 
 				MeleePath.x -= xsmallOffset;
 				MeleePath.y += tier1YOffset;
@@ -1923,7 +1923,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			{
 				// TIER 0
 				*currButton++ = skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
-					nullptr, UtilitySkillUpgrade_tier0, &textTable->UtiliyBase);
+					nullptr, UtilitySkillUpgrade_tier0, &textTable->UtiliyBase, false);
 				AEVec2 UtilityPath_Branch{ UtilityPath };
 
 				UtilityPath.x += xsmallOffset;
@@ -2333,7 +2333,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Melee.first_tier.cooldown = 0.0f;
 			player->Melee.timer = 7.5f;
 			buildResource -= MeleeBase_cost;
-			std::cout << "AOE active\n";
+			//make other buttons active
+			skillBtns[AOE_SKILL_1]->bEnable = true;
 		}
 	}
 
@@ -2343,7 +2344,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			player->Melee.skill_bit |= tier1;
 			buildResource -= MeleeTier1_cost;
-			std::cout << "Melee tier1 active\n";
+			//make other buttons active
+			skillBtns[AOE_SKILL_2]->bEnable = true;
+			skillBtns[AOE_SKILL_3]->bEnable = true;
 		}
 	}
 	void MeleeSkillUpgrade_tier2(UI::UI_Button*)
@@ -2353,16 +2356,18 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Melee.skill_bit |= tier2;
 			player->Melee.timer = 5.f;
 			buildResource -= MeleeTier2_cost;
-			std::cout << "Melee tier2 active\n";
+			//make other buttons active
+			skillBtns[AOE_SKILL_4]->bEnable = true;
 		}
 	}
 	void MeleeSkillUpgrade_tier3(UI::UI_Button*)
 	{
-		if (!(player->Melee.skill_bit & tier3) && (player->Melee.skill_bit & tier2) && buildResource >= MeleeTier3_cost)
+		if (!(player->Melee.skill_bit & tier3) && (player->Melee.skill_bit & tier1) && buildResource >= MeleeTier3_cost)
 		{
 			player->Melee.skill_bit |= tier3;
 			buildResource -= MeleeTier3_cost;
-			std::cout << "Melee tier3 active\n";
+			//make other buttons active
+			skillBtns[AOE_SKILL_5]->bEnable = true;
 		}
 	}
 	void MeleeSkillUpgrade_tier4(UI::UI_Button*)
@@ -2371,7 +2376,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= MeleeTier4_cost;
 			player->Melee.skill_bit |= tier4;
-			std::cout << "Melee tier4 active\n";
+			//make other buttons active
+			skillBtns[AOE_SKILL_6]->bEnable = true;
 		}
 	}
 
@@ -2381,17 +2387,19 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= MeleeTier5_cost;
 			player->Melee.skill_bit |= tier5;
-			std::cout << "Melee tier5 active\n";
+			//make other buttons active
+			skillBtns[AOE_SKILL_6]->bEnable = true;
 		}
 	}
 
 	void MeleeSkillUpgrade_tier6(UI::UI_Button*)
 	{
-		if (!(player->Melee.skill_bit & tier6) && (player->Melee.skill_bit & tier4) && buildResource >= MeleeTier6_cost)
+		if (!(player->Melee.skill_bit & tier6) && ((player->Melee.skill_bit & tier4) || (player->Melee.skill_bit & tier5)) && buildResource >= MeleeTier6_cost)
 		{
 			buildResource -= MeleeTier6_cost;
 			player->Melee.skill_bit |= tier6;
-			std::cout << "Melee tier6 active\n";
+			//make other buttons active
+			skillBtns[AOE_SKILL_7]->bEnable = true;
 		}
 	}
 
@@ -2401,7 +2409,6 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= MeleeTier7_cost;
 			player->Melee.skill_bit |= tier7;
-			std::cout << "Melee tier7 active\n";
 		}
 	}
 
@@ -2413,7 +2420,11 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			player->Range.first_tier.cooldown = 0.0f;
 			player->Range.timer = 0.2f;
 			buildResource -= RangeBase_cost;
-			std::cout << "shoot active\n";
+			//set other buttons active
+			skillBtns[RANGE_SKILL_1]->bEnable = true;
+			skillBtns[RANGE_SKILL_2]->bEnable = true;
+			skillBtns[AOE_SKILL_0]->bEnable = true;
+			skillBtns[UTIL_SKILL_0]->bEnable = true;
 		}
 	}
 
@@ -2423,7 +2434,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= RangeTier1_cost;
 			player->Range.skill_bit |= tier1;
-			std::cout << "Range tier1 active\n";
+			//set other buttons active
+			skillBtns[RANGE_SKILL_4]->bEnable = true;
+			skillBtns[RANGE_SKILL_5]->bEnable = true;
 		}
 	}
 
@@ -2434,7 +2447,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			buildResource -= RangeBase_cost;
 			player->Range.timer = 0.15f;
 			player->Range.skill_bit |= tier2;
-			std::cout << "Range tier2 active\n";
+			//set other buttons active
+			skillBtns[RANGE_SKILL_3]->bEnable = true;
 		}
 	}
 	void RangeSkillUpgrade_tier3(UI::UI_Button*)
@@ -2443,7 +2457,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= RangeTier3_cost;
 			player->Range.skill_bit |= tier3;
-			std::cout << "Range tier3 active\n";
+			//set other buttons active
+			skillBtns[RANGE_SKILL_6]->bEnable = true;
+			skillBtns[RANGE_SKILL_7]->bEnable = true;
 		}
 	}
 	void RangeSkillUpgrade_tier4(UI::UI_Button*)
@@ -2452,7 +2468,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= RangeTier4_cost;
 			player->Range.skill_bit |= tier4;
-			std::cout << "Range tier4 active\n";
+			//set other buttons active
+			skillBtns[RANGE_SKILL_8]->bEnable = true;
 		}
 	}
 
@@ -2462,7 +2479,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= RangeTier5_cost;
 			player->Range.skill_bit |= tier5;
-			std::cout << "Range tier5 active\n";
+			//set other buttons active
+			skillBtns[RANGE_SKILL_8]->bEnable = true;
 		}
 	}
 
@@ -2473,7 +2491,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			{
 				buildResource -= RangeTier6_cost;
 				player->Range.skill_bit |= tier6;
-				std::cout << "Range tier6 active\n";
+				//set other buttons active
+				skillBtns[RANGE_SKILL_9]->bEnable = true;
 			}
 		}
 	}
@@ -2484,7 +2503,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			{
 				buildResource -= RangeTier7_cost;
 				player->Range.skill_bit |= tier7;
-				std::cout << "Range tier7 active\n";
+				//set other buttons active
+				skillBtns[RANGE_SKILL_9]->bEnable = true;
 			}
 	}
 	void RangeSkillUpgrade_tier8(UI::UI_Button*)
@@ -2493,7 +2513,6 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= RangeTier8_cost;
 			player->Range.skill_bit |= tier8;
-			std::cout << "Range tier8 active\n";
 		}
 	}
 	void RangeSkillUpgrade_tier9(UI::UI_Button*)
@@ -2502,7 +2521,6 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= RangeTier9_cost;
 			player->Range.skill_bit |= tier9;
-			std::cout << "Range tier9 active\n";
 		}
 	}
 
@@ -2513,7 +2531,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			buildResource -= UtilityBase_cost;
 			player->Utility.skill_bit |= base;
 			player->Utility.first_tier.cooldown = 0;
-			std::cout << "blink active\n";
+			//set other buttons active
+			skillBtns[UTIL_SKILL_1]->bEnable = true;
+			skillBtns[UTIL_SKILL_2]->bEnable = true;
 		}
 	}
 
@@ -2524,7 +2544,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			buildResource -= UtilityTier1_cost;
 			player->Utility.skill_bit |= tier1;
 			player->Utility.second_tier.cooldown = 0;
-			std::cout << "heal active\n";
+			//set other buttons active
+			skillBtns[UTIL_SKILL_3]->bEnable = true;
 		}
 	}
 
@@ -2534,8 +2555,8 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= UtilityTier1_cost;
 			player->Utility.skill_bit |= tier2;
-			//player->Utility.third_tier.cooldown = 0;
-			std::cout << "blink active\n";
+			//set other buttons active
+			skillBtns[UTIL_SKILL_4]->bEnable = true;
 		}
 	}
 
@@ -2545,8 +2566,6 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= UtilityTier1_cost;
 			player->Utility.skill_bit |= tier3;
-			//player->Utility.third_tier.cooldown = 0;
-			std::cout << "blink active\n";
 		}
 	}
 
@@ -2556,8 +2575,6 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		{
 			buildResource -= UtilityTier1_cost;
 			player->Utility.skill_bit |= tier4;
-			//player->Utility.third_tier.cooldown = 0;
-			std::cout << "blink active\n";
 		}
 	}
 
