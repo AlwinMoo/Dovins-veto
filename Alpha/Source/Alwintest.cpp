@@ -1959,6 +1959,10 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			AEVec2 const buttonSize{ 200.f, 70.f };
 			float const yOffset{ quitUIManager.m_winDim.y * 0.1f };
 			AEVec2 buttonPos{ quitUIManager.m_winDim.x * 0.5f, quitUIManager.m_winDim.y * 0.5f };
+
+			AEVec2 const panelPos{ quitUIManager.m_winDim.x * 0.5f, quitUIManager.m_winDim.y * .6f },
+				panelScale{ quitUIManager.m_winDim.x * 0.25f, quitUIManager.m_winDim.y * 0.35f };
+			pauseUIManager.CreatePanel(panelPos, panelScale, UI::TEX_PANEL);
 			// The paused message
 			{
 				AEVec2 const textPos{ quitUIManager.m_winDim.x * .47f, quitUIManager.m_winDim.y * .75f };
