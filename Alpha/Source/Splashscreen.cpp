@@ -178,7 +178,7 @@ void splashscreen_Update()
 		next = GS_QUIT;
 	}
 
-	if (AEInputCheckTriggered(AEVK_N))
+	if (AEInputCheckTriggered(AEVK_LBUTTON) || AEInputCheckTriggered(AEVK_RBUTTON) || AEInputCheckTriggered(AEVK_RETURN) || AEInputCheckTriggered(AEVK_ESCAPE) || AEInputCheckTriggered(AEVK_SPACE) || AEInputCheckTriggered(AEVK_N))
 	{
 		next = GS_MENU;
 	}

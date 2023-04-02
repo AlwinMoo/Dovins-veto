@@ -148,7 +148,7 @@ void menu_Unload()
 
 void start_button(UI::UI_Button*)
 {
-	next = GS_LEVEL3;
+	next = GS_LEVEL1;
 }
 void tutorial_button(UI::UI_Button*)
 {

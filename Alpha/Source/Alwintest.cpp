@@ -136,7 +136,7 @@ namespace
 	static const float TIME_TO_STAY_AFTER_DESTROYED = 1.f;
 	static const float OBJ_SHAKE_INCREMENT = 1.f;
 
-	static const float TIME_BEFORE_PLACE_STRUCTURE_AFTER_PAUSE = 0.1f;
+	static const float TIME_BEFORE_PLACE_STRUCTURE_AFTER_PAUSE = 0.2f;
 
 	//player
 	GameObject* player;
@@ -295,7 +295,7 @@ void Alwintest_Load()
 
 void Alwintest_Initialize()
 {
-	std::srand(std::time(nullptr));
+	std::srand((unsigned int)std::time(nullptr));
 
 	InitializeUIManager();
 	InitializeUIButtons();
@@ -325,7 +325,7 @@ void Alwintest_Update()
 		{
 			if (AEInputCheckCurr(AEVK_LBUTTON) && hoverStructure->active)
 			{
-				placeStructureClickTimer -= AEFrameRateControllerGetFrameTime();
+				placeStructureClickTimer -= (float)AEFrameRateControllerGetFrameTime();
 				if (placeStructureClickTimer <= 0.f)
 				{
 					if (hoverStructure->tex == eraseTex)
@@ -354,19 +354,10 @@ void Alwintest_Update()
 				SetPlayerGoal();
 		}
 
-		if (AEInputCheckTriggered(AEVK_P))
-		{
-			GameOver(player);
-		}
-		if (AEInputCheckTriggered(AEVK_N))
-		{
-			GameOver(Nexus);
-		}
-
 		if (player_moving && !player->Path.empty())
 			PlayerReachGoalCheck();
 
-		TempTestUpdateFunctions();
+		//TempTestUpdateFunctions();
 
 		GameObject* player_clone = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CLONE);
 		player_clone->tex = playerTex;
@@ -531,7 +522,7 @@ void Alwintest_Update()
 					{
 						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 						{
-							std::cout << "Remain: " << enemiesRemaining << std::endl;
+							//std::cout << "Remain: " << enemiesRemaining << std::endl;
 							go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - gameObj->Range.damage);//gameObj->Stats.GetStat(STAT_DAMAGE)); // we just say 1 bullet does 1 damage for now
 							gameObj->active = false;
 							AEVec2 collideDir;
@@ -586,7 +577,7 @@ void Alwintest_Update()
 					{
 						if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
 						{
-							std::cout << "Remain: " << enemiesRemaining << std::endl;
+							//std::cout << "Remain: " << enemiesRemaining << std::endl;
 							enemiesRemaining--;
 							uiEnemiesCount--;
 							go->active = false;
@@ -614,7 +605,7 @@ void Alwintest_Update()
 					{
 						gameObj->active = false;
 						gameObj->skill_flag = false;
-						std::cout << "AOE destroyed";
+						//std::cout << "AOE destroyed";
 					}
 				}
 
@@ -674,9 +665,9 @@ void Alwintest_Update()
 	{
 		if (blackScreen->alpha < 1.f)
 		{
-			blackScreen->alpha += BLACK_SCREEN_FADE_SPEED * AEFrameRateControllerGetFrameTime();
+			blackScreen->alpha += BLACK_SCREEN_FADE_SPEED * (float)AEFrameRateControllerGetFrameTime();
 
-			deathCollideSpawnTime += AEFrameRateControllerGetFrameTime();
+			deathCollideSpawnTime += (float)AEFrameRateControllerGetFrameTime();
 			if (deathCollideSpawnTime >= SPAWN_COLLIDE_WHEN_DYING_TIME)
 			{
 				deathCollideSpawnTime = 0.f;
@@ -690,7 +681,7 @@ void Alwintest_Update()
 				SpawnCollideParticles(10, loseObjEdge, loseObj->particleColor, randomDir, 40.f, 100.f, 150.f, 1.f, 1.5f, 2.f, 5.f);
 			}
 
-			deathShakeAmount += OBJ_SHAKE_INCREMENT * AEFrameRateControllerGetFrameTime();
+			deathShakeAmount += OBJ_SHAKE_INCREMENT * (float)AEFrameRateControllerGetFrameTime();
 			loseObj->position.x = RandFloat(loseObj->originalPosition.x - deathShakeAmount, loseObj->originalPosition.x + deathShakeAmount);
 			loseObj->position.y = RandFloat(loseObj->originalPosition.y - deathShakeAmount, loseObj->originalPosition.y + deathShakeAmount);
 		}
@@ -702,7 +693,7 @@ void Alwintest_Update()
 		}
 		else
 		{
-			timeToDeath += AEFrameRateControllerGetFrameTime();
+			timeToDeath += (float)AEFrameRateControllerGetFrameTime();
 			if (timeToDeath >= TIME_TO_STAY_AFTER_DESTROYED)
 				next = GS_GAMELOSS;
 
@@ -1366,7 +1357,7 @@ namespace
 				++enemiesRemaining;
 				++enemiesSpawned;
 				enemySpawnTimer = 0.0f;
-				std::cout << enemiesSpawned << "/" << enemiesToSpawn << std::endl;
+				//std::cout << enemiesSpawned << "/" << enemiesToSpawn << std::endl;
 			}
 		}
 	}
@@ -1401,18 +1392,19 @@ namespace
 			currGameState = GAMESTATE::BUILD_PHASE;
 			skillMenuBtn->bEnable = true;
 			buildResource += static_cast<int>(std::round(easeInOutSine(normCurrentWave / 20) * 1500));
-			for (GameObject* tile : go_list)
+			for (GameObject* go : go_list)
 			{
-				if (tile->type == GameObject::GO_TILE)
-					tile->tex = grassTex;
+				if (go->type == GameObject::GO_TILE)
+					go->tex = grassTex;
 
-				if (tile->type == GameObject::GO_BULLET)
-					tile->active = false;
-
-				if (tile->type == GameObject::GO_CLONE)
-					tile->active = false;
-				if (tile->type == GameObject::GO_CAR)
-					tile->active = false;
+				if (go->type == GameObject::GO_BULLET)
+					go->active = false;
+				if (go->type == GameObject::GO_CLONE)
+					go->active = false;
+				if (go->type == GameObject::GO_CAR)
+					go->active = false;
+				if (go->type == GameObject::GO_AOE)
+					go->active = false;
 			}
 			hoverStructure->active = true;
 			EnableDangerSigns();
@@ -1457,6 +1449,15 @@ namespace
 			temp->tex = enemyTex;
 			temp->active = true;
 
+		}
+
+		if (AEInputCheckTriggered(AEVK_P))
+		{
+			GameOver(player);
+		}
+		if (AEInputCheckTriggered(AEVK_N))
+		{
+			GameOver(Nexus);
 		}
 	}
 
@@ -1547,7 +1548,7 @@ namespace
 				// init
 				// always set next state
 				gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
-				std::cout << "attack enter" << std::endl;
+				//std::cout << "attack enter" << std::endl;
 			}
 			break;
 			case (INNER_STATE::ISTATE_UPDATE):
@@ -1848,12 +1849,12 @@ namespace
 				// TIER 2
 				*currButton++ = skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
 					nullptr, MeleeSkillUpgrade_tier2, &textTable->MeleeTier2, false);
-				MeleePath.x -= 0.75 * xOffset;
+				MeleePath.x -= 0.75f * xOffset;
 
 				// TIER 3
 				*currButton++ = skillUIManager.CreateButton(MeleePath_Branch1, buildButtonSize, UI::AOE_SKILL_BUTTON,
 					nullptr, MeleeSkillUpgrade_tier3, &textTable->MeleeTier3, false);
-				MeleePath_Branch1.x -= 0.75 * xOffset;
+				MeleePath_Branch1.x -= 0.75f * xOffset;
 
 				// TIER 4
 				*currButton++ = skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
@@ -1866,7 +1867,7 @@ namespace
 				//TIER 6
 				*currButton++ = skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
 					nullptr, MeleeSkillUpgrade_tier6, &textTable->MeleeTier6, false);
-				MeleePath.x -= 0.75 * xOffset;
+				MeleePath.x -= 0.75f * xOffset;
 				//TIER 7
 				*currButton++ = skillUIManager.CreateButton(MeleePath, buildButtonSize, UI::AOE_SKILL_BUTTON,
 nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
@@ -1946,7 +1947,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 				UtilityPath.x += xsmallOffset;
 				UtilityPath.y -= tier1YOffset;
 
-				UtilityPath_Branch.x += 1.5 * xsmallOffset;
+				UtilityPath_Branch.x += 1.5f * xsmallOffset;
 				//UtilityPath_Branch.y += tier1YOffset;
 				// TIER 1
 				*currButton++ = skillUIManager.CreateButton(UtilityPath, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
@@ -1956,7 +1957,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 				// TIER 2
 				*currButton++ = skillUIManager.CreateButton(UtilityPath_Branch, buildButtonSize, UI::UTILITY_SKILL_BUTTON,
 					nullptr, UtilitySkillUpgrade_tier2, &textTable->UtilityTier2, false);
-				UtilityPath_Branch.x += 1.5 * xsmallOffset;
+				UtilityPath_Branch.x += 1.5f * xsmallOffset;
 				//UtilityPath_Branch.y += tier1YOffset;
 
 				//TIER 3
@@ -2220,13 +2221,18 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			blackScreen = new GameObject;
 			blackScreen->color.Set(0.f, 0.f, 0.f);
 			blackScreen->alpha = 0.f;
-			blackScreen->scale.x = AEGetWindowWidth();
-			blackScreen->scale.y = AEGetWindowWidth();
+			blackScreen->scale.x = (f32)AEGetWindowWidth();
+			blackScreen->scale.y = (f32)AEGetWindowWidth();
 			blackScreen->position.x = AEGetWindowWidth() / 2.f;
 			blackScreen->position.y = AEGetWindowHeight() / 2.f;
 			blackScreen->tex = NULL;
 		}
 		blackScreen->alpha = 0.f;
+
+		if (destroyedCondition == player)
+			playerloss = true;
+		else
+			playerloss = false;
 	}
 
 	AEVec2 UIPosToGamePos(const AEVec2& UIPos)

@@ -70,7 +70,7 @@ namespace UI
 		AEMtx33Scale(&scale, meshScale.x, meshScale.y);
 
 		AEMtx33 rotate = { 0 };
-		AEMtx33Rot(&rotate, PI);
+		AEMtx33Rot(&rotate, 0);
 
 		AEMtx33 translate = { 0 };
 		AEMtx33Trans(&translate, pos.x, pos.y);

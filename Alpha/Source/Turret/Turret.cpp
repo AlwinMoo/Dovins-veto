@@ -4,12 +4,12 @@ namespace
 {
 	void Shoot()
 	{
-		std::cout << "Bang!" << std::endl;
+		//std::cout << "Bang!" << std::endl;
 	}
 
 	void Idle()
 	{
-		std::cout << "Idle" << std::endl;
+		//std::cout << "Idle" << std::endl;
 	}
 }
 

@@ -177,7 +177,8 @@ namespace UI
 			curr->bHovering = false;
 
 #ifdef DEBUG_UI
-			std::cout << "MOUSEPOS = " << mousePos.x << ", " << mousePos.y << '\n';
+			std::
+				<< "MOUSEPOS = " << mousePos.x << ", " << mousePos.y << '\n';
 			std::cout << "CURRMIN  = " << curr->min.x << ", " << curr->min.y << '\n';
 			std::cout << "CURRMAX  = " << curr->max.x << ", " << curr->max.y << '\n';
 			std::cout << std::endl;

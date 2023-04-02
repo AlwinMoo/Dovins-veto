@@ -53,7 +53,7 @@ namespace UI{
 				isWord = is_whitespace(*rIt) ? false : true;
 				++rIt;
 			}
-		if (int index = line.rend() - rIt)
+		if (int index = static_cast<int>(line.rend() - rIt))
 			return static_cast<u32>(index);
 		//do 
 		//{
@@ -154,7 +154,7 @@ namespace UI{
 
 	UI_TextArea::~UI_TextArea()
 	{
-		std::cout << "DESTROYED" << std::endl;
+		//std::cout << "DESTROYED" << std::endl;
 	}
 
 }

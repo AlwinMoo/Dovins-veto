@@ -24,20 +24,20 @@ void skills_upgrade_check(GameObject* player)
 		player->Range.skill_bit = base;
 		player->Range.first_tier.cooldown = 0.0f;
 		player->Range.timer = 0.0f;
-		std::cout << "shoot active\n";
+		//std::cout << "shoot active\n";
 	}
 
 	if ((player->Range.skill_bit & tier1) != tier1 && AEInputCheckTriggered(AEVK_B))
 	{
 		player->Range.skill_bit |= tier1;
-		std::cout << "exploding active";
+		//std::cout << "exploding active";
 	}
 
 	if((player->Range.skill_bit & tier2) != tier2 && AEInputCheckTriggered(AEVK_N))
 	{
 		player->Range.skill_bit |= tier2;
 		player->Range.second_tier.cooldown = 0.0f;
-		std::cout << "car active";
+		//std::cout << "car active";
 	}
 
 	if ((player->Melee.skill_bit & base) != base && AEInputCheckTriggered(AEVK_J))
@@ -45,25 +45,25 @@ void skills_upgrade_check(GameObject* player)
 		player->Melee.skill_bit |= base;
 		player->Melee.first_tier.cooldown = 0.0f;
 		player->Melee.timer = 0.0f;
-		std::cout << "AOE active\n";
+		//std::cout << "AOE active\n";
 	}
 
 	if ((player->Melee.skill_bit & tier1) != tier1 && AEInputCheckTriggered(AEVK_U))
 	{
 		player->Melee.skill_bit |= tier1;
-		std::cout << "taunt active";
+		//std::cout << "taunt active";
 	}
 
 	if ((player->Melee.skill_bit & tier2) != tier2 && AEInputCheckTriggered(AEVK_I))
 	{
 		player->Melee.skill_bit |= tier2;
-		std::cout << "Blasting";
+		//std::cout << "Blasting";
 	}
 
 	if ((player->Utility.skill_bit & base) != base && AEInputCheckTriggered(AEVK_O))
 	{
 		player->Utility.skill_bit |= base;
-		std::cout << "blink active\n";
+		//std::cout << "blink active\n";
 	}
 }
 
@@ -165,7 +165,7 @@ void car_move(GameObject* Player, GameObject* skill_inst)
 	skill_inst->scale.y = skill_vals::CAR_SIZE;
 	skill_inst->alpha = 1.0f;
 	car_ang = atan2(static_cast<double>(skill_inst->position.y - mouseY), static_cast<double> (skill_inst->position.x - mouseX));
-	AEVec2Set(&skill_inst->direction, -cos(car_ang), -sin(car_ang));
+	AEVec2Set(&skill_inst->direction, -cosf((float)car_ang), -sinf((float)car_ang));
 }
 
 void random_shoot(GameObject* parent, GameObject* skill_inst)
@@ -243,7 +243,7 @@ void AOE_ready(GameObject* player, GameObject* AOE)
 			player->rotation = AERadToDeg(atan2f(norm.x, norm.y));
 
 			AOE_ang = atan2(static_cast<double>(AOE->position.y - mouseY), static_cast<double> (AOE->position.x - mouseX));
-			AEVec2Set(&AOE->direction, -cos(AOE_ang), -sin(AOE_ang));
+			AEVec2Set(&AOE->direction, -cosf((float)AOE_ang), -sinf((float)AOE_ang));
 			AEVec2 norm_direc;
 			AEVec2Normalize(&norm_direc, &AOE->direction);
 			AEVec2Set(&AOE->direction, norm_direc.x, norm_direc.y);
@@ -261,12 +261,12 @@ void player_blink(GameObject* player)
 {
 	s32 mousex, mousey;
 	AEInputGetCursorPosition(&mousex, &mousey);
-	AEVec2 Mouse{ mousex, mousey };
+	AEVec2 Mouse{ (f32)mousex, (f32)mousey };
 	float dist = (player->Utility.skill_bit & tier3) ? skill_vals::UPGRADED_BLINK_RANGE : skill_vals::BLINK_RANGE;
 	if (AEVec2Distance(&player->position, &Mouse) >= dist) return;
 
-	player->position.x = mousex;
-	player->position.y = mousey;
+	player->position.x = (f32)mousex;
+	player->position.y = (f32)mousey;
 
 	player->Utility.first_tier.on_cd = true;
 	DASH_opcty = 0.5f;
@@ -333,7 +333,7 @@ void cooldown_check(GameObject* player)
 		player->Melee.first_tier.cooldown += AEFrameRateControllerGetFrameTime();
 		double timer;
 		timer = (player->Melee.skill_bit & tier3) ? 5.0 : 7.5;
-		AOE_opcty += 0.5 / (timer / AEFrameRateControllerGetFrameTime());
+		AOE_opcty += 0.5f / (f32)(timer / AEFrameRateControllerGetFrameTime());
 		if (player->Melee.first_tier.cooldown >= timer)
 		{
 			player->Melee.first_tier.cooldown = 0.0;
@@ -345,7 +345,7 @@ void cooldown_check(GameObject* player)
 	if (player->Range.second_tier.on_cd) //car cooldown
 	{
 		player->Range.second_tier.cooldown += AEFrameRateControllerGetFrameTime();
-		CAR_opcty += 0.5 / (CAR_CD/ AEFrameRateControllerGetFrameTime());
+		CAR_opcty += 0.5f / (f32)(CAR_CD/ AEFrameRateControllerGetFrameTime());
 		if (player->Range.second_tier.cooldown >= CAR_CD)
 		{
 			player->Range.second_tier.cooldown = 0.0;
@@ -370,7 +370,7 @@ void cooldown_check(GameObject* player)
 		player->Utility.first_tier.cooldown += AEFrameRateControllerGetFrameTime();
 		double timer;
 		timer = (player->Utility.skill_bit & tier1) ? UPGRADED_DASH_CD : DASH_CD;
-		DASH_opcty += 0.5 / (timer / AEFrameRateControllerGetFrameTime());
+		DASH_opcty += 0.5f / (f32)(timer / AEFrameRateControllerGetFrameTime());
 		if (player->Utility.first_tier.cooldown >= timer)
 		{
 			player->Utility.first_tier.cooldown = 0.0;
@@ -382,7 +382,7 @@ void cooldown_check(GameObject* player)
 	{
 		player->Utility.second_tier.cooldown += AEFrameRateControllerGetFrameTime();
 		double timer = (player->Utility.skill_bit & tier4) ? UPGRADED_HEAL_CD : HEAL_CD;
-		HEAL_opcty += 0.5 / (timer / AEFrameRateControllerGetFrameTime());
+		HEAL_opcty += 0.5f / (f32)(timer / AEFrameRateControllerGetFrameTime());
 		if (player->Utility.second_tier.cooldown >= timer)
 		{
 			player->Utility.second_tier.cooldown = 0.0;
