@@ -1,4 +1,3 @@
-
 /******************************************************************************/
 /*!
 \file		Map.cpp
@@ -14,6 +13,7 @@ Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
  */
  /******************************************************************************/
+
 #include "Menu.h"
 #include "UI_Manager.h"
 #include "UI_TextAreaTable.h"

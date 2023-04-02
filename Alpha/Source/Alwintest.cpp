@@ -6,7 +6,7 @@
 \author		Bevan Lim
 \author		Alonzo Nalpon
 \par        email: moo.g\@digipen.edu
-\par        email: \@digipen.edu
+\par        email: a.yeo\@digipen.edu
 \par        email: \@digipen.edu
 \par        email: \@digipen.edu
 \date       April 02, 2023
