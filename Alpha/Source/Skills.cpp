@@ -376,7 +376,7 @@ void cooldown_UI(GameObject* player, AEGfxVertexList* pMesh)
 		}
 		generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_HEAL_SKILL], HEAL_opcty, 100.f, 100.f, 0.f, -400.f);
 	}
-	if (player->Range.skill_bit & tier6)
+	if (player->Range.skill_bit & tier9)
 	{
 		if (!player->Range.second_tier.on_cd)
 		{
