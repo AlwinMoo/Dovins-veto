@@ -653,17 +653,17 @@ void Alwintest_Update()
 
 				//GameObject* biproduct = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
 
-				for (GameObject* go : go_list)
-				{
-					if (!go->active || go->type != GameObject::GO_WALL)
-						continue;
+				//for (GameObject* go : go_list)
+				//{
+				//	if (!go->active || go->type != GameObject::GO_WALL)
+				//		continue;
 
-					if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
-					{
-						gameObj->active = false;
-						player->Range.second_tier.active = false;
-					}
-				}
+				//	if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
+				//	{
+				//		gameObj->active = false;
+				//		player->Range.second_tier.active = false;
+				//	}
+				//}
 
 				if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 				{
