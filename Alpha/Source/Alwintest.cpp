@@ -1,3 +1,24 @@
+/******************************************************************************/
+/*!
+\file		Alwintest.cpp
+\author		Alwin Moo
+\author		Alvin Yeo
+\author		Bevan Lim
+\author		Alonzo Nalpon
+\par        email: moo.g\@digipen.edu
+\par        email: \@digipen.edu
+\par        email: \@digipen.edu
+\par        email: \@digipen.edu
+\date       April 02, 2023
+\brief		Alwin (25%), Alvin (25%), Bevan (25%), Alonzo (25%)
+			Main game loop and functions
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
+
 #include "Alwintest.h"
 #include <iostream>
 #include "Rendering.hpp"
@@ -835,24 +856,7 @@ void Alwintest_Update()
 void Alwintest_Draw()
 {
 	s32 cursorX, cursorY;
-	//s8 text[] = "TEST";
 	AEInputGetCursorPosition(&cursorX, &cursorY);
-	//f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
-	//f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
-	//f32 fcursorX, fcursorY;
-	//
-	//AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
-	//
-	//// IMPORTANT SNIPPET:
-	///***********************************************************************/
-	//f32 winX{ AEGfxGetWinMaxX() - AEGfxGetWinMinX() }, winY{ AEGfxGetWinMaxY() - AEGfxGetWinMinY() };
-	////std::cout << winX << ", " <<  winY << std::endl;
-	//f32 cursorXN{ cursorX / winX * 2 - 1.f }, cursorYN{ cursorY / winY * -2 + 1.f }; // NORMALIZED COORDINATES
-	//std::cout << cursorXN << ", " << cursorYN << std::endl;
-	///************************************************************************/
-	//s8 const* testStr = "BUILD PHASE";
-	//AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	////AEGfxPrint(m_fontId, (s8*)testStr, cursorXN, cursorYN, 2.f, 1.f, 0.f, 0.f);
 
 	// If not in skill tree, render game objects
 	if (currUILayer == UI_TYPE::UI_TYPE_GAME || currGameState == GAMESTATE::DEATH_PHASE || currGameState == GAMESTATE::PAUSE_PHASE)
@@ -866,10 +870,6 @@ void Alwintest_Draw()
 
 			if (gameObj->type != GameObject::GO_PARTICLE)
 				gameObj->Render();
-
-			//
-			/*if (gameObj->type == GameObject::GO_ENEMY && gameObj->Stats.GetCurrState() == STATE::STATE_ENEMY_ATTACK)
-				RenderTexture(targetedTex, gameObj->smallTarget->position, gameObj->smallTarget->scale, gameObj->smallTarget->rotation);*/
 		}
 
 		if (currGameState == GAMESTATE::DEFEND_PHASE)
@@ -1049,7 +1049,6 @@ namespace
 		AEInputGetCursorPosition(&mouseX, &mouseY);
 		AEVec2Set(&absMousePos, static_cast<f32>(mouseX), static_cast<f32>(mouseY));
 		AEVec2Set(&mouse_pos, static_cast<f32>(mouseX), static_cast<f32>(mouseY));
-		//float mouseYGrid = static_cast<int>(mouseY / test_map->get_tile_size()) * test_map->get_tile_size() + (test_map->get_tile_size() * 0.5);
 		mouse_pos = test_map->SnapCoordinates(mouse_pos);
 	}
 
@@ -1300,11 +1299,11 @@ namespace
 
 	void SpawnEnemies()
 	{
-		enemySpawnTimer += static_cast<float>(AEFrameRateControllerGetFrameTime());
+		enemySpawnTimer += static_cast<float>(AEFrameRateControllerGetFrameTime()); //increase count to next enemy
 
-		if (enemiesSpawned < enemiesToSpawn)
+		if (enemiesSpawned < enemiesToSpawn) // if we have not yet reached the number of enemies
 		{
-			if (enemySpawnTimer > enemySpawnRate)
+			if (enemySpawnTimer > enemySpawnRate) //if we have exceeded spawn rate
 			{
 				GameObject* temp = FetchGO(GameObject::GO_ENEMY);
 
@@ -1333,7 +1332,6 @@ namespace
 				temp->Stats.SetCurrInnerState(INNER_STATE::ISTATE_NONE);
 				temp->Stats.SetCurrStateFromNext();
 				// deafult values, can be overwritten later
-				//temp->Stats.SetRawStat(STAT_HEALTH, ENEMY_HEALTH);
 				temp->Stats.SetStat(STAT_MOVE_SPEED, ENEMY_BASE_MOVESPEED);
 				temp->target = player;
 				temp->Stats.SetDefault(INFANTRY_HEALTH, ENEMY_BASE_MOVESPEED, INFANTRY_ATTACK_SPEED, INFANTRY_DAMAGE);
@@ -1383,14 +1381,12 @@ namespace
 				++enemiesRemaining;
 				++enemiesSpawned;
 				enemySpawnTimer = 0.0f;
-				//std::cout << enemiesSpawned << "/" << enemiesToSpawn << std::endl;
 			}
 		}
 	}
 
 	void NextWaveCheck()
 	{
-		//std::cout << "Remain: " << enemiesRemaining << std::endl;
 		if ((enemiesRemaining == 0 && enemiesSpawned == enemiesToSpawn) || !player->active || !Nexus->active)
 		{
 			double normCurrentWave{ static_cast<double>(AEClamp(static_cast<float>(currentWave + 6), 6, 20)) };
@@ -1518,17 +1514,20 @@ namespace
 
 				if (gameObj->Stats.path_timer >= 1.0f && gameObj->target != nullptr)
 				{
+					// create path maker
 					PathManager pathmaker(test_map, false);
+					// calculate the path
 					gameObj->Path = pathmaker.GetPath(AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->position)) }, AEVec2{ (float)test_map->GetX(test_map->WorldToIndex(gameObj->target->position)), (float)test_map->GetY(test_map->WorldToIndex(gameObj->target->position)) });
 
-					if (!gameObj->Path.empty())
+					if (!gameObj->Path.empty()) // if we got a valid path
 					{
-						gameObj->Path.erase(gameObj->Path.begin());
+						gameObj->Path.erase(gameObj->Path.begin()); // erase begin because that would be the object's own position
 						std::vector<AEVec2>::iterator it = gameObj->Path.begin();
 						for (auto& pos : gameObj->Path) // converting grid pos to world pos
 						{
 							if (test_map->map_arr[test_map->GetIndex(static_cast<int>(pos.x), static_cast<int>(pos.y))] != game_map::TILE_TYPE::TILE_NONE)
 							{
+								// set the nearest GO as the secondary target
 								gameObj->smallTarget = IndexToGO(test_map->GetIndex(static_cast<int>(pos.x), static_cast<int>(pos.y)));
 								if (gameObj->smallTarget != nullptr) break;
 							}
@@ -1542,8 +1541,7 @@ namespace
 						gameObj->Stats.path_timer = 0.0f;
 					}
 
-					// @TODO CHANGE MELEE RANGE
-					if (gameObj->smallTarget == nullptr)
+					if (gameObj->smallTarget == nullptr) // if we have no secondary targets, make the secondary target the primary target
 						gameObj->smallTarget = gameObj->target;
 
 					if (AEVec2Distance(&gameObj->smallTarget->position, &gameObj->position) <= (gameObj->smallTarget->scale.x * gameObj->smallTarget->gridScale.x + gameObj->scale.x) * 0.8f)

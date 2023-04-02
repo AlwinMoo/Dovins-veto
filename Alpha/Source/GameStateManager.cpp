@@ -1,8 +1,20 @@
+/******************************************************************************/
+/*!
+\file		GameStateManager.cpp
+\author		Bevan Lim
+\author		Alonzo Nalpon
+\par        email: \@digipen.edu
+\date       April 02, 2023
+\brief		
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #include "AEEngine.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
-#include "Bevantest.h"
-#include "TestScene.h"
 #include "Alwintest.h"
 #include "Splashscreen.h"
 #include "Menu.h"
