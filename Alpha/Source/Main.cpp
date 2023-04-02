@@ -1,13 +1,17 @@
 /******************************************************************************/
 /*!
-\file		GameObject.cpp
+\file		Main.cpp
 \author		Bevan Lim
 \author		Alonzo Nalpon
 \author		Alvin Yeo
 \author		Alwin Moo
 \par        email: moo.g\@digipen.edu
+\par        email: a.yeo\@digipen.edu
+\par        email: \@digipen.edu
+\par        email: \@digipen.edu
 \date       April 02, 2023
-\brief		GameObject effector
+\brief		Alwin (25%), Alvin (25%), Bevan (25%), Alonzo (25%)
+			Main Game Loop
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

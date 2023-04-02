@@ -1,3 +1,19 @@
+/******************************************************************************/
+/*!
+\file		GameObject.h
+\author		Alwin Moo
+\author		Alvin Yeo
+\par        email: moo.g\@digipen.edu
+\par		email: a.yeo\@digipen.edu
+\date       January 10, 2023
+\brief		Alwin (Primary 80%), Alvin (Secondary 20%)
+			GameObject effector
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 

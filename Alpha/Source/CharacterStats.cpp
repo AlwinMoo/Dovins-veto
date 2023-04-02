@@ -5,7 +5,7 @@
 \author		Alonzo Nalpon
 \par        email: moo.g\@digipen.edu
 \par        email: a.nalpon\@digipen.edu
-\date       April 02, 2023
+\date       March 01, 2023
 \brief		Alonzo (Primary 50%), Alwin (Secondary 50%)
 			Charcater stats and functions to provide raw and calculated stats.
 

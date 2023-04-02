@@ -3,8 +3,9 @@
 \file		pathfinder.cpp
 \author		Alwin Moo
 \par        email: moo.g\@digipen.edu
-\date       April 02, 2023
+\date       January 29, 2023
 \brief		Alwin (Primary 100%)
+			A* pathfinding functions
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
