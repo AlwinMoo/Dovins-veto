@@ -5,7 +5,7 @@
 \author		Alvin Yeo
 \par        email: moo.g\@digipen.edu
 \par		email: a.yeo\@digipen.edu
-\date       April 02, 2023
+\date       January 10, 2023
 \brief		Alwin (Primary 80%), Alvin (Secondary 20%)
 			GameObject effector
 

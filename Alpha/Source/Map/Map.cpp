@@ -5,7 +5,7 @@
 \author		Alvin Yeo
 \par        email: moo.g\@digipen.edu
 \par		email: a.yeo\@digipen.edu
-\date       April 02, 2023
+\date       January 26, 2023
 \brief		Alwin (Primary 50%), Alvin (Secondary 50%)
 
 Copyright (C) 2023 DigiPen Institute of Technology.
