@@ -1,8 +1,10 @@
 /******************************************************************************/
 /*!
 \file		UI_Button.h
-\author 	Alonzo Nalpon 95%, Alvin Yeo 5%
+\author 	Alonzo Nalpon(a.nalpon) 95%, Alvin Yeo 5%
+\author 	Alvin Yeo 5%
 \par    	email: a.nalpon@digipen.edu
+\par    	email: 
 \date   	April 01, 2023
 \brief		This file contains the definition of button class
 			to be used with ui manager

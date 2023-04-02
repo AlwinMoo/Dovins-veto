@@ -1,3 +1,17 @@
+/******************************************************************************/
+/*!
+\file		UI_Button.h
+\authors 	Alonzo Nalpon(a.nalpon)
+\par    	email: a.nalpon@digipen.edu
+\date   	April 01, 2023
+\brief		This file contains the definition of UI_StatInfo class.
+			These elements can render text and/or mesh
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #ifndef UI_STAT_ELEMENT_H
 #define UI_STAT_ELEMENT_H
 #include "UI_Def.h"
@@ -26,24 +40,7 @@ namespace UI {
 	// Prints out image followed by text
 	class UI_StatElement
 	{
-		//void (*m_drawFuncArr[UI_STAT_ELEMENT_TOTAL])();
-		// TODO: remove this
-		std::array<void (*)(), UI_STAT_ELEMENT_TOTAL>m_drawFuncArr;
-		UI_STAT_ELEMENT_TYPE m_type;
-		
-
 		UI_StatInfo data;
-
-		double m_counter;
-		bool m_bTimed;
-		std::string m_text;		//!< any beginning text (before value)
-	
-		//AEVec2 m_textNPosStart;	//!< screen space pos (NORMALIZED) for text
-		AEVec2 m_vel;			//!< moving texts
-
-		
-
-		// Private Methods
 	public:
 		UI_StatElement(AEVec2 pos, UI_TextArea* text = nullptr, AEVec2 const& meshDims = {});
 		~UI_StatElement() = default;
