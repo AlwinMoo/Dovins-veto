@@ -116,7 +116,6 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClCompile Include="..\Source\Skills.cpp" />
     <ClCompile Include="..\Source\TestScene.cpp" />
     <ClCompile Include="..\Source\UI_Def.cpp" />
-    <ClCompile Include="..\Source\UI_SkillTree.cpp" />
     <ClCompile Include="..\Source\UI_TextArea.cpp" />
     <ClCompile Include="..\Source\UI_TextAreaTable.cpp" />
     <ClCompile Include="..\Source\UI_TextLineInfo.cpp" />
@@ -149,7 +148,6 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.08\lib\Alpha_Engine.dll" "$(OutDir)" 
     <ClInclude Include="..\Source\Skills.h" />
     <ClInclude Include="..\Source\TestScene.h" />
     <ClInclude Include="..\Source\UI_Panel.h" />
-    <ClInclude Include="..\Source\UI_SkillTree.h" />
     <ClInclude Include="..\Source\UI_TextArea.h" />
     <ClInclude Include="..\Source\UI_TextAreaTable.h" />
     <ClInclude Include="..\Source\UI_TextLineInfo.h" />
