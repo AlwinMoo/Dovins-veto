@@ -1,6 +1,19 @@
+/******************************************************************************/
+/*!
+\file		pathfinder.cpp
+\author		Alwin Moo
+\par        email: moo.g\@digipen.edu
+\date       April 02, 2023
+\brief		Alwin (Primary 100%)
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #include "pathfinder.h"
 
-constexpr static unsigned int MAX_ITER{ 10000 };
+const static unsigned int MAX_ITER{ 10000 };
 
 PathManager::PathManager(game_map* Map, bool player) : Map(Map), is_player(player), iterations(0)
 {
@@ -91,8 +104,6 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 	AEVec2 NewPos{ 0,0 };	
 	std::string sPos{};
 	double fNew, gNew, hNew;
-
-	// @TODO make sure path exists
 
 #pragma region NORTH
 	// x, y + 1
@@ -461,9 +472,6 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 
 std::vector<AEVec2> PathManager::tracePath(std::map<std::string, cell> cellData, AEVec2 goalPos)
 {
-	/*printf("\nThe Path is ");
-	int row = dest.first;
-	int col = dest.second;*/
 	AEVec2 temp = goalPos;
 
 	std::stack<AEVec2> Path;
@@ -497,11 +505,6 @@ std::vector<AEVec2> PathManager::GetPath(AEVec2 const& startPos, AEVec2 const& g
 	if (!IsPositionValid(goalPos) || !IsPositionValid(startPos))
 		return std::vector<AEVec2>();
 
-	/*std::map<AEVec2, cell> cellData;
-	std::map<AEVec2, bool> closedList;*/
-
-	// @TODO take these out so that we dont have to initialise a new map every time AI searches for a path
-
 	cellData.at(VectorToString(startPos)).f = 0.0;
 	cellData.at(VectorToString(startPos)).g = 0.0;
 	cellData.at(VectorToString(startPos)).h = 0.0;
@@ -527,56 +530,6 @@ std::vector<AEVec2> PathManager::GetPath(AEVec2 const& startPos, AEVec2 const& g
 
 		// Start searching neighbours
 
-		//for (int newX = -1; newX <= 1; newX++) 
-		//{
-		//	for (int newY = -1; newY <= 1; newY++) 
-		//	{
-		//		double gNew, hNew, fNew;
-
-		//		AEVec2 NewPos = AEVec2{ StringToVector(curr.second).x + newX, StringToVector(curr.second).y + newY };
-		//		std::string sPos = VectorToString(NewPos);
-
-		//		if (IsPositionValid(NewPos))
-		//		{
-		//			// if destination is same as current
-		//			if (NewPos.x == goalPos.x && NewPos.y == goalPos.y)
-		//			{
-		//				// set parent of goal cell
-		//				cellData.at(sPos).parent = StringToVector(curr.second);
-		//				result = tracePath(cellData, goalPos);
-		//				foundDest =  true;
-		//			}
-		//			else if (closedList.at(sPos) == false) // if already on the closed list, or if not possible
-		//			{
-		//				gNew = cellData.at(curr.second).g + sqrt(newX * newX + newY * newY) + (*Map)(NewPos);
-		//				hNew = calculateHValue(NewPos, goalPos);
-		//				fNew = gNew + 2.f * hNew;
-
-		//				// If it isn’t on the open list, add it to
-		//				// the open list. Make the current square
-		//				// the parent of this square. Record the
-		//				// f, g, and h costs of the square cell
-		//				//                OR
-		//				// If it is on the open list already, check
-		//				// to see if this path to that square is
-		//				// better, using 'f' cost as the measure.
-
-		//				if (cellData.at(sPos).f == FLT_MAX || cellData.at(sPos).f > fNew)
-		//				{
-		//					openList.insert(std::make_pair(fNew, sPos));
-
-		//					// update details
-		//					cellData.at(sPos).f = fNew;
-		//					cellData.at(sPos).g = gNew;
-		//					cellData.at(sPos).h = hNew;
-		//					cellData.at(sPos).parent = StringToVector(curr.second);
-		//				}
-		//			}
-
-		//		}
-		//	}
-		//}
-
 		foundDest = calculate_neighbour(StringToVector(curr.second), goalPos);
 
 		if (iterations >= MAX_ITER)
@@ -588,51 +541,3 @@ std::vector<AEVec2> PathManager::GetPath(AEVec2 const& startPos, AEVec2 const& g
 
 	return std::vector<AEVec2>();
 }
-
-//std::vector<AEVec2> PathManager::GetPath(AEVec2 StartPos, AEVec2 GoalPos)
-//{
-//	if (!IsPositionValid(GoalPos))
-//		return std::vector<AEVec2>();
-//
-//	std::vector<AEVec2> backtrackPath{};
-//
-//	// clean up
-//	std::queue<std::pair<AEVec2, AEVec2>> empty{};
-//	std::swap(frontier, empty);
-//
-//	visited.clear();
-//
-//	frontier.push(std::make_pair(StartPos, AEVec2{-1, -1}));
-//
-//	unsigned int iter = 0;
-//	while (frontier.size() > 0)
-//	{
-//		std::pair<AEVec2, AEVec2> cellInfo = frontier.front();
-//		frontier.pop();
-//
-//		if (CheckCell(cellInfo.first, cellInfo.second, GoalPos))
-//			break;
-//
-//		++iter;
-//
-//		if (iter >= MAX_ITER) // if we have reached max iterations but still have yet to find the path
-//			return std::vector<AEVec2>();
-//	}
-//
-//	AEVec2 currPos = GoalPos;
-//
-//	// while the current position exists and the last position is not 0,0
-//	while (visited.count(VectorToString(currPos)) && (visited[VectorToString(currPos)].x != -1 && visited[VectorToString(currPos)].y != -1))
-//	{
-//		if (currPos.x != -1 && currPos.y != -1)
-//			backtrackPath.push_back(currPos);
-//		
-//		currPos = visited[VectorToString(currPos)];
-//	}
-//
-//	std::reverse(backtrackPath.begin(), backtrackPath.end());
-//
-//	return backtrackPath;
-//}
-
-

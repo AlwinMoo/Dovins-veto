@@ -1,10 +1,25 @@
+/******************************************************************************/
+/*!
+\file		GameObject.cpp
+\author		Bevan Lim
+\author		Alonzo Nalpon
+\author		Alvin Yeo
+\author		Alwin Moo
+\par        email: moo.g\@digipen.edu
+\date       April 02, 2023
+\brief		GameObject effector
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 // ---------------------------------------------------------------------------
 // includes
 
 #include "AEEngine.h"
 #include "../Source/GameStateManager.h"
 #include "../Source/GameStateList.h"
-#include "../Source/TestScene.h"
 #include "UI_Def.h"
 // ---------------------------------------------------------------------------
 // main
@@ -65,6 +80,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			//more steps
 			AESysFrameStart();
 			AEInputUpdate();
+			AEAudioUpdate();
 			fpUpdate();
 			fpDraw();
 			AESysFrameEnd();

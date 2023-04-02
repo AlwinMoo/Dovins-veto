@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\Source\Bevantest.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\GameObject.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -17,9 +14,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Rendering.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\TestScene.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\UI_TextArea.cpp">
@@ -41,15 +35,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Skills.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Enemy\Enemy.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Enemy\StateMachine.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Turret\Turret.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\CharacterStats.cpp">
@@ -81,9 +66,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Source\Bevantest.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\GameObject.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -117,9 +99,6 @@
     <ClInclude Include="..\Source\SceneManager.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\TestScene.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\UI_TextArea.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -136,15 +115,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Skills.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Enemy\Enemy.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Enemy\StateMachine.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Turret\Turret.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\CharacterStats.h">
