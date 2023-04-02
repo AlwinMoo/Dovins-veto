@@ -529,6 +529,8 @@ void Alwintest_Update()
 
 				for (GameObject* go : go_list)
 				{
+					if (go == nullptr)
+						continue;
 					if (!go->active)
 						continue;
 					if (go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
