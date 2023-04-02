@@ -115,7 +115,6 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.09\lib\fmod.dll" "$(OutDir)" /s /r /y
     <ClCompile Include="..\Source\Skills.cpp" />
     <ClCompile Include="..\Source\UI_Def.cpp" />
     <ClCompile Include="..\Source\UI_TextArea.cpp" />
-    <ClCompile Include="..\Source\UI_TextAreaTable.cpp" />
     <ClCompile Include="..\Source\UI_TextLineInfo.cpp" />
     <ClCompile Include="..\Source\UI_Manager.cpp" />
     <ClCompile Include="..\Source\UI_StatElement.cpp" />

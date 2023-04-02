@@ -86,7 +86,7 @@ namespace UI
 		UI::UI_TextArea UtilityTier3				= { .3f, 1.f, "Reduced cooldwon for your heal. COSTS: 200" };
 		UI::UI_TextArea UtilityTier4				= { .3f, 1.f, "Increased blink radius. COSTS: 200" };
 
-		UI_TextAreaTable();
+		UI_TextAreaTable() = default;
 		~UI_TextAreaTable() = default;
 	};
 }
