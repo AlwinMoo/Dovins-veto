@@ -380,7 +380,7 @@ void Alwintest_Update()
 		if (player_moving && !player->Path.empty())
 			PlayerReachGoalCheck();
 
-		TempTestUpdateFunctions();
+		//TempTestUpdateFunctions();
 
 		GameObject* player_clone = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CLONE);
 		player_clone->tex = playerTex;
