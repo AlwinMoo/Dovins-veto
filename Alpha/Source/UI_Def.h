@@ -1,12 +1,32 @@
+/******************************************************************************/
+/*!
+\file		UI_Def.h
+\author 	Alonzo Nalpon 90% -> functions, extern declarations, enumerations
+			Bevan 10% -> additional enumerations for buttons/tex
+\par    	email: a.nalpon@digipen.edu
+\date   	April 01, 2023
+\brief		This file contains enumerations for textures, button types and meshes
+			with helper functions to draw/print text on screen, init and unloading UI.
+			All textures and mesh used by UI will be loaded and unloaded by UI_Def.
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #ifndef UI_DEF_H
 #define UI_DEF_H
 #include "AEEngine.h"
 #include <array>
-extern s8 g_fontID;
 
 // Types
+extern s8 g_fontID; // Defined in main: the font used by all
 namespace UI
 {
+	/// <summary>
+	/// Enumerations for all button types.
+	/// To be used when calling UI_Manager::CreateButton
+	/// </summary>
 	enum BUTTON_TYPE {
 		WHITE_BUTTON,
 		END_PHASE_BUTTON,
@@ -28,12 +48,18 @@ namespace UI
 		NUM_BUTTONS
 	};
 
+	/// <summary>
+	/// Enumerations for meshes used by ui buttons/ elements
+	/// </summary>
 	enum UI_MESH
 	{
 		MESH_BOX,
 		NUM_MESH
 	};
 
+	/// <summary>
+	/// Textures for all UI elements/buttons
+	/// </summary>
 	enum UI_TEX
 	{
 		TEX_BUTTON,
@@ -54,15 +80,19 @@ namespace UI
 		TEX_GUN_SKILL,
 		TEX_AOE_SKILL,
 		TEX_HEAL_SKILL,
+		// Other UI elements
 		TEX_READY,
 		TEX_CREDIT,
 		TEX_MENU,
 		TEX_UI_BUTTON,
 		TEX_RESTART,
-		TEX_PANEL,
+		TEX_PANEL, // Panel for button background
 		NUM_TEX
 	};
 
+	/// <summary>
+	/// Types of UI stat elements
+	/// </summary>
 	enum UI_STAT_ELEMENT_TYPE
 	{
 		UI_STAT_ELEMENT_INT = 0,
@@ -78,23 +108,55 @@ namespace UI
 // Functions
 namespace UI
 {
+	/// <summary>
+	/// Loads all required textures and meshes. Call once on app startup
+	/// </summary>
 	void InitUI();
 
+	/// <summary>
+	/// Unloads all loaded required textures amd meshes. Call once on app termination
+	/// </summary>
 	void UnloadUI();
 
+	/// <summary>
+	/// Alternative print function involving more compact parameters
+	/// </summary>
+	/// <param name="pStr">string to print</param>
+	/// <param name="screenPosN">position of text with in range [-1, 1]</param>
+	/// <param name="scale">scale of text</param>
+	/// <param name="color">color of text</param>
 	void AEGfxPrint(s8 const* pStr, AEVec2 const& screenPosN, f32 scale, UI_Color const& color);
 
-	void AEGfxGetPrintSize(s8 const* pStr, AEVec2& screenPosN, f32 scale);
+	/// <summary>
+	/// Alternative print size function involving more compact parameters
+	/// </summary>
+	/// <param name="pStr">string to measure</param>
+	/// <param name="textDimsN">reference to be assigned width and height</param>
+	/// <param name="scale">scale of text</param>
+	void AEGfxGetPrintSize(s8 const* pStr, AEVec2& textDimsN, f32 scale);
 
+	/// <summary>
+	/// Draw a mesh based on pos, scale and texture onto a quad
+	/// </summary>
+	/// <param name="pos">position of mesh</param>
+	/// <param name="meshScale">scale of mesh</param>
+	/// <param name="texID">texture ID of mesh</param>
 	void DrawMesh(AEVec2 const& pos, AEVec2 const& meshScale, UI_TEX texID);
 
+	/// <summary>
+	/// Draws a mesh with a tint color
+	/// </summary>
+	/// <param name="pos">position of mesh</param>
+	/// <param name="meshScale">scale of mesh</param>
+	/// <param name="texID">texture ID of mesh</param>
+	/// <param name="color">color of the mesh to be tinted</param>
 	void DrawMesh(AEVec2 const& pos, AEVec2 const& meshScale, UI_TEX texID, UI_Color const& color);
 }
 
 // Globals
 namespace UI
 {
-	extern std::array<AEGfxTexture*, NUM_TEX> TextureList;
-	extern std::array<AEGfxVertexList*, NUM_MESH> MeshList;
+	extern std::array<AEGfxTexture*, NUM_TEX> TextureList; // !< array of textures to be loaded on InitUI()
+	extern std::array<AEGfxVertexList*, NUM_MESH> MeshList; //!< array of meshlists to be loaded on InitUI()
 }
 #endif

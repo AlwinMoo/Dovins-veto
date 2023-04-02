@@ -1,3 +1,17 @@
+/******************************************************************************/
+/*!
+\file		UI_Def.cpp
+\author 	Alonzo Nalpon 90% -> function and variable definitions
+			Bevan 10% -> loading additional textures
+\par    	email: a.nalpon@digipen.edu
+\date   	April 01, 2023
+\brief		This file contains definitions for Init/unload ui and draw functions
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #include "UI_Def.h"
 #include "Rendering.hpp"
 #include "Menu.h"
@@ -53,9 +67,9 @@ namespace UI
 		::AEGfxPrint(g_fontID, const_cast<s8*>(pStr), screenPosN.x, screenPosN.y, scale, color.r, color.g, color.b);
 	}
 
-	void AEGfxGetPrintSize(s8 const* pStr, AEVec2& screenPosN, f32 scale)
+	void AEGfxGetPrintSize(s8 const* pStr, AEVec2& textDimsN, f32 scale)
 	{
-		::AEGfxGetPrintSize(g_fontID, const_cast<s8*>(pStr), screenPosN.x, screenPosN.y, scale);
+		::AEGfxGetPrintSize(g_fontID, const_cast<s8*>(pStr), textDimsN.x, textDimsN.y, scale);
 	}
 
 	void DrawMesh(AEVec2 const& pos, AEVec2 const& meshScale, UI_TEX texID)

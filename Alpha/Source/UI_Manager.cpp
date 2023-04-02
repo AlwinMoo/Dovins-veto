@@ -2,7 +2,6 @@
 #include "Rendering.hpp"
 #include "Menu.h"
 #include <iostream>
-extern s8 g_fontID;
 namespace UI
 {
 	/*________________________________________________*/
