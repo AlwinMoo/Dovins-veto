@@ -580,11 +580,11 @@ void Alwintest_Update()
 							if ((gameObj->Range.skill_bit & tier2))
 							{
 								//implement spread shot function here
-								for (int i{}; i < skill_vals::MAX_SPREAD; ++i)
+								for (int bullet_counter{}; bullet_counter < skill_vals::MAX_SPREAD; ++bullet_counter)
 								{
 									GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
 									skill_inst->tex = bulletTex;
-									spreadshot(gameObj, skill_inst, i);
+									spreadshot(gameObj, skill_inst, bullet_counter);
 								}
 							}
 
@@ -1903,11 +1903,9 @@ namespace
 			AEVec2 skillPos{ tier1XPos, screenHeightY * 0.3f };
 			AEVec2 Begin{ screenWidthX * .5f , screenHeightY * 0.4f };
 
-			float Yoffset{ screenHeightY * 0.2f };
 			float tier1YOffset	{ screenHeightY * 0.1f };
 			float xOffset		{ screenWidthX * 0.08f };
 			float xsmallOffset	{ screenWidthX * 0.04f };
-			float ysmallOffset	{ screenHeightY * 0.5f };
 
 			AEVec2 RangePath_Branch1	{ Begin };
 			AEVec2 RangePath_Branch2	{ Begin };

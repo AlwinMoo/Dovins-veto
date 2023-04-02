@@ -42,8 +42,6 @@ void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 
 	AEVec2 out{};
 	AEVec2 norm{};
-	
-	u32 tier_checker	{ Player->Range.skill_bit };
 
 	AEInputGetCursorPosition(&mouseX, &mouseY);
 	AEVec2Set(&norm, (Player->position.x - mouseX), (Player->position.y - mouseY));
@@ -385,15 +383,16 @@ void cooldown_UI(GameObject* player, AEGfxVertexList* pMesh)
 		generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_SKILL_MENU], DASH_opcty, 100.f, 100.f, -300.f, -400.f);
 	}
 
-	if (player->Utility.skill_bit & tier2)
+	if (player->Utility.skill_bit & tier1)
 	{
 		if (!player->Utility.second_tier.on_cd)
 		{
 			HEAL_opcty = 1.f;
-			generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_READY], 1.f, 350.f, 300.f, -300.f, -325.f);
+			generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_READY], 1.f, 350.f, 300.f, -0.f, -325.f);
 		}
 		generic_draw(pMesh, UI::TextureList[UI::UI_TEX::TEX_HEAL_SKILL], HEAL_opcty, 100.f, 100.f, 0.f, -400.f);
 	}
+
 	if (player->Range.skill_bit & tier9)
 	{
 		if (!player->Range.second_tier.on_cd)
