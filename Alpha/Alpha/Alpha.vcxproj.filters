@@ -49,9 +49,6 @@
     <ClCompile Include="..\Source\UI_TextAreaTable.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\UI_SkillTree.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\Splashscreen.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -130,9 +127,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\UI_TextAreaTable.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\UI_SkillTree.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Splashscreen.h">

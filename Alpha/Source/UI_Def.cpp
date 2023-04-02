@@ -1,7 +1,7 @@
 /******************************************************************************/
 /*!
 \file		UI_Def.cpp
-\author 	Alonzo Nalpon 90% -> function and variable definitions
+\authors 	Alonzo Nalpon 90% -> function and variable definitions
 			Bevan 10% -> loading additional textures
 \par    	email: a.nalpon@digipen.edu
 \date   	April 01, 2023

@@ -274,10 +274,6 @@ namespace UI
 		}
 
 	}
-	UI_Manager::UI_Manager()
-	{
-		m_buttons = {};
-	}
 
 	UI_Manager::~UI_Manager()
 	{
