@@ -1,3 +1,21 @@
+/******************************************************************************/
+/*!
+\file		Tutorial.h
+\author		Bevan Lim Zhi Wei
+\par        email: bevanzhiwei.lim\@digipen.edu
+\date       April 02, 2023
+\brief		Bevan(Primary 100%)
+
+This source file contains the necessary function declarations for the execution
+of the tutorial segment of Badea 2.
+
+The tutorial segment shows a series of pictures depicting the basics of Badea 2
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #pragma once
 #include "GameStateManager.h"
 #include "GameStateList.h"

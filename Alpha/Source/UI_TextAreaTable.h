@@ -5,6 +5,8 @@
 \author		Alvin Yeo 33%
 \author		Bevan 33%
 \par    	email: a.nalpon@digipen.edu
+\par		email: 
+\par		email: bevanzhiwei.lim@digipen.edu
 \date   	April 01, 2023
 \brief		This file contains game text assets to be used with UI
 
