@@ -2610,7 +2610,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 	}
 	void RangeSkillUpgrade_tier9(UI::UI_Button* button)
 	{
-		if ((player->Range.skill_bit & tier9) != tier9 && (player->Range.skill_bit & tier6)  && buildResource >= RangeTier9_cost)
+		if ((player->Range.skill_bit & tier9) != tier9 && ((player->Range.skill_bit & tier6) || (player->Range.skill_bit & tier7))  && buildResource >= RangeTier9_cost)
 		{
 			buildResource -= RangeTier9_cost;
 			player->Range.skill_bit |= tier9;
