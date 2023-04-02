@@ -1419,7 +1419,7 @@ namespace
 			buildResource += static_cast<int>(std::round(easeInOutSine(normCurrentWave / 20) * 1500));
 
 			//skill stuff
-			cooldown_check(player);
+			cooldown_reset(player);
 			player->Range.second_tier.active = false;
 			//player->Melee.first_tier.active = false;
 			//end skill stuff
