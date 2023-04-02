@@ -437,37 +437,8 @@ void Alwintest_Update()
 			}
 		}
 
-		if (player->Range.second_tier.active)
-		{
-			GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
-			for (GameObject* go : go_list)
-			{
-				if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_CAR)
-				{
-					skill_inst->tex = bulletTex;
-					random_shoot(go, skill_inst);
-					break;
-				}
-			}
-		}
-
 		SpawnEnemies();
 		NextWaveCheck();
-
-		//skill stuff
-		if (player->Range.second_tier.active)
-		{
-			GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
-			for (GameObject* go : go_list)
-			{
-				if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_CAR)
-				{
-					skill_inst->tex = bulletTex;
-					random_shoot(go, skill_inst);
-					break;
-				}
-			}
-		}
 		// GameObject Update
 		for (GameObject* gameObj : go_list)
 		{
@@ -678,6 +649,9 @@ void Alwintest_Update()
 				gameObj->position.x += gameObj->direction.x * skill_vals::CAR_VEL * static_cast<float>(AEFrameRateControllerGetFrameTime());
 				gameObj->position.y += gameObj->direction.y * skill_vals::CAR_VEL * static_cast<float>(AEFrameRateControllerGetFrameTime());
 
+				GameObject* biproduct = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+				biproduct->tex = bulletTex;
+				random_shoot(gameObj, biproduct);
 				if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 				{
 					gameObj->active = false;
@@ -704,6 +678,21 @@ void Alwintest_Update()
 			}
 			}
 		}
+
+		//if (player->Range.second_tier.active)
+		//{
+		//	GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
+		//	for (GameObject* go : go_list)
+		//	{
+		//		if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_CAR)
+		//		{
+		//			skill_inst->tex = bulletTex;
+		//			random_shoot(go, skill_inst);
+		//			break;
+		//		}
+		//	}
+		//}
+
 		break;
 	}
 	case GAMESTATE::DEATH_PHASE:
