@@ -22,7 +22,7 @@ game_map::game_map(unsigned int width_size, unsigned int height_size, float worl
 	this->width = width_size;
 	this->height = height_size;
 	this->map_size = width_size * height_size;
-	this->map_arr = new TILE_TYPE[static_cast<size_t>(width_size) * height_size]{ TILE_TYPE::TILE_NONE };
+	this->map_arr = new TILE_TYPE[static_cast<size_t>(map_size)]{ TILE_TYPE::TILE_NONE };
 	this->world_width = world_width;
 	this->world_height = world_height;
 	this->world_offset = grid_offset * this->GetTileSize();

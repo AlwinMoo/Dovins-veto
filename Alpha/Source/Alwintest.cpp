@@ -339,6 +339,8 @@ void Alwintest_Initialize()
 {
 	std::srand((unsigned int)std::time(nullptr));
 
+	InitializeVariables();
+
 	InitializeUIManager();
 	InitializeUIButtons();
 	InitializeUIElements();
@@ -346,7 +348,6 @@ void Alwintest_Initialize()
 	InitializeTestMap();
 	InitialFetchGos();
 
-	InitializeVariables();
 
 	AEAudioPlay(BGM, music, 0.3f, 1.f, -1);
 
@@ -461,8 +462,10 @@ void Alwintest_Update()
 		SpawnEnemies();
 		NextWaveCheck();
 		// GameObject Update
-		for (GameObject* gameObj : go_list)
+		for (int i = 0; i < object_count; i++)
 		{
+			GameObject* gameObj = go_list[i];
+
 			if (!gameObj->active || gameObj->type == GameObject::GAMEOBJECT_TYPE::GO_TILE)
 				continue;
 
@@ -548,8 +551,10 @@ void Alwintest_Update()
 				if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 					gameObj->active = false;
 
-				for (GameObject* go : go_list)
+				for (int j = 0; j < object_count; j++)
 				{
+					GameObject* go = go_list[j];
+
 					if (go == nullptr)
 						continue;
 					if (!go->active)
@@ -609,8 +614,10 @@ void Alwintest_Update()
 				player->Melee.lifetime += AEFrameRateControllerGetFrameTime();
 
 				//check collision
-				for (GameObject* go : go_list)
+				for (int j = 0; j < object_count; j++)
 				{
+					GameObject* go = go_list[j];
+
 					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
 					{
 						if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
@@ -716,8 +723,10 @@ void Alwintest_Update()
 		if (player->Range.second_tier.active)
 		{
 			GameObject* skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
-			for (GameObject* go : go_list)
+			for (int i = 0; i < object_count; i++)
 			{
+				GameObject* go = go_list[i];
+
 				if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_CAR)
 				{
 					skill_inst->tex = bulletTex;
@@ -976,7 +985,7 @@ void Alwintest_Free()
 		delete go_list.back();
 		go_list.pop_back();
 	}
-
+	
 	delete goHealthBar;
 	delete textTable;
 	for (UI::UI_Manager* manager : uiManagers)
@@ -984,7 +993,7 @@ void Alwintest_Free()
 	delete test_map;
 	delete blackScreen;
 	blackScreen = nullptr;
-
+	//
 	AEGfxMeshFree(cooldown_mesh);
 	AEAudioStopGroup(music);
 }
@@ -999,18 +1008,22 @@ namespace
 {
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value)
 	{
-		for (auto it : go_list)
+		for (GameObject* go : go_list)
 		{
-			GameObject* go = (GameObject*)it;
 			if (!go->active && go->type == value)
 			{
 				go->active = true;
-				++object_count;
 				return go;
 			}
 		}
-		GameObject* go{ new GameObject(value) };
-		go_list.push_back(go);
+
+		// Create surplus of objects to reduce amount of times new memory is allocated
+		for (int i = 0; i < 50; i++)
+		{
+			GameObject* go{ new GameObject(value) };
+			go_list.push_back(go);
+			++object_count;
+		}
 
 		//CODE TO INITIALISE GO SPECIFIC VARIABLES
 
@@ -1025,6 +1038,8 @@ namespace
 		{
 			if (go->type == GameObject::GO_DANGER_SIGN && !go->active)
 			{
+				if (go->position.x == 0 && go->position.y == 0)
+					continue;
 				go->active = true;
 				test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(go->position));
 			}
@@ -1037,6 +1052,8 @@ namespace
 		{
 			if (go->type == GameObject::GO_DANGER_SIGN && go->active)
 			{
+				if (go->position.x == 0 && go->position.y == 0)
+					continue;
 				go->active = false;
 				test_map->RemoveItem(test_map->WorldToIndex(go->position));
 			}
@@ -2203,7 +2220,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			test_map->AddItem(game_map::TILE_TYPE::TILE_PLANET, test_map->WorldToIndex(temp->position));
 		}
 
-		EnableDangerSigns();
+		//EnableDangerSigns();
 	}
 
 	void InitializeVariables()
@@ -2223,6 +2240,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		enemySpawnTimer = 0.f;
 		enemyTankInGame = 0;
 		placeStructureClickTimer = 0.f;
+		object_count = 0;
 	}
 
 	float RandFloat(float min, float max)
