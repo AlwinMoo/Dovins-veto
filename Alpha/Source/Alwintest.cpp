@@ -327,7 +327,7 @@ void Alwintest_Initialize()
 
 	InitializeVariables();
 
-	AEAudioPlay(BGM, music, 1.f, 1.f, -1);
+	AEAudioPlay(BGM, music, 0.3f, 1.f, -1);
 
 	//skill UI stuff
 	cooldown_mesh = basic_mesh();
