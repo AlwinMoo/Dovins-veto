@@ -70,7 +70,6 @@ enum upgrade_level : u32
 
 //overall skill funcs
 using skill_func = void (*)(GameObject*, GameObject*);
-void skills_upgrade_check(GameObject*);
 void skills_update(GameObject*, GameObject*);
 int skill_input_check(GameObject*);
 
@@ -78,6 +77,7 @@ int skill_input_check(GameObject*);
 void basic_mesh(AEGfxVertexList*);
 void cooldown_UI(GameObject*, AEGfxVertexList*);
 void cooldown_check(GameObject*);
+void cooldown_reset(GameObject*);
 
 //range functions
 void shoot_bullet(GameObject*, GameObject*);

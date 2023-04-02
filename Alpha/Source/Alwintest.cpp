@@ -321,6 +321,7 @@ void Alwintest_Update()
 	{
 	case GAMESTATE::BUILD_PHASE:
 	{
+
 		if (currUILayer == UI_TYPE::UI_TYPE_GAME)
 		{
 			if (AEInputCheckCurr(AEVK_LBUTTON) && hoverStructure->active)
@@ -343,7 +344,6 @@ void Alwintest_Update()
 			}
 			UpdateHoverStructure();
 		}
-		skills_upgrade_check(player);
 		break;
 	}
 	case GAMESTATE::DEFEND_PHASE:
@@ -363,9 +363,6 @@ void Alwintest_Update()
 		player_clone->tex = playerTex;
 
 		afterimage(player_clone, player);
-
-		SpawnEnemies();
-		NextWaveCheck();
 
 
 
@@ -425,6 +422,9 @@ void Alwintest_Update()
 				}
 			}
 		}
+
+		SpawnEnemies();
+		NextWaveCheck();
 
 		// GameObject Update
 		for (GameObject* gameObj : go_list)
@@ -1392,6 +1392,12 @@ namespace
 			currGameState = GAMESTATE::BUILD_PHASE;
 			skillMenuBtn->bEnable = true;
 			buildResource += static_cast<int>(std::round(easeInOutSine(normCurrentWave / 20) * 1500));
+
+			//skill stuff
+			cooldown_check(player);
+			player->Range.second_tier.active = false;
+			//player->Melee.first_tier.active = false;
+			//end skill stuff
 			for (GameObject* go : go_list)
 			{
 				if (go->type == GameObject::GO_TILE)

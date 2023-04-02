@@ -17,56 +17,6 @@ namespace
 	double UPGRADED_HEAL_CD{ 5.0 };
 }
 
-void skills_upgrade_check(GameObject* player)
-{
-	if ((player->Range.skill_bit & base) != base && AEInputCheckTriggered(AEVK_H))
-	{
-		player->Range.skill_bit = base;
-		player->Range.first_tier.cooldown = 0.0f;
-		player->Range.timer = 0.0f;
-		//std::cout << "shoot active\n";
-	}
-
-	if ((player->Range.skill_bit & tier1) != tier1 && AEInputCheckTriggered(AEVK_B))
-	{
-		player->Range.skill_bit |= tier1;
-		//std::cout << "exploding active";
-	}
-
-	if((player->Range.skill_bit & tier2) != tier2 && AEInputCheckTriggered(AEVK_N))
-	{
-		player->Range.skill_bit |= tier2;
-		player->Range.second_tier.cooldown = 0.0f;
-		//std::cout << "car active";
-	}
-
-	if ((player->Melee.skill_bit & base) != base && AEInputCheckTriggered(AEVK_J))
-	{
-		player->Melee.skill_bit |= base;
-		player->Melee.first_tier.cooldown = 0.0f;
-		player->Melee.timer = 0.0f;
-		//std::cout << "AOE active\n";
-	}
-
-	if ((player->Melee.skill_bit & tier1) != tier1 && AEInputCheckTriggered(AEVK_U))
-	{
-		player->Melee.skill_bit |= tier1;
-		//std::cout << "taunt active";
-	}
-
-	if ((player->Melee.skill_bit & tier2) != tier2 && AEInputCheckTriggered(AEVK_I))
-	{
-		player->Melee.skill_bit |= tier2;
-		//std::cout << "Blasting";
-	}
-
-	if ((player->Utility.skill_bit & base) != base && AEInputCheckTriggered(AEVK_O))
-	{
-		player->Utility.skill_bit |= base;
-		//std::cout << "blink active\n";
-	}
-}
-
 void shoot_bullet(GameObject* Player, GameObject* skill_inst)
 {
 	double bullet_ang;
@@ -217,6 +167,7 @@ void AOE_move(GameObject* Player, GameObject* skill_inst)
 
 	if (Player->Range.skill_bit & tier6)
 		skill_inst->Melee.damage += 0.5f;
+
 	//if (Player->Range.skill_bit & tier7) just to see that theres a tier but doesnt require any action
 
 }
@@ -224,13 +175,14 @@ void AOE_move(GameObject* Player, GameObject* skill_inst)
 void AOE_ready(GameObject* player, GameObject* AOE)
 {
 	//tier 4 stuff
-		if (player->Melee.lifetime > 0.2 && AOE->alpha < 1.0f && (player->Melee.skill_bit & tier4))
+
+		if (player->Melee.lifetime > 0.2 && AOE->alpha < 1.0f)
 		{
 			AOE->alpha += 0.1f;
 			player->Melee.timer = 0;
 		}
 
-		if (AOE->alpha >= 1.0f && !AOE->skill_flag && (player->Melee.skill_bit & tier4))
+		if (AOE->alpha >= 1.0f && !AOE->skill_flag)
 		{
 			s32 mouseX, mouseY;
 			AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -290,7 +242,7 @@ int skill_input_check(GameObject* player)
 		return AOEing;
 	}
 
-	if (AEInputCheckTriggered(AEVK_C) && (player->Range.skill_bit & tier6) && !player->Range.second_tier.on_cd) //car
+	if (AEInputCheckTriggered(AEVK_C) && (player->Range.skill_bit & tier9) && !player->Range.second_tier.on_cd) //car
 	{
 		player->Range.second_tier.active = true;
 		player->Range.second_tier.on_cd = true;
@@ -436,6 +388,14 @@ void cooldown_UI(GameObject* player, AEGfxVertexList* pMesh)
 
 	}
 		
+}
+
+void cooldown_reset(GameObject* player)
+{
+	player->Melee.first_tier.on_cd = false;
+	player->Range.second_tier.on_cd = false;
+	player->Utility.first_tier.on_cd = false;
+	player->Utility.second_tier.on_cd = false;
 }
 
 

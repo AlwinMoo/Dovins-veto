@@ -208,8 +208,6 @@ void Bevantest_Update()
 	GameObject* player_clone = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CLONE);
 	player_clone->tex = Player;
 	afterimage(player_clone, player);
-
-	skills_upgrade_check(player);
 	skill_input = skill_input_check(player);
 	
 
@@ -436,13 +434,13 @@ void Bevantest_Update()
 
 
 	if(AEInputCheckTriggered(AEVK_Q)) next = GS_QUIT;
-	if (AEInputCheckTriggered(AEVK_K)) next = GS_LEVEL3;
+	if (AEInputCheckTriggered(AEVK_K)) next = GS_LEVEL1;
 
 
 
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
-		next = GS_LEVEL3;
+		next = GS_LEVEL1;
 	}
 	//if (AEInputCheckTriggered(AEVK_W)) next = GS_RESTART;
 	// Your own update logic goes here
@@ -604,5 +602,5 @@ void Bevantest_Unload()
 
 void PlayButton(UI::UI_Button*)
 {
-	next = GS_LEVEL3;
+	next = GS_LEVEL1;
 }
