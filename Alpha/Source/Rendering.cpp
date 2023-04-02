@@ -1,10 +1,11 @@
 /******************************************************************************/
 /*!
 \file		Rendering.cpp
-\author		Alwin Moo
-\par        email: moo.g\@digipen.edu
-\date       January 26, 2023
-\brief		Alwin (Primary 100%)
+\author		Alonzo Nalpon
+\par        email: a.nalpon@digipen.edu
+\date       January 12, 2023
+\brief		Alonzo (Primary 100%)
+Contains definitions to create different meshes
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

@@ -1,3 +1,18 @@
+/******************************************************************************/
+/*!
+\file		UI_TextLineInfo.h
+\author		Alonzo Nalpon
+\par        email: a.nalpon@digipen.edu
+\date       February 26, 2023
+\brief		Alonzo (Primary 100%)
+Contains declarations to get information about the text UI
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+/******************************************************************************/
+
 #ifndef UI_TEXT_LINE_INFO_H
 #define UI_TEXT_LINE_INFO_H
 #include <string>

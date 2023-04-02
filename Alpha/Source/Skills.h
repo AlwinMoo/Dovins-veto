@@ -2,8 +2,8 @@
 /*!
 \file		Skills.h
 \author		Bevan Lim Zhi Wei
-\par        email: bevanzhiwei.lim\@digipen.edu
-\date       April 02, 2023
+\par        email: bevanzhiwei.lim@digipen.edu
+\date       February 28, 2023
 \brief		Bevan (Primary 100%)
 This source file contains the necessary functions declarations for player skills,
 cooldown managers and skill input management

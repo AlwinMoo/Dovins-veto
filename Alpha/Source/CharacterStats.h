@@ -3,8 +3,8 @@
 \file		CharacterStats.h
 \author		Alwin Moo
 \author		Alonzo Nalpon
-\par        email: moo.g\@digipen.edu
-\par        email: a.nalpon\@digipen.edu
+\par        email: moo.g@digipen.edu
+\par        email: a.nalpon@digipen.edu
 \date       March 01, 2023
 \brief		Alonzo (Primary 50%), Alwin (Secondary 50%)
 			Charcater stats and functions to provide raw and calculated stats.

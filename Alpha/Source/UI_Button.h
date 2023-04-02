@@ -1,12 +1,14 @@
 /******************************************************************************/
 /*!
 \file		UI_Button.h
-\author 	Alonzo Nalpon(a.nalpon) 95%, Alvin Yeo 5%
-\author 	Alvin Yeo 5%
+\author 	Alonzo Nalpon -> Everything
+\author 	Alvin Yeo -> Only added support for a different render for if a
+						 skill is bought in the skill tree
 \par    	email: a.nalpon@digipen.edu
-\par    	email: 
-\date   	April 01, 2023
-\brief		This file contains the definition of button class
+\par    	email: a.yeo@digipen.edu
+\date   	January 28, 2023
+\brief		Alonzo (Primary 95%), Alvin (Secondary 5%)
+			This file contains the definition of button class
 			to be used with ui manager
 
 Copyright (C) 2023 DigiPen Institute of Technology.

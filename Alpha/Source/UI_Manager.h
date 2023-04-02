@@ -1,16 +1,17 @@
 /******************************************************************************/
 /*!
-\file		UI_TextAreaTable.h
+\file		UI_Manager.h
 \author 	Alonzo Nalpon (a.nalpon)
 \par    	email: a.nalpon@digipen.edu
-\date   	April 01, 2023
-\brief		This file contains game text assets to be
+\date   	January 26, 2023
+\brief		This file contains declarations for the UI Manager
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
  */
  /******************************************************************************/
+
 #ifndef UI_MANAGER_H
 #define UI_MANAGER_H
 #include <array>

@@ -2,7 +2,7 @@
 /*!
 \file		pathfinder.cpp
 \author		Alwin Moo
-\par        email: moo.g\@digipen.edu
+\par        email: moo.g@digipen.edu
 \date       January 29, 2023
 \brief		Alwin (Primary 100%)
 			A* pathfinding functions

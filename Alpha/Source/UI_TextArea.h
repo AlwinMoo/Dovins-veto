@@ -1,3 +1,18 @@
+/******************************************************************************/
+/*!
+\file		UI_TextArea.h
+\author		Alonzo Nalpon
+\par        email: a.nalpon@digipen.edu
+\date       January 28, 2023
+\brief		Alonzo (Primary 100%)
+			Contains declarations for a text box which includes text wrapping
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+/******************************************************************************/
+
 #ifndef UI_TEXTAREA_H
 #define UI_TEXTAREA_H
 #include "AEEngine.h"

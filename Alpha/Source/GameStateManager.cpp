@@ -3,9 +3,9 @@
 \file		GameStateManager.cpp
 \author		Bevan Lim
 \author		Alonzo Nalpon
-\par        email: bevanzhiwei.lim\@digipen.edu
+\par        email: bevanzhiwei.lim@digipen.edu
 \par		email: a.nalpon@digipen.edu
-\date       April 02, 2023
+\date       January 26, 2023
 \brief		Bevan (Primary 50%), Alonzo (Secondary 50%)
 
 This source file contains the function definition for the game state manager

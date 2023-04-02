@@ -2,8 +2,8 @@
 /*!
 \file		Splashscreen.cpp
 \author		Bevan Lim Zhi Wei
-\par        email: bevanzhiwei.lim\@digipen.edu
-\date       April 02, 2023
+\par        email: bevanzhiwei.lim@digipen.edu
+\date       March 29, 2023
 \brief		Bevan (Primary 100%)
 
 This source file contains the necessary functions definitions

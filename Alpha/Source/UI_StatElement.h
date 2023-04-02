@@ -1,10 +1,10 @@
 /******************************************************************************/
 /*!
-\file		UI_Button.h
+\file		UI_StatElement.h
 \authors 	Alonzo Nalpon(a.nalpon)
 \par    	email: a.nalpon@digipen.edu
-\date   	April 01, 2023
-\brief		This file contains the definition of UI_StatInfo class.
+\date   	March 02, 2023
+\brief		This file contains the declaration of UI_StatInfo class.
 			These elements can render text and/or mesh
 
 Copyright (C) 2023 DigiPen Institute of Technology.
@@ -12,6 +12,7 @@ Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
  */
  /******************************************************************************/
+
 #ifndef UI_STAT_ELEMENT_H
 #define UI_STAT_ELEMENT_H
 #include "UI_Def.h"

@@ -1,10 +1,12 @@
 /******************************************************************************/
 /*!
-\file		pathfinder.cpp
-\author		Alwin Moo
-\par        email: moo.g\@digipen.edu
-\date       April 02, 2023
-\brief		Alwin (Primary 100%)
+\file		UI_Button.cpp
+\author 	Alonzo Nalpon
+\par    	email: a.nalpon@digipen.edu
+\date   	January 28, 2023
+\brief		Alonzo (Primary 100%)
+			This file contains the definitions of button class
+			to be used with ui manager
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

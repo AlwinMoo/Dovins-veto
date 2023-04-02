@@ -1,14 +1,15 @@
 /******************************************************************************/
 /*!
 \file		UI_TextAreaTable.h
-\author 	Alonzo Nalpon(a.nalpon) 33% 
-\author		Alvin Yeo 33%
-\author		Bevan 33%
+\author 	Alonzo Nalpon
+\author		Alvin Yeo
+\author		Bevan
 \par    	email: a.nalpon@digipen.edu
-\par		email: 
+\par		email: a.yeo@digipen.edu
 \par		email: bevanzhiwei.lim@digipen.edu
-\date   	April 01, 2023
-\brief		This file contains game text assets to be used with UI
+\date   	March 16, 2023
+\brief		Alonzo (Primary 33%), Alvin (Secondary 33%), Bevan (Secondary 33%)
+			This file contains game text assets to be used with UI
 
 
 Copyright (C) 2023 DigiPen Institute of Technology.

@@ -1,16 +1,18 @@
 /******************************************************************************/
 /*!
-\file		pathfinder.cpp
-\author		Alwin Moo
-\par        email: moo.g\@digipen.edu
-\date       April 02, 2023
-\brief		Alwin (Primary 100%)
+\file		UI_StatElement.cpp
+\authors 	Alonzo Nalpon(a.nalpon)
+\par    	email: a.nalpon@digipen.edu
+\date   	March 02, 2023
+\brief		This file contains the definitions of UI_StatInfo class.
+			These elements can render text and/or mesh
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
  */
  /******************************************************************************/
+
 #include "UI_StatElement.h"
 
 namespace UI {

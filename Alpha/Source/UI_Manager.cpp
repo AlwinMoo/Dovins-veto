@@ -1,16 +1,17 @@
 /******************************************************************************/
 /*!
-\file		pathfinder.cpp
-\author		Alwin Moo
-\par        email: moo.g\@digipen.edu
-\date       April 02, 2023
-\brief		Alwin (Primary 100%)
+\file		UI_Manager.cpp
+\author 	Alonzo Nalpon (a.nalpon)
+\par    	email: a.nalpon@digipen.edu
+\date   	January 26, 2023
+\brief		This file contains declarations for the UI Manager
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
  */
  /******************************************************************************/
+
 #include "UI_Manager.h"
 #include "Rendering.hpp"
 #include "Menu.h"

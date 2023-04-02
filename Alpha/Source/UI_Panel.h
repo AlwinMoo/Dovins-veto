@@ -1,6 +1,6 @@
 /******************************************************************************/
 /*!
-\file		UI_Button.h
+\file		UI_Panel.h
 \author 	Alonzo Nalpon(a.nalpon)
 \par    	email: a.nalpon@digipen.edu
 \date   	April 01, 2023

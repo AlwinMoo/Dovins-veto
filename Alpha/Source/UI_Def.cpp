@@ -1,11 +1,13 @@
 /******************************************************************************/
 /*!
 \file		UI_Def.cpp
-\authors 	Alonzo Nalpon 90% -> function and variable definitions
-			Bevan 10% -> loading additional textures
+\author 	Alonzo Nalpon -> function and variable definitions
+\author		Bevan Lim -> loading additional textures
 \par    	email: a.nalpon@digipen.edu
-\date   	April 01, 2023
-\brief		This file contains definitions for Init/unload ui and draw functions
+\par    	email: bevanzhiwei.lim@digipen.edu
+\date   	March 02, 2023
+\brief		Alonzo (Primary 90%), Bevan (Secondary 10%)
+			This file contains definitions for Init/unload ui and draw functions
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

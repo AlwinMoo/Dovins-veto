@@ -3,10 +3,12 @@
 \file		GameObject.h
 \author		Alwin Moo
 \author		Alvin Yeo
-\par        email: moo.g\@digipen.edu
-\par		email: a.yeo\@digipen.edu
+\author		Bevan Lim
+\par        email: moo.g@digipen.edu
+\par		email: a.yeo@digipen.edu
+\par		email: bevanzhiwei.lim@digipen.edu
 \date       January 10, 2023
-\brief		Alwin (Primary 80%), Alvin (Secondary 20%)
+\brief		Alwin (Primary 60%), Alvin (Secondary 30%), Bevan (Secondary 10%)
 			GameObject effector
 
 Copyright (C) 2023 DigiPen Institute of Technology.

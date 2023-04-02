@@ -3,7 +3,7 @@
 \file		Tutorial.h
 \author		Bevan Lim Zhi Wei
 \par        email: bevanzhiwei.lim\@digipen.edu
-\date       April 02, 2023
+\date       April 01, 2023
 \brief		Bevan(Primary 100%)
 
 This source file contains the necessary function declarations for the execution

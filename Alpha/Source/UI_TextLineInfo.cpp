@@ -1,16 +1,18 @@
 /******************************************************************************/
 /*!
-\file		pathfinder.cpp
-\author		Alwin Moo
-\par        email: moo.g\@digipen.edu
-\date       April 02, 2023
-\brief		Alwin (Primary 100%)
+\file		UI_TextLineInfo.cpp
+\author		Alonzo Nalpon
+\par        email: a.nalpon@digipen.edu
+\date       February 26, 2023
+\brief		Alonzo (Primary 100%)
+Contains definitions to get information about the text UI
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
  */
  /******************************************************************************/
+
 #include "UI_TextLineInfo.h"
 namespace UI
 {

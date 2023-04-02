@@ -5,7 +5,7 @@
 \author		Alonzo Nalpon -> Quit UI overlay, prompting for confirmation to quitting
 \par        email: bevanzhiwei.lim@digipen.edu
 \par		email: a.nalpon@digipen.edu
-\date       April 02, 2023
+\date       March 29, 2023
 \brief		Bevan (Primary 70%), Alonzo (Secondary 30%)
 
 This source file contains the necessary functions declarations

@@ -3,7 +3,7 @@
 \file		Skills.cpp
 \author		Bevan Lim Zhi Wei
 \par        email: bevanzhiwei.lim\@digipen.edu
-\date       April 02, 2023
+\date       March 30, 2023
 \brief		Bevan (Primary 100%)
 This source file contains the necessary functions definitions for the execution
 of the credits sequence for Badea 2

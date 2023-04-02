@@ -1,9 +1,9 @@
 /******************************************************************************/
 /*!
-\file		Skills.h
+\file		Credits.h
 \author		Bevan Lim Zhi Wei
-\par        email: bevanzhiwei.lim\@digipen.edu
-\date       April 02, 2023
+\par        email: bevanzhiwei.lim@digipen.edu
+\date       March 30, 2023
 \brief		Bevan (Primary 100%)
 This source file contains the necessary functions declarations for the execution
 of the credits sequence for Badea 2
