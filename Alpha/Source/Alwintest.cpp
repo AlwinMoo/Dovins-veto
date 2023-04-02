@@ -1390,6 +1390,7 @@ namespace
 			enemiesSpawned = 0;
 			enemyTankInGame = 0;
 			currGameState = GAMESTATE::BUILD_PHASE;
+			placeStructureClickTimer = TIME_BEFORE_PLACE_STRUCTURE_AFTER_PAUSE;
 			skillMenuBtn->bEnable = true;
 			buildResource += static_cast<int>(std::round(easeInOutSine(normCurrentWave / 20) * 1500));
 
