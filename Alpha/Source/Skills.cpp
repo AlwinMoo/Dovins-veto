@@ -1,10 +1,15 @@
 /******************************************************************************/
 /*!
-\file		pathfinder.cpp
-\author		Alwin Moo
-\par        email: moo.g\@digipen.edu
+\file		Skills.cpp
+\author		Bevan Lim Zhi Wei
+\par        email: bevanzhiwei.lim\@digipen.edu
 \date       April 02, 2023
-\brief		Alwin (Primary 100%)
+\brief		Bevan (Primary 100%)
+This source file contains the necessary functions definitions for player skills,
+cooldown managers and skill input management
+
+Players have skills split into three different categories, ranged, melee and utility
+which requires upgrades to be used.
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

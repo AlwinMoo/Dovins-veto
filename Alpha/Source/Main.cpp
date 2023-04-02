@@ -7,7 +7,7 @@
 \author		Alwin Moo
 \par        email: moo.g\@digipen.edu
 \par        email: a.yeo\@digipen.edu
-\par        email: \@digipen.edu
+\par        email: bevanzhiwe.lim\@digipen.edu
 \par        email: \@digipen.edu
 \date       April 02, 2023
 \brief		Alwin (25%), Alvin (25%), Bevan (25%), Alonzo (25%)

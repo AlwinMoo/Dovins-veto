@@ -1,3 +1,21 @@
+/******************************************************************************/
+/*!
+\file		Skills.h
+\author		Bevan Lim Zhi Wei
+\par        email: bevanzhiwei.lim\@digipen.edu
+\date       April 02, 2023
+\brief		Bevan (Primary 100%)
+This source file contains the necessary functions declarations for player skills,
+cooldown managers and skill input management
+
+Players have skills split into three different categories, ranged, melee and utility
+which requires upgrades to be used.
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #pragma once
 #include "Bevantest.h"
 #include "Skills.h"

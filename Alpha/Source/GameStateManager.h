@@ -1,3 +1,21 @@
+/******************************************************************************/
+/*!
+\file		GameStateManager.h
+\author		Bevan Lim
+\author		Alonzo Nalpon
+\par        email: bevanzhiwei.lim\@digipen.edu
+\par		email: a.nalpon@digipen.edu
+\date       April 02, 2023
+\brief		Bevan (Primary 50%), Alonzo (Secondary 50%)
+
+This source file contains the function declaration for the game state manager
+for Badea 2
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #pragma once
 typedef void(*FP)(void);
 

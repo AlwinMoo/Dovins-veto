@@ -1,10 +1,15 @@
 /******************************************************************************/
 /*!
-\file		CharacterStats.cpp
-\author		
-\par        email: \@digipen.edu
+\file		Skills.cpp
+\author		Bevan Lim Zhi Wei
+\par        email: bevanzhiwei.lim\@digipen.edu
 \date       April 02, 2023
-\brief		Charcater stats and functions to provide raw and calculated stats.
+\brief		Bevan (Primary 100%)
+This source file contains the necessary functions definitions for the execution
+of the credits sequence for Badea 2
+
+The credits sequence displays the people who made the game as well as our thanks to
+those who have supported us
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

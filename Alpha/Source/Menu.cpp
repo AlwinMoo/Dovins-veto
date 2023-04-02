@@ -1,12 +1,23 @@
 /******************************************************************************/
 /*!
-\file		Map.cpp
-\author		Alwin Moo
-\author		Alvin Yeo
-\par        email: moo.g\@digipen.edu
-\par		email: a.yeo\@digipen.edu
+\file		Menu.cpp
+\author		Bevan Lim Zhi Wei -> Initialized buttons, positions, gamestate manager
+\author		Alonzo Nalpon -> Quit UI overlay, prompting for confirmation to quitting
+\par        email: bevanzhiwei.lim@digipen.edu
+\par		email: a.nalpon@digipen.edu
 \date       April 02, 2023
-\brief		Alwin (Primary 50%), Alvin (Secondary 50%)
+\brief		Bevan (Primary 70%), Alonzo (Secondary 30%)
+
+This source file contains the necessary functions definition
+to load the Menu state for Badea2
+
+start_button changes game state to our first game level
+
+tutorial_button changes game state to our how to play level
+
+credits_button changes game state to credits
+
+exit_button prompts you for confirmation then exits the game when confirmed
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

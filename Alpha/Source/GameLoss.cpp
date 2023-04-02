@@ -1,10 +1,21 @@
 /******************************************************************************/
 /*!
-\file		CharacterStats.cpp
-\author
-\par        email: \@digipen.edu
+\file		GameLoss.cpp
+\author		Bevan Lim Zhi Wei -> Initialized buttons, positions, gamestate manager
+\author		Alonzo Nalpon -> Quit UI overlay, prompting for confirmation to quitting
+\par        email: bevanzhiwei.lim@digipen.edu
+\par		email: a.nalpon@digipen.edu
 \date       April 02, 2023
-\brief		Charcater stats and functions to provide raw and calculated stats.
+\brief		Bevan (Primary 70%), Alonzo (Secondary 30%)
+
+This source file contains the necessary functions definition
+to load the GameLoss state for Badea2
+
+res_button changes game state to our first game level
+
+credits_button changes game state to credits
+
+Menu_button prompts you for confirmation then exits the game when confirmed
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

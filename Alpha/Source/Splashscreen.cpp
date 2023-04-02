@@ -1,10 +1,13 @@
 /******************************************************************************/
 /*!
-\file		pathfinder.cpp
-\author		Alwin Moo
-\par        email: moo.g\@digipen.edu
+\file		Splashscreen.cpp
+\author		Bevan Lim Zhi Wei
+\par        email: bevanzhiwei.lim\@digipen.edu
 \date       April 02, 2023
-\brief		Alwin (Primary 100%)
+\brief		Bevan (Primary 100%)
+
+This source file contains the necessary functions definitions
+to execute the splashscreen portion of Badea 2.
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
