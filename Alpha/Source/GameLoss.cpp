@@ -13,6 +13,9 @@ namespace
 
 	UI::UI_Manager* gameUIManager;
 	//UI::UI_TextAreaTable* textTable;
+	// Audio
+	AEAudioGroup soundEffects;
+	AEAudio clickSound;
 }
 
 void res_button(UI::UI_Button*);
@@ -26,6 +29,8 @@ void gameLoss_Load()
 	credit_button = AEGfxTextureLoad("Assets/CREDITS_TEX.png");
 	restart_button = AEGfxTextureLoad("Assets/RESTART_TEX.png");
 	menu_button = AEGfxTextureLoad("Assets/MENU_TEX.png");
+	clickSound = AEAudioLoadSound("Assets/Click.wav");
+	soundEffects = AEAudioCreateGroup();
 }
 
 void gameLoss_Initialize()
@@ -113,14 +118,17 @@ void gameLoss_Unload()
 void res_button(UI::UI_Button*)
 {
 	next = GS_LEVEL1;
+	AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 }
 
 void Credits_button(UI::UI_Button*)
 {
 	next = GS_CREDITS;
+	AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 }
 
 void Menu_button(UI::UI_Button*)
 {
 	next = GS_MENU;
+	AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 }

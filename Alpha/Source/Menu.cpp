@@ -19,6 +19,12 @@ namespace
 	UI::UI_Manager* quitUIManager; // holding prompts for quit
 
 	UI::UI_TextAreaTable* textTable;
+
+	// Audio
+	AEAudioGroup soundEffects;
+	AEAudio clickSound;
+	AEAudioGroup music;
+	AEAudio BGM;
 }
 
 //button declaration
@@ -34,11 +40,16 @@ void menu_Load()
 {
 	pTex = AEGfxTextureLoad("Assets/EnemyTexture.png");
 	titleTex = AEGfxTextureLoad("Assets/Badea2_Title.png");
+	clickSound = AEAudioLoadSound("Assets/Click.wav");
+	soundEffects = AEAudioCreateGroup();
+	BGM = AEAudioLoadMusic("Assets/menuBGM.wav");
+	music = AEAudioCreateGroup();
 }
 
 void menu_Initialize()
 {
 	{
+		AEAudioPlay(BGM, music, 1.f, 1.f, -1);
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		//auto meshTest = render::GenerateQuad();
@@ -138,6 +149,7 @@ void menu_Free()
 	delete gameUIManager;
 	delete quitUIManager;
 	delete textTable;
+	AEAudioStopGroup(music);
 }
 
 void menu_Unload()
@@ -149,31 +161,37 @@ void menu_Unload()
 void start_button(UI::UI_Button*)
 {
 	next = GS_LEVEL1;
+	AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 }
 void tutorial_button(UI::UI_Button*)
 {
 	next = GS_TUTORIAL;
+	AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 }
 void credits_button(UI::UI_Button*)
 {
 	next = GS_CREDITS;
+	AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 }
 
 void exit_button(UI::UI_Button*)
 {
 	// enable quit prompt layer
 	currUILayer = UI_TYPE_QUIT;
+	AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 }
 
 void confirmExit_button(UI::UI_Button*)
 {
 	next = GS_QUIT;
+	AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 }
 
 void cancelExit_button(UI::UI_Button*)
 {
 	// enable menu again
 	currUILayer = UI_TYPE_MENU;
+	AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 }
 
 void generic_draw(AEGfxVertexList* mesh, AEGfxTexture* tex, f32 opacity, f32 width, f32 height, f32 x, f32 y)

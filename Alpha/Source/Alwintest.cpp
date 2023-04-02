@@ -91,6 +91,23 @@ namespace
 	AEGfxTexture* targetedTex;
 	AEGfxVertexList* squareMesh;
 
+	// Audio
+	AEAudioGroup soundEffects;
+	AEAudioGroup music;
+	AEAudio BGM;
+	AEAudio clickSound;
+	AEAudio enemyAttackSound;
+	AEAudio enemyHitSound;
+	AEAudio enemyDieSound;
+	AEAudio playerShootSound;
+	AEAudio playerMeleeSound;
+	AEAudio playerHealSound;
+	AEAudio structurePlaceSound;
+	AEAudio structureDestroySound;
+	AEAudio bigExplodeSound;
+	AEAudio shakeSound;
+	AEAudio skillLearntSound;
+
 	UI::UI_Button* nexusButton;
 	UI::UI_Button* playerButton;
 	bool nexusPlaced;
@@ -203,6 +220,9 @@ namespace
 	GameObject* FetchGO(GameObject::GAMEOBJECT_TYPE value);
 
 	void LoadTextures();
+	void LoadAudio();
+
+	void UnloadTextures();
 
 	void InitializeUIManager();
 	void InitializeUIButtons();
@@ -290,6 +310,7 @@ namespace
 void Alwintest_Load()
 {
 	LoadTextures();
+	LoadAudio();
 	squareMesh = render::GenerateQuad();
 }
 
@@ -305,6 +326,8 @@ void Alwintest_Initialize()
 	InitialFetchGos();
 
 	InitializeVariables();
+
+	AEAudioPlay(BGM, music, 1.f, 1.f, -1);
 
 	//skill UI stuff
 	cooldown_mesh = basic_mesh();
@@ -357,7 +380,7 @@ void Alwintest_Update()
 		if (player_moving && !player->Path.empty())
 			PlayerReachGoalCheck();
 
-		//TempTestUpdateFunctions();
+		TempTestUpdateFunctions();
 
 		GameObject* player_clone = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CLONE);
 		player_clone->tex = playerTex;
@@ -381,16 +404,19 @@ void Alwintest_Update()
 				skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
 				skill_inst->tex = bulletTex;
 				to_exec(player, skill_inst);
+				AEAudioPlay(playerShootSound, soundEffects, 1.f, 1.f, 0);
 				break;
 			case(AOEing):
 				skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_AOE);
 				skill_inst->tex = bulletTex;
 				to_exec(player, skill_inst);
+				AEAudioPlay(playerMeleeSound, soundEffects, 1.f, 1.f, 0);
 				break;
 			case(car):
 				skill_inst = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_CAR);
 				skill_inst->tex = bulletTex;
 				to_exec(player, skill_inst);
+				AEAudioPlay(playerShootSound, soundEffects, 1.f, 1.f, 0);
 				break;
 			case(heal):
 				for (GameObject* go : go_list)
@@ -400,9 +426,11 @@ void Alwintest_Update()
 
 					go->Stats.SetStat(STAT_HEALTH, 10.f);
 				}
+				AEAudioPlay(playerHealSound, soundEffects, 1.f, 1.f, 0);
 				break;
 			case(blink):
 				player_blink(player);
+				AEAudioPlay(shakeSound, soundEffects, 1.f, 1.f, 0);
 				break;
 			default:
 				break;
@@ -534,6 +562,7 @@ void Alwintest_Update()
 							AEVec2Add(&collidePos, &go->position, &collidePos);
 
 							SpawnCollideParticles(8, collidePos, go->particleColor, collideDir, 30.f, 100.f, 150.f, 0.2f, 0.5f, 3.f, 7.f);
+							AEAudioPlay(enemyHitSound, soundEffects, 1.f, 1.f, 0);
 
 							if ((gameObj->Range.skill_bit & tier2))
 							{
@@ -552,6 +581,7 @@ void Alwintest_Update()
 								enemiesRemaining--;
 								uiEnemiesCount--;
 								SpawnDeathParticles(20, go->position, go->particleColor, 20.f, 50.f, 0.3f, 0.8f, 3.f, 7.f);
+								AEAudioPlay(enemyDieSound, soundEffects, 0.4f, 1.f, 0);
 							}
 						}
 					}
@@ -582,6 +612,7 @@ void Alwintest_Update()
 							uiEnemiesCount--;
 							go->active = false;
 							SpawnDeathParticles(20, go->position, go->particleColor, 20.f, 50.f, 0.3f, 0.8f, 3.f, 7.f);
+							AEAudioPlay(enemyDieSound, soundEffects, 0.4f, 1.f, 0);
 						}
 					}
 				}
@@ -679,6 +710,7 @@ void Alwintest_Update()
 				AEVec2Add(&loseObjEdge, &loseObj->position, &loseObjEdge);
 
 				SpawnCollideParticles(10, loseObjEdge, loseObj->particleColor, randomDir, 40.f, 100.f, 150.f, 1.f, 1.5f, 2.f, 5.f);
+				AEAudioPlay(shakeSound, soundEffects, 1.f, 1.f, 0);
 			}
 
 			deathShakeAmount += OBJ_SHAKE_INCREMENT * (float)AEFrameRateControllerGetFrameTime();
@@ -689,6 +721,7 @@ void Alwintest_Update()
 		{
 			blackScreen->alpha = 1.f;
 			SpawnDeathParticles(50, loseObj->position, loseObj->particleColor, 60.f, 140.f, 5.f, 15.f, 3.f, 6.f);
+			AEAudioPlay(bigExplodeSound, soundEffects, 1.f, 1.f, 0);
 			loseObj->active = false;
 		}
 		else
@@ -951,23 +984,12 @@ void Alwintest_Free()
 	blackScreen = nullptr;
 
 	AEGfxMeshFree(cooldown_mesh);
+	AEAudioStopGroup(music);
 }
 
 void Alwintest_Unload()
 {
-	AEGfxTextureUnload(grassBorderlessTex);
-	AEGfxTextureUnload(turretTex);
-	AEGfxTextureUnload(grassTex);
-	AEGfxTextureUnload(bulletTex);
-	AEGfxTextureUnload(playerTex);
-	AEGfxTextureUnload(enemyTex);
-	AEGfxTextureUnload(wallTex);
-	AEGfxTextureUnload(nexusTex);
-	AEGfxTextureUnload(eraseTex);
-	AEGfxTextureUnload(dangerTex);
-	AEGfxTextureUnload(targetedTex);
-	AEGfxTextureUnload(enemy_nexusTex);
-	AEGfxTextureUnload(enemy_tankTex);
+	UnloadTextures();
 	AEGfxMeshFree(squareMesh);
 }
 
@@ -1076,7 +1098,6 @@ namespace
 		if ((int)hoverStructure->gridScale.y % 2)
 			hoverTopLeftPos.y += test_map->GetTileSize() / 2.f;
 
-
 		if (hoverStructure->tex == wallTex)
 		{
 			if (buildResource < WALL_COST)
@@ -1136,6 +1157,8 @@ namespace
 				playerButton->hoverText = &textTable->buildPlayerPlacedHoverText;
 				PlaceWallButton(nullptr);
 			}
+
+			AEAudioPlay(structurePlaceSound, soundEffects, 1.f, 1.f, 0);
 		}
 	}
 
@@ -1157,6 +1180,7 @@ namespace
 		topRightPos.x -= (gameObj->gridScale.x - 1) * 0.5f * test_map->GetTileSize();
 		topRightPos.y -= (gameObj->gridScale.y - 1) * 0.5f * test_map->GetTileSize();
 		deleteGridScale = gameObj->gridScale;
+		AEAudioPlay(structurePlaceSound, soundEffects, 1.f, 1.f, 0);
 
 		if (gameObj->type == GameObject::GO_NEXUS)
 		{
@@ -1577,6 +1601,8 @@ namespace
 						AEVec2Add(&collidePos, &gameObj->smallTarget->position, &collidePos);
 						SpawnCollideParticles(8, collidePos, gameObj->smallTarget->particleColor, collideDir, 30.f, 80.f, 110.f, 0.1f, 0.3f, 3.f, 4.f);
 						gameObj->timer = 1;
+
+						AEAudioPlay(enemyAttackSound, soundEffects, 1.f, 1.f, 0);
 					}
 
 
@@ -1588,6 +1614,7 @@ namespace
 							test_map->RemoveItem(gameObj->smallTarget->gridIndex.front(), static_cast<int>(gameObj->smallTarget->gridScale.x), static_cast<int>(gameObj->smallTarget->gridScale.y));
 							gameObj->smallTarget->gridIndex.clear();
 							SpawnDeathParticles(25, gameObj->smallTarget->position, gameObj->smallTarget->particleColor, 10.f, 30.f, 0.3f, 0.5f, 3.f, 4.f);
+							AEAudioPlay(structureDestroySound, soundEffects, 1.f, 1.f, 0);
 						}
 						else if (gameObj->smallTarget == player)
 							GameOver(player);
@@ -1732,6 +1759,42 @@ namespace
 		eraseTex = AEGfxTextureLoad("Assets/Eraser.png");
 		dangerTex = AEGfxTextureLoad("Assets/Danger.png");
 		targetedTex = AEGfxTextureLoad("Assets/Targeted.png");
+	}
+
+	void LoadAudio()
+	{
+		soundEffects = AEAudioCreateGroup();
+		music = AEAudioCreateGroup();
+		clickSound = AEAudioLoadSound("Assets/Click.wav");
+		enemyAttackSound = AEAudioLoadSound("Assets/EnemyAttack.wav");
+		enemyHitSound = AEAudioLoadSound("Assets/EnemyHit.wav");
+		enemyDieSound = AEAudioLoadSound("Assets/EnemyDie.wav");
+		playerShootSound = AEAudioLoadSound("Assets/PlayerShoot.wav");
+		playerMeleeSound = AEAudioLoadSound("Assets/PlayerMelee.wav");
+		playerHealSound = AEAudioLoadSound("Assets/PlayerHeal.wav");
+		structurePlaceSound = AEAudioLoadSound("Assets/Place.wav");
+		structureDestroySound = AEAudioLoadSound("Assets/StructureExplode.wav");
+		bigExplodeSound = AEAudioLoadSound("Assets/StructureBigExplode.wav");
+		shakeSound = AEAudioLoadSound("Assets/Shake.wav");
+		skillLearntSound = AEAudioLoadSound("Assets/SkillLearnt.wav");
+		BGM = AEAudioLoadMusic("Assets/gameBGM.wav");
+	}
+
+	void UnloadTextures()
+	{
+		AEGfxTextureUnload(grassBorderlessTex);
+		AEGfxTextureUnload(turretTex);
+		AEGfxTextureUnload(grassTex);
+		AEGfxTextureUnload(bulletTex);
+		AEGfxTextureUnload(playerTex);
+		AEGfxTextureUnload(enemyTex);
+		AEGfxTextureUnload(wallTex);
+		AEGfxTextureUnload(nexusTex);
+		AEGfxTextureUnload(eraseTex);
+		AEGfxTextureUnload(dangerTex);
+		AEGfxTextureUnload(targetedTex);
+		AEGfxTextureUnload(enemy_nexusTex);
+		AEGfxTextureUnload(enemy_tankTex);
 	}
 
 	void RenderTexture(AEGfxTexture* texture, AEVec2 pos_, AEVec2 scale_, float rotation_)
@@ -2249,9 +2312,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 
 #pragma region UI_CALLBACK_DEFINITIONS
 	void EndTurnButton(UI::UI_Button*) {
-		skillMenuBtn->bEnable = false; // disable skill tree
 		if (nexusPlaced && playerPlaced)
 		{
+			skillMenuBtn->bEnable = false; // disable skill tree
 			currGameState = GAMESTATE::DEFEND_PHASE;
 			hoverStructure->active = false;
 			for (GameObject* tile : go_list)
@@ -2287,6 +2350,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 				}
 			}
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void PlaceNexusButton(UI::UI_Button*)
@@ -2299,6 +2363,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 			hoverStructure->tex = nexusTex;
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void PlacePlayerButton(UI::UI_Button*)
@@ -2311,6 +2376,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 			hoverStructure->tex = playerTex;
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void PlaceTowerButton(UI::UI_Button*)
@@ -2320,6 +2386,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
 		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 		hoverStructure->tex = turretTex;
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void PlaceWallButton(UI::UI_Button*)
@@ -2329,6 +2396,7 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
 		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 		hoverStructure->tex = wallTex;
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void EraseButton(UI::UI_Button*)
@@ -2338,11 +2406,13 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		hoverStructure->position.x += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.x - 1);
 		hoverStructure->position.y += test_map->GetTileSize() * 0.5f * (hoverStructure->gridScale.y - 1);
 		hoverStructure->tex = eraseTex;
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void SkillTreeButton(UI::UI_Button*) 
 	{
 		currUILayer = (currUILayer == UI_TYPE_SKILL? UI_TYPE_GAME : UI_TYPE_SKILL);
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void resume_button(UI::UI_Button*)
@@ -2351,21 +2421,25 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 		// TODO: UNPAUSE GAME
 		placeStructureClickTimer = TIME_BEFORE_PLACE_STRUCTURE_AFTER_PAUSE;
 		currGameState = prePauseState;
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void mainMenu_button(UI::UI_Button*)
 	{
 		currUILayer = UI_TYPE_QUIT;
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void confirmExit_button(UI::UI_Button*)
 	{
 		next = GS_MENU;
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void cancelExit_button(UI::UI_Button*)
 	{
 		currUILayer = UI_TYPE_PAUSE;
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void MeleeSkillUpgrade_tier0(UI::UI_Button* button)
@@ -2381,7 +2455,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void MeleeSkillUpgrade_tier1(UI::UI_Button* button)
@@ -2396,7 +2472,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 	void MeleeSkillUpgrade_tier2(UI::UI_Button* button)
 	{
@@ -2410,7 +2488,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 	void MeleeSkillUpgrade_tier3(UI::UI_Button* button)
 	{
@@ -2423,7 +2503,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 	void MeleeSkillUpgrade_tier4(UI::UI_Button* button)
 	{
@@ -2436,7 +2518,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void MeleeSkillUpgrade_tier5(UI::UI_Button* button)
@@ -2450,7 +2534,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void MeleeSkillUpgrade_tier6(UI::UI_Button* button)
@@ -2464,7 +2550,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void MeleeSkillUpgrade_tier7(UI::UI_Button* button)
@@ -2476,7 +2564,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 1.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void RangeSkillUpgrade_tier0(UI::UI_Button* button)
@@ -2495,7 +2585,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void RangeSkillUpgrade_tier1(UI::UI_Button* button)
@@ -2510,7 +2602,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void RangeSkillUpgrade_tier2(UI::UI_Button* button)
@@ -2525,7 +2619,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 	void RangeSkillUpgrade_tier3(UI::UI_Button* button)
 	{
@@ -2539,7 +2635,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 	void RangeSkillUpgrade_tier4(UI::UI_Button* button)
 	{
@@ -2552,7 +2650,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void RangeSkillUpgrade_tier5(UI::UI_Button* button)
@@ -2566,37 +2666,41 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void RangeSkillUpgrade_tier6(UI::UI_Button* button)
 	{
+		if ((player->Range.skill_bit & tier6) != tier6 && (player->Range.skill_bit & tier3) && buildResource >= RangeTier6_cost)
 		{
-			if ((player->Range.skill_bit & tier6) != tier6 && (player->Range.skill_bit & tier3) && buildResource >= RangeTier6_cost)
-			{
-				buildResource -= RangeTier6_cost;
-				player->Range.skill_bit |= tier6;
-				//set other buttons active
-				skillBtns[RANGE_SKILL_9]->bEnable = true;
-				button->bBought = true;
+			buildResource -= RangeTier6_cost;
+			player->Range.skill_bit |= tier6;
+			//set other buttons active
+			skillBtns[RANGE_SKILL_9]->bEnable = true;
+			button->bBought = true;
 
-				SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
-			}
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void RangeSkillUpgrade_tier7(UI::UI_Button* button)
 	{
-			if ((player->Range.skill_bit & tier7) != tier7 && (player->Range.skill_bit & tier3) && buildResource >= RangeTier7_cost)
-			{
-				buildResource -= RangeTier7_cost;
-				player->Range.skill_bit |= tier7;
-				//set other buttons active
-				skillBtns[RANGE_SKILL_9]->bEnable = true;
-				button->bBought = true;
+		if ((player->Range.skill_bit & tier7) != tier7 && (player->Range.skill_bit & tier3) && buildResource >= RangeTier7_cost)
+		{
+			buildResource -= RangeTier7_cost;
+			player->Range.skill_bit |= tier7;
+			//set other buttons active
+			skillBtns[RANGE_SKILL_9]->bEnable = true;
+			button->bBought = true;
 
-				SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
-			}
+			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
+		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 	void RangeSkillUpgrade_tier8(UI::UI_Button* button)
 	{
@@ -2607,7 +2711,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 	void RangeSkillUpgrade_tier9(UI::UI_Button* button)
 	{
@@ -2618,7 +2724,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 1.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void UtilitySkillUpgrade_tier0(UI::UI_Button* button)
@@ -2634,7 +2742,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void UtilitySkillUpgrade_tier1(UI::UI_Button* button)
@@ -2649,7 +2759,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void UtilitySkillUpgrade_tier2(UI::UI_Button* button)
@@ -2663,7 +2775,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void UtilitySkillUpgrade_tier3(UI::UI_Button* button)
@@ -2675,7 +2789,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 	void UtilitySkillUpgrade_tier4(UI::UI_Button* button)
@@ -2687,7 +2803,9 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 			button->bBought = true;
 
 			SpawnDeathParticles(20, UIPosToGamePos(button->pos), Color{ 0.f, 1.f, 0.f }, 70.f, 100.f, 1.f, 1.4f, 2, 4);
+			AEAudioPlay(skillLearntSound, soundEffects, 1.f, 1.f, 0);
 		}
+		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 	}
 
 #pragma endregion

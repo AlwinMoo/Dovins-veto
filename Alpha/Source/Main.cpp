@@ -65,6 +65,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			//more steps
 			AESysFrameStart();
 			AEInputUpdate();
+			AEAudioUpdate();
 			fpUpdate();
 			fpDraw();
 			AESysFrameEnd();

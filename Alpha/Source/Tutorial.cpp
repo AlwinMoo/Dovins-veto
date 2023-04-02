@@ -19,6 +19,12 @@ namespace
 
 	UI::UI_Manager* gameUIManager;
 	UI::UI_TextAreaTable* textTable;
+
+	// Audio
+	AEAudioGroup soundEffects;
+	AEAudio clickSound;
+	AEAudioGroup music;
+	AEAudio BGM;
 }
 
 void next_button(UI::UI_Button*);
@@ -35,11 +41,16 @@ void tutorial_Load()
 	scene8 = AEGfxTextureLoad("Assets/tutorial_scene8.png");
 	scene9 = AEGfxTextureLoad("Assets/tutorial_scene9.png");
 	scene10 = AEGfxTextureLoad("Assets/tutorial_scene10.png");
-	scene11 = AEGfxTextureLoad("Assets/tutorial_scene11.png");
+	scene11 = AEGfxTextureLoad("Assets/tutorial_scene11.png"); 
+	clickSound = AEAudioLoadSound("Assets/Click.wav");
+	soundEffects = AEAudioCreateGroup();
+	BGM = AEAudioLoadMusic("Assets/tutorialBGM.wav");
+	music = AEAudioCreateGroup();
 }
 
 void tutorial_Initialize()
 {
+	AEAudioPlay(BGM, music, 1.f, 1.f, -1);
 	pMesh = basic_mesh();
 
 	counter = 1;
@@ -119,6 +130,7 @@ void tutorial_Free()
 	AEGfxMeshFree(pMesh);
 	delete gameUIManager;
 	delete textTable;
+	AEAudioStopGroup(music);
 }
 
 void tutorial_Unload()
@@ -139,4 +151,5 @@ void tutorial_Unload()
 void next_button(UI::UI_Button*)
 {
 	counter += 1;
+	AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
 }
