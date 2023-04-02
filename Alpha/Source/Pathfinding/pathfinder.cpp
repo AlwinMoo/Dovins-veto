@@ -5,6 +5,7 @@
 \par        email: moo.g\@digipen.edu
 \date       January 29, 2023
 \brief		Alwin (Primary 100%)
+			A* pathfinding functions
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

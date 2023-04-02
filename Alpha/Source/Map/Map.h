@@ -1,3 +1,18 @@
+/******************************************************************************/
+/*!
+\file		Map.h
+\author		Alwin Moo
+\author		Alvin Yeo
+\par        email: moo.g\@digipen.edu
+\par		email: a.yeo\@digipen.edu
+\date       January 26, 2023
+\brief		Alwin (Primary 50%), Alvin (Secondary 50%)
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #pragma once
 
 #include <AEEngine.h>

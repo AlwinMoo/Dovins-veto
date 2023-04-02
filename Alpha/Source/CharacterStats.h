@@ -1,3 +1,19 @@
+/******************************************************************************/
+/*!
+\file		CharacterStats.h
+\author		Alwin Moo
+\author		Alonzo Nalpon
+\par        email: moo.g\@digipen.edu
+\par        email: a.nalpon\@digipen.edu
+\date       March 01, 2023
+\brief		Alonzo (Primary 50%), Alwin (Secondary 50%)
+			Charcater stats and functions to provide raw and calculated stats.
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #ifndef CHARACTER_STATS_H
 #define CHARACTER_STATS_H
 #include "AEEngine.h"

@@ -1,3 +1,17 @@
+/******************************************************************************/
+/*!
+\file		pathfinder.cpp
+\author		Alwin Moo
+\par        email: moo.g\@digipen.edu
+\date       January 29, 2023
+\brief		Alwin (Primary 100%)
+			A* pathfinding functions
+
+Copyright (C) 2023 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
 #pragma once
 
 #include <AEEngine.h>
@@ -27,13 +41,9 @@ class PathManager
 {
 	game_map* Map;
 	bool is_player;
-	/*std::queue<std::pair<AEVec2, AEVec2>> frontier;
-	std::map < std::string, AEVec2 > visited;*/
 
 	std::string VectorToString(AEVec2);
 	AEVec2 StringToVector(std::string);
-
-	//bool CheckCell(AEVec2, AEVec2, AEVec2);
 
 	// A* variables
 	bool IsPositionValid(AEVec2);
@@ -55,7 +65,6 @@ class PathManager
 
 public:
 	
-	//std::vector<AEVec2> GetPath(AEVec2, AEVec2);
 	std::vector<AEVec2> GetPath(AEVec2 const&, AEVec2 const&);
 
 	PathManager(game_map* Map, bool);
