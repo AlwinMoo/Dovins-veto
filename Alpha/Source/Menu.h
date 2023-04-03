@@ -1,14 +1,16 @@
 /******************************************************************************/
 /*!
 \file		Menu.h
-\author		Bevan Lim Zhi Wei -> Initialized buttons, positions, gamestate manager
-\author		Alonzo Nalpon -> Quit UI overlay, prompting for confirmation to quitting
+\author		Bevan Lim Zhi Wei
+\author		Alonzo Nalpon
 \par        email: bevanzhiwei.lim@digipen.edu
 \par		email: a.nalpon@digipen.edu
 \date       March 29, 2023
 \brief		Bevan (Primary 70%), Alonzo (Secondary 30%)
+			Bevan: Initialized buttons, positions, gamestate manager
+			Alonzo: Quit UI overlay, prompting for confirmation to quitting
 
-This source file contains the necessary functions declarations
+This source file contains the necessary functions definition
 to load the Menu state for Badea2
 
 start_button changes game state to our first game level

@@ -1,6 +1,6 @@
 /******************************************************************************/
 /*!
-\file		Skills.cpp
+\file		Credit.cpp
 \author		Bevan Lim Zhi Wei
 \par        email: bevanzhiwei.lim\@digipen.edu
 \date       March 30, 2023

@@ -10,7 +10,11 @@
 \par        email: bevanzhiwei.lim@digipen.edu
 \par        email: a.nalpon@digipen.edu
 \date       January 10, 2023
-\brief		Alwin (25%), Alvin (25%), Bevan (25%), Alonzo (25%)
+\brief		Alwin (30%), Alvin (30%), Bevan (20%), Alonzo (20%)
+			Alwin: AI, FetchGo, Balancing, Pathfinding
+			Alvin: Game Flow, Build Phase, Death Phase, Particles, Sound
+			Bevan: player skills
+			Alonzo: UI
 			Main game loop and functions
 
 Copyright (C) 2023 DigiPen Institute of Technology.

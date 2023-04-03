@@ -1,13 +1,17 @@
 /******************************************************************************/
 /*!
 \file		UI_Def.cpp
-\author 	Alonzo Nalpon -> function and variable definitions
-\author		Bevan Lim -> loading additional textures
+\author 	Alonzo Nalpon
+\author		Bevan Lim
 \par    	email: a.nalpon@digipen.edu
 \par    	email: bevanzhiwei.lim@digipen.edu
 \date   	March 02, 2023
 \brief		Alonzo (Primary 90%), Bevan (Secondary 10%)
-			This file contains definitions for Init/unload ui and draw functions
+			This file contains enumerations for textures, button types and meshes
+			with helper functions to draw/print text on screen, init and unloading UI.
+			All textures and mesh used by UI will be loaded and unloaded by UI_Def.
+			Alonzo: functions, extern declarations, enumerations
+			Bevan: additional enumerations for buttons/tex
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

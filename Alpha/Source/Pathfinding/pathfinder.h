@@ -1,6 +1,6 @@
 /******************************************************************************/
 /*!
-\file		pathfinder.cpp
+\file		pathfinder.h
 \author		Alwin Moo
 \par        email: moo.g@digipen.edu
 \date       January 29, 2023

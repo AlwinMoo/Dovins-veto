@@ -66,34 +66,19 @@
     <ClInclude Include="..\Source\GameObject.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\GameScene.hpp">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\GameStateList.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\GameStateManager.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\MainMenuScene.hpp">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\Map\Map.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.hpp">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Pathfinding\pathfinder.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Rendering.hpp">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\SceneBase.hpp">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\SceneManager.hpp">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\UI_TextArea.h">

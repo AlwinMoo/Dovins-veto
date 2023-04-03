@@ -8,6 +8,8 @@
 \date       March 01, 2023
 \brief		Alonzo (Primary 50%), Alwin (Secondary 50%)
 			Charcater stats and functions to provide raw and calculated stats.
+			Alonzo: file set up, setter/getter and calculation
+			Alwin: setters/getters, normalised values, state machine values
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
