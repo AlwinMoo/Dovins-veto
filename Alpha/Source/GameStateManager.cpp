@@ -7,6 +7,8 @@
 \par		email: a.nalpon@digipen.edu
 \date       January 26, 2023
 \brief		Bevan (Primary 50%), Alonzo (Secondary 50%)
+			Bevan: Basic GSM implementation
+			Alonzo: GSM upkeep
 
 This source file contains the function definition for the game state manager
 for Badea 2
