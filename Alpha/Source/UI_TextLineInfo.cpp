@@ -14,11 +14,12 @@ prior written consent of DigiPen Institute of Technology is prohibited.
  /******************************************************************************/
 
 #include "UI_TextLineInfo.h"
+extern s8 g_fontID; // Defined in main: the font used by all
 namespace UI
 {
 	UI_TextLineInfo::UI_TextLineInfo(std::string const& str, f32 scale) : line(str)
 	{
-		AEGfxGetPrintSize(1, const_cast<s8*>(str.c_str()), scale, m_width, m_height);
+		AEGfxGetPrintSize(g_fontID, const_cast<s8*>(str.c_str()), scale, m_width, m_height);
 	}
 
 	f32 UI_TextLineInfo::Height()const

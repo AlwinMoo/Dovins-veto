@@ -27,6 +27,7 @@ namespace UI
 	std::array<AEGfxVertexList*, NUM_MESH> MeshList;
 	void InitUI()
 	{
+		// LOAD ALL TEXTURES
 		TextureList[TEX_BUTTON]			= AEGfxTextureLoad("Assets/SquareButton.png");
 		TextureList[TEX_END_PHASE]		= AEGfxTextureLoad("Assets/Hourglass.png");
 		TextureList[TEX_TOWER]			= AEGfxTextureLoad("Assets/Tower.png");
@@ -47,7 +48,7 @@ namespace UI
 		TextureList[TEX_GREEN_NODE]		= AEGfxTextureLoad("Assets/greenNode_Badea2.png");
 		TextureList[TEX_UI_BUTTON]		= AEGfxTextureLoad("Assets/UIButton.png");
 		TextureList[TEX_PANEL]			= AEGfxTextureLoad("Assets/UIPanel.png");
-
+		// LOAD THAT ONE MESH WE ALL NEED
 		MeshList[MESH_BOX] = basic_mesh();
 	}
 
@@ -97,10 +98,10 @@ namespace UI
 		AEMtx33Trans(&translate, pos.x, pos.y);
 
 		AEMtx33 transform = { 0 };
-		AEMtx33Concat(&transform, &rotate, &scale);
+		AEMtx33Concat(&transform, &rotate, &scale);	// translate * rotate * scale
 		AEMtx33Concat(&transform, &translate, &transform);
 
-		AEGfxSetTransform(transform.m);
+		AEGfxSetTransform(transform.m); // apply transform
 		AEGfxMeshDraw(MeshList[MESH_BOX], AE_GFX_MDM_TRIANGLES);
 	}
 

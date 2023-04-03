@@ -46,13 +46,39 @@ namespace UI {
 		UI_StatElement(AEVec2 pos, UI_TextArea* text = nullptr, AEVec2 const& meshDims = {});
 		~UI_StatElement() = default;
 		UI_StatElement& operator=(const UI_StatElement&) = delete;
-		void SetElementPos(AEVec2 const& pos);		//!< Set element position and calculate text/mesh pos
-		void CalculatePositions();					//!< Calculate positions of mesh offset from text
-		void SetValue(double val);					//!< Set value of double (for bars)
+
+		/// <summary>
+		/// Set element position and calculate text/mesh pos
+		/// </summary>
+		/// <param name="pos">new pos</param>
+		void SetElementPos(AEVec2 const& pos);
+
+		/// <summary>
+		/// Calculate positions of mesh offset from text
+		/// </summary>
+		void CalculatePositions();
+
+		/// <summary>
+		/// Set value of double (for bars)
+		/// </summary>
+		/// <param name="val"></param>
+		void SetValue(double val);
+
+		/// <summary>
+		/// Obtains double value held by element
+		/// </summary>
+		/// <returns></returns>
 		double GetValue()const;
+		
+		/// <summary>
+		/// set tint color of mesh
+		/// </summary>
+		/// <param name="color"></param>
 		void SetColor(UI_Color const& color);
 
-		void Update(double dt);
+		/// <summary>
+		/// Draw the element. Draws text if any followed by mesh
+		/// </summary>
 		void Draw();
 	};
 }
