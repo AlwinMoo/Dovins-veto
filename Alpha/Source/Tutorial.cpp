@@ -68,7 +68,7 @@ void tutorial_Load()
 
 void tutorial_Initialize()
 {
-	AEAudioPlay(BGM, music, 0.3f, 1.f, -1);
+	AEAudioPlay(BGM, music, 0.2f, 1.f, -1);
 	pMesh = basic_mesh();
 
 	counter = 1;

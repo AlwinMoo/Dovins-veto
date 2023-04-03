@@ -1,6 +1,6 @@
 /******************************************************************************/
 /*!
-\file		Alwintest.h
+\file		BadeaState.h
 \author		Alwin Moo
 \author		Alvin Yeo
 \author		Bevan Lim
@@ -29,15 +29,15 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "UI_Manager.h"
 #include "UI_TextAreaTable.h"
 
-void Alwintest_Load();
+void BadeaState_Load();
 
-void Alwintest_Initialize();
+void BadeaState_Initialize();
 
-void Alwintest_Update();
+void BadeaState_Update();
 
-void Alwintest_Draw();
+void BadeaState_Draw();
 
-void Alwintest_Free();
+void BadeaState_Free();
 
-void Alwintest_Unload();
+void BadeaState_Unload();
 

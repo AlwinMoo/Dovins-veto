@@ -29,7 +29,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "GameStateManager.h"
 #include "AEEngine.h"
 #include "Menu.h"
-#include "Alwintest.h"
+#include "BadeaState.h"
 
 extern bool playerloss;
 

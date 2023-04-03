@@ -21,7 +21,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AEEngine.h"
 #include "GameStateManager.h"
 #include "GameStateList.h"
-#include "Alwintest.h"
+#include "BadeaState.h"
 #include "Splashscreen.h"
 #include "Menu.h"
 #include "Credits.h"
@@ -42,12 +42,12 @@ void GSM_Update()
 	switch (current)
 	{
 		case GS_LEVEL1:
-			fpLoad = Alwintest_Load;
-			fpInitialize = Alwintest_Initialize;
-			fpUpdate = Alwintest_Update;
-			fpDraw = Alwintest_Draw;
-			fpFree = Alwintest_Free;
-			fpUnload = Alwintest_Unload;
+			fpLoad = BadeaState_Load;
+			fpInitialize = BadeaState_Initialize;
+			fpUpdate = BadeaState_Update;
+			fpDraw = BadeaState_Draw;
+			fpFree = BadeaState_Free;
+			fpUnload = BadeaState_Unload;
 			break;
 		case GS_SPLASH:
 			fpLoad = splashscreen_Load;

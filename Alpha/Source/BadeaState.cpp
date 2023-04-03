@@ -1,6 +1,6 @@
 /******************************************************************************/
 /*!
-\file		Alwintest.cpp
+\file		BadeaState.cpp
 \author		Alwin Moo
 \author		Alvin Yeo
 \author		Bevan Lim
@@ -23,7 +23,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
  */
  /******************************************************************************/
 
-#include "Alwintest.h"
+#include "BadeaState.h"
 #include <iostream>
 #include "Rendering.hpp"
 #include "GameStateList.h"
@@ -332,14 +332,14 @@ namespace
 #pragma endregion
 }
 
-void Alwintest_Load()
+void BadeaState_Load()
 {
 	LoadTextures();
 	LoadAudio();
 	squareMesh = render::GenerateQuad();
 }
 
-void Alwintest_Initialize()
+void BadeaState_Initialize()
 {
 	std::srand((unsigned int)std::time(nullptr));
 
@@ -353,13 +353,13 @@ void Alwintest_Initialize()
 	InitialFetchGos();
 
 
-	AEAudioPlay(BGM, music, 0.3f, 1.f, -1);
+	AEAudioPlay(BGM, music, 0.2f, 1.f, -1);
 
 	//skill UI stuff
 	cooldown_mesh = basic_mesh();
 }
 
-void Alwintest_Update()
+void BadeaState_Update()
 {
 	turret_shoot_timer += static_cast<float>(AEFrameRateControllerGetFrameRate());
 	// Player Input
@@ -866,7 +866,7 @@ void Alwintest_Update()
 	//}
 }
 
-void Alwintest_Draw()
+void BadeaState_Draw()
 {
 	s32 cursorX, cursorY;
 	AEInputGetCursorPosition(&cursorX, &cursorY);
@@ -982,7 +982,7 @@ void Alwintest_Draw()
 	}
 }
 
-void Alwintest_Free()
+void BadeaState_Free()
 {
 	while (!go_list.empty())
 	{
@@ -1002,7 +1002,7 @@ void Alwintest_Free()
 	AEAudioStopGroup(music);
 }
 
-void Alwintest_Unload()
+void BadeaState_Unload()
 {
 	UnloadTextures();
 	AEGfxMeshFree(squareMesh);

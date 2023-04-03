@@ -78,7 +78,7 @@ void menu_Load()
 void menu_Initialize()
 {
 	{
-		AEAudioPlay(BGM, music, 0.3f, 1.f, -1);
+		AEAudioPlay(BGM, music, 0.2f, 1.f, -1);
 		f32 screenWidthX = AEGfxGetWinMaxX() - AEGfxGetWinMinX();
 		f32 screenHeightY = AEGfxGetWinMaxY() - AEGfxGetWinMinY();
 		//auto meshTest = render::GenerateQuad();
