@@ -36,20 +36,17 @@ Cheat codes:
 'N' - skip intro screen
 
 Credits:
-Design and Production:
+Special thanks:
 Ding Xiang Cheng
 Gerald Wong
+
+Design and Production:
 Bevan Lim
 Alvin Yeo
 Alonzo Nalpon
 Alwin Moo
 
 Art:
-Ding Xiang Cheng
-Gerald Wong
-
-Programming:
-Bevan Lim
 Alvin Yeo
 Alonzo Nalpon
 Alwin Moo

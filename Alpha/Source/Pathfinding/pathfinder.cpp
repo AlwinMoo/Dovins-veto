@@ -67,7 +67,7 @@ std::string PathManager::VectorToString(AEVec2 pos)
  */
 AEVec2 PathManager::StringToVector(std::string buf)
 {
-	AEVec2 result{ 0,0 };
+	AEVec2 temp{ 0,0 };
 	
 	std::string num{};
 	for (int i = 0; i < buf.size(); ++i)
@@ -78,14 +78,14 @@ AEVec2 PathManager::StringToVector(std::string buf)
 		}
 		else
 		{
-			result.x = std::stof(num);
+			temp.x = std::stof(num);
 			num.clear();
 			continue;
 		}
 	}
-	result.y = std::stof(num);
+	temp.y = std::stof(num);
 
-	return result;
+	return temp;
 }
 
 /**
@@ -507,11 +507,11 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 /**
  * \brief calculates the final path backwards from calculated results
  * 
- * \param cellData data of the current cell to start generating from
+ * \param posData data of the current cell to start generating from
  * \param goalPos position GO wishes to get to
  * \return finalised path
  */
-std::vector<AEVec2> PathManager::tracePath(std::map<std::string, cell> cellData, AEVec2 goalPos)
+std::vector<AEVec2> PathManager::tracePath(std::map<std::string, cell> posData, AEVec2 goalPos)
 {
 	AEVec2 temp = goalPos;
 
@@ -520,10 +520,10 @@ std::vector<AEVec2> PathManager::tracePath(std::map<std::string, cell> cellData,
 
 	unsigned int itr{};
 
-	while (!(cellData.at(VectorToString(temp)).parent.x == temp.x && cellData.at(VectorToString(temp)).parent.y == temp.y) && temp.x != -1.f && temp.y != -1.f)
+	while (!(posData.at(VectorToString(temp)).parent.x == temp.x && posData.at(VectorToString(temp)).parent.y == temp.y) && temp.x != -1.f && temp.y != -1.f)
 	{
 		Path.push(temp);
-		temp = cellData.at(VectorToString(temp)).parent;
+		temp = posData.at(VectorToString(temp)).parent;
 
 		++itr;
 		if (itr >= Map->map_size)
@@ -560,11 +560,6 @@ std::vector<AEVec2> PathManager::GetPath(AEVec2 const& startPos, AEVec2 const& g
 
 	openList.clear();
 	openList.insert(std::make_pair(0.0, VectorToString(startPos)));
-
-	auto& ref1 = Map->map_arr[Map->GetIndex(static_cast<const int>(startPos.x), static_cast<const int>(startPos.y) + 1)];
-	auto& ref2 = Map->map_arr[Map->GetIndex(static_cast<const int>(startPos.x) + 1, static_cast<const int>(startPos.y))];
-	auto& ref3 = Map->map_arr[Map->GetIndex(static_cast<const int>(startPos.x), static_cast<const int>(startPos.y) - 1)];
-	auto& ref4 = Map->map_arr[Map->GetIndex(static_cast<const int>(startPos.x) - 1, static_cast<const int>(startPos.y))];
 
 	bool foundDest = false;
 	while (!openList.empty())
