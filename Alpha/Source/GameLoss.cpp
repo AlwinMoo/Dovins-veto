@@ -38,7 +38,6 @@ namespace
 	AEGfxTexture* menu_button;
 
 	UI::UI_Manager* gameUIManager;
-	//UI::UI_TextAreaTable* textTable;
 	// Audio
 	AEAudioGroup soundEffects;
 	AEAudio clickSound;
@@ -63,7 +62,7 @@ void gameLoss_Initialize()
 {
 	pMesh = basic_mesh();
 	gameUIManager = new UI::UI_Manager{};
-	//textTable = new UI::UI_TextAreaTable;
+
 	gameUIManager->SetWinDim(static_cast<f32> (AEGetWindowWidth()), static_cast<f32> (AEGetWindowHeight()));
 
 	AEVec2 FirstPos{ static_cast<float> (AEGetWindowWidth()) * 0.5f, static_cast<float> (AEGetWindowHeight()) * 0.5f };
@@ -129,7 +128,6 @@ void gameLoss_Free()
 {
 	AEGfxMeshFree(pMesh);
 	delete gameUIManager;
-	//delete textTable;
 }
 
 void gameLoss_Unload()

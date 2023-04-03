@@ -165,11 +165,3 @@ class game_map
 	//AEVec2 operator[](unsigned int const&);
 
 };
-
-//void load_file(game_map* dst, const char* src);
-
-//void loadSprites(void);
-//
-//void render_map(game_map* map, AEVec2 offset);
-//
-//void render_mapFog(game_map* map, AEVec2 offset, AEVec2 pos, int range, int mapoffset);

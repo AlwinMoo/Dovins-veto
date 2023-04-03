@@ -69,11 +69,7 @@ namespace UI{
 			}
 		if (int id = static_cast<int>(line.rend() - rIt))
 			return static_cast<u32>(id);
-		//do 
-		//{
-		//	lineCpy.erase(lineCpy.end() - 1);		// erasing one
-		//	GetPrintSize(lineCpy, width, height);	// and checking if fits
-		//} while (width >= m_boxWidthN);
+
 		return static_cast<u32>(lineCpy.size());
 	}
 

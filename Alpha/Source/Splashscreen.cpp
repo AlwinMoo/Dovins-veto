@@ -224,31 +224,6 @@ void splashscreen_Draw()
 
 	if (gam_logo6)
 		generic_draw(logo_mesh, twoTex, logo_pt6, 1000.f, 1200.f, 100.f, -50.f);
-	//if (gam_logo)
-	//{
-	//	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
-	//	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	//	AEGfxSetTintColor(1.0f, 1.0f, 1.0f, opacity);
-	//	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	//	AEGfxSetTransparency(1.0f);
-
-	//	AEGfxTextureSet(badea2, 0, 0);
-
-	//	AEMtx33 scale = { 0 };
-	//	AEMtx33 rotate = { 0 };
-	//	AEMtx33 translate = { 0 };
-	//	AEMtx33 transform = { 0 };
-
-	//	AEMtx33Scale(&scale, AEGetWindowWidth(), AEGetWindowHeight());
-	//	AEMtx33Rot(&rotate, 0);
-	//	AEMtx33Trans(&translate, 0, 0);
-	//	AEMtx33Concat(&transform, &rotate, &scale);
-	//	AEMtx33Concat(&transform, &translate, &transform);
-
-	//	AEGfxSetTransform(transform.m);
-	//	AEGfxMeshDraw(logo_mesh, AE_GFX_MDM_TRIANGLES);
-	//}
-
 }
 
 void splashscreen_Free()

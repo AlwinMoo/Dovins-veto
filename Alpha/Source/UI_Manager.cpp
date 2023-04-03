@@ -137,9 +137,9 @@ namespace UI
 		default:
 			break;
 		}
-		newButton->bEnable = enabled;
-		newButton->bBought = false;
-		m_buttons.push_back(newButton);
+		newButton->bEnable = enabled; // set flag
+		newButton->bBought = false;		// The other flag too
+		m_buttons.push_back(newButton); // push back to container
 		return newButton;
 	}
 

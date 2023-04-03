@@ -129,6 +129,7 @@
     <ClInclude Include="..\Source\Tutorial.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -137,5 +138,11 @@
     <Filter Include="Header">
       <UniqueIdentifier>{6f7a2f4e-45ef-410a-b28a-2c8291acadcc}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Alpha.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Assets\game.ico" />
   </ItemGroup>
 </Project>

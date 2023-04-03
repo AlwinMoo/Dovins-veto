@@ -40,8 +40,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	 
 	GSM_Initialize(GS_SPLASH);
 	// Using custom window procedure
-	//AESysInit(hInstance, nCmdShow, 800, 600, 1, 60, true, NULL);
+
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, true, NULL);
+	HICON hWindowIcon = NULL;
+	hWindowIcon = LoadIcon(hInstance, MAKEINTRESOURCE(101));  //101 is your new icon ID that you added into the reources. 
+	SendMessage(AESysGetWindowHandle(), WM_SETICON, ICON_SMALL, (LPARAM)hWindowIcon);
+	// Mem leak tests
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
@@ -54,13 +58,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	g_fontID = AEGfxCreateFont("Assets/SignikaNegative-Regular.ttf", 16);
 	// reset the system modules
 	AESysReset();
-	// Enable run-time memory check for debug builds.
-	// 
-	//test_scene::TestScene* mainScene = new test_scene::TestScene();
-	//mainScene->Init();
-	//s8 defaultFont = AEGfxCreateFont("./Assets/Roboto-Regular.ttf", 0);
-	//mainScene->m_fontId = defaultFont;
-	// Game Loop
+
 	while (current != GS_QUIT)
 	{
 		if (current != GS_RESTART)
@@ -102,16 +100,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		previous = current;
 		current = next;
-		
-
-		// Your own rendering logic goes here
-		//mainScene->Update();
-		//mainScene->Render();
-		// Informing the system about the loop's end
-
 	}
 	
-	//AEGfxDestroyFont(defaultFont);
 	UI::UnloadUI();
 	// free the system
 	AESysExit();

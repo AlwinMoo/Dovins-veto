@@ -163,10 +163,6 @@ int game_map::operator()(unsigned int const& x, unsigned int const& y)
 	case game_map::TILE_TYPE::TILE_PLANET:
 		return 10;
 		break;
-	/*case game_map::TILE_TYPE::TILE_NEXUS:
-		break;
-	case game_map::TILE_TYPE::NUM_TYPES_TILE:
-		break;*/
 	default:
 		return 0;
 		break;

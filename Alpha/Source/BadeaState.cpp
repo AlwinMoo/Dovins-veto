@@ -510,9 +510,6 @@ void BadeaState_Update()
 					gameObj->rotation = AERadToDeg(atan2f(target.x, target.y));
 				}
 
-				//UpdateEnemyPath(gameObj);
-				//UpdateEnemyRotation(gameObj);
-				//UpdateEnemyPosition(gameObj);
 
 				break;
 			}
@@ -520,18 +517,7 @@ void BadeaState_Update()
 			{
 				UpdatePlayerPosition();
 
-				/*for (GameObject* go : go_list)
-				{
-					if (go->active && go->type == GameObject::GAMEOBJECT_TYPE::GO_ENEMY)
-					{
-						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
-						{
-							std::cout << "Remain: " << enemiesRemaining << std::endl;
-							enemiesRemaining--;
-							go->active = false;
-						}
-					}
-				}*/
+				
 				break;
 			}
 			case (GameObject::GAMEOBJECT_TYPE::GO_TURRET):
@@ -567,8 +553,7 @@ void BadeaState_Update()
 					{
 						if (AEVec2Distance(&gameObj->position, &go->position) <= go->scale.x * 0.5)
 						{
-							//std::cout << "Remain: " << enemiesRemaining << std::endl;
-							go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - gameObj->Range.damage);//gameObj->Stats.GetStat(STAT_DAMAGE)); // we just say 1 bullet does 1 damage for now
+							go->Stats.SetStat(STAT_HEALTH, go->Stats.GetStat(STAT_HEALTH) - gameObj->Range.damage); // dealing damage
 							gameObj->active = false;
 							AEVec2 collideDir;
 							AEVec2 collidePos;
@@ -626,7 +611,6 @@ void BadeaState_Update()
 					{
 						if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
 						{
-							//std::cout << "Remain: " << enemiesRemaining << std::endl;
 							enemiesRemaining--;
 							uiEnemiesCount--;
 							go->active = false;
@@ -655,7 +639,6 @@ void BadeaState_Update()
 					{
 						gameObj->active = false;
 						gameObj->skill_flag = false;
-						//std::cout << "AOE destroyed";
 					}
 				}
 
@@ -683,25 +666,12 @@ void BadeaState_Update()
 				gameObj->position.x += gameObj->direction.x * skill_vals::CAR_VEL * static_cast<float>(AEFrameRateControllerGetFrameTime());
 				gameObj->position.y += gameObj->direction.y * skill_vals::CAR_VEL * static_cast<float>(AEFrameRateControllerGetFrameTime());
 
-				//GameObject* biproduct = FetchGO(GameObject::GAMEOBJECT_TYPE::GO_BULLET);
-
-				//for (GameObject* go : go_list)
-				//{
-				//	if (!go->active || go->type != GameObject::GO_WALL)
-				//		continue;
-
-				//	if (AEVec2Distance(&gameObj->position, &go->position) <= (gameObj->scale.x * 0.5 + go->scale.x * 0.5))
-				//	{
-				//		gameObj->active = false;
-				//		player->Range.second_tier.active = false;
-				//	}
-				//}
+				
 
 				if (gameObj->position.x > ((test_map->tile_offset + test_map->width) * test_map->GetTileSize()) || gameObj->position.x < (test_map->tile_offset * test_map->GetTileSize()) || gameObj->position.y > AEGetWindowHeight() || gameObj->position.y < 0)
 				{
 					gameObj->active = false;
 					player->Range.second_tier.active = false;
-					//std::cout << "car destroyed";
 				}
 				break;
 			}
@@ -927,31 +897,7 @@ void BadeaState_Draw()
 	}
 
 	{
-#ifdef CURSOR_TEST
-		// THE WHERE'S MY CURSOR TEST?
-		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-		AEGfxSetTintColor(1.f, 1.f, 1.f, 1.0f);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxSetTransparency(1.f);
-		AEGfxTextureSet(texTest, 0, 0);
 
-		AEMtx33 scale = { 0 };
-		AEMtx33Scale(&scale, 50.f, 50.f);
-
-		AEMtx33 rotate = { 0 };
-		AEMtx33Rot(&rotate, 0.f);
-
-		AEMtx33 translate = { 0 };
-		//std::cout << cursorX << ", " << cursorY << std::endl;
-		AEMtx33Trans(&translate, cursorX - screenWidthX / 2, -cursorY + screenWidthY / 2 - 50);
-
-		AEMtx33 transform = { 0 };
-		AEMtx33Concat(&transform, &rotate, &scale);
-		AEMtx33Concat(&transform, &translate, &transform);
-
-		AEGfxSetTransform(transform.m);
-		AEGfxMeshDraw(uiManager->m_mesh[0], AE_GFX_MDM_TRIANGLES);
-#endif
 		// Render UI
 		uiManagers[currUILayer]->Draw(cursorX, cursorY);
 
@@ -966,7 +912,6 @@ void BadeaState_Draw()
 
 			sprintf_s(buff, "Enemies Remaining: %d", uiEnemiesCount);
 			AEGfxPrint(1, buff, .65f, .5f, 1.5f, 1.f, 1.f, 0.f);
-			//std::cout << "Resource Left:" << buildResource << std::endl;
 		}
 	}
 
@@ -997,7 +942,7 @@ void BadeaState_Free()
 	delete test_map;
 	delete blackScreen;
 	blackScreen = nullptr;
-	//
+	
 	AEGfxMeshFree(cooldown_mesh);
 	AEAudioStopGroup(music);
 }
@@ -1600,7 +1545,6 @@ namespace
 				// init
 				// always set next state
 				gameObj->Stats.SetCurrInnerState(INNER_STATE::ISTATE_UPDATE);
-				//std::cout << "attack enter" << std::endl;
 			}
 			break;
 			case (INNER_STATE::ISTATE_UPDATE):
