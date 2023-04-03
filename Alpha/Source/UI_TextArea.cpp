@@ -26,7 +26,6 @@ namespace UI{
 		}
 	}
 
-	// TODO: STORE COLOR IN TEXTAREA
 	void UI_TextArea::GetPrintSize(std::string const& str, f32& width, f32& height)
 	{
 		::AEGfxGetPrintSize(FONT_ID, const_cast<s8*>(str.c_str()), m_scale, width, height);

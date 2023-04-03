@@ -2436,7 +2436,6 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 	void resume_button(UI::UI_Button*)
 	{
 		currUILayer = UI_TYPE_GAME;
-		// TODO: UNPAUSE GAME
 		placeStructureClickTimer = TIME_BEFORE_PLACE_STRUCTURE_AFTER_PAUSE;
 		currGameState = prePauseState;
 		AEAudioPlay(clickSound, soundEffects, 0.6f, 1.f, 0);
