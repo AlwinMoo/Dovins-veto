@@ -48,11 +48,23 @@ PathManager::~PathManager()
 {
 }
 
+/**
+ * \brief convert from AEVec2 to string to be able to hash
+ * 
+ * \param pos coordinates to convert
+ * \return formatted string of coordinates
+ */
 std::string PathManager::VectorToString(AEVec2 pos)
 {
 	return std::string{ std::to_string((int)pos.x) + ',' + std::to_string((int)pos.y) };
 }
 
+/**
+ * \brief convert from string to AEvec2
+ * 
+ * \param string to convert
+ * \return position from string
+ */
 AEVec2 PathManager::StringToVector(std::string buf)
 {
 	AEVec2 result{ 0,0 };
@@ -76,6 +88,13 @@ AEVec2 PathManager::StringToVector(std::string buf)
 	return result;
 }
 
+/**
+ * \brief checks whether the position is valid
+ * 
+ * \param coord position to check
+ * \return true position is valid
+ * \return false position is invalid
+ */
 bool PathManager::IsPositionValid(AEVec2 coord)
 {
 	if (coord.x < 0 || coord.y < 0 || static_cast<unsigned int>(coord.x) >= Map->width || static_cast<unsigned int>(coord.y) >= Map->height)
@@ -93,13 +112,27 @@ bool PathManager::IsPositionValid(AEVec2 coord)
 			static_cast<int>(Map->map_arr[Map->GetIndex(static_cast<int>(coord.x), static_cast<int>(coord.y))]) < 0; // is it ground
 }
 
-// A Utility Function to calculate the 'h' heuristics.
+/**
+ * \brief A Utility Function to calculate the 'h' heuristics.
+ * 
+ * \param coord starting position
+ * \param goal ending position
+ * \return returns the distance between 2 positons
+ */
 double calculateHValue(AEVec2 coord, AEVec2 goal)
 {
 	// Return using the distance formula
 	return AEVec2Distance(&coord, &goal);
 }
 
+/**
+ * \brief unrolled calculation of neighbour
+ * 
+ * \param parent parent position
+ * \param goalPos position GO wishes to get to
+ * \return true we have reached the goal
+ * \return false we have yet to reach the goal
+ */
 bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 {
 	AEVec2 NewPos{ 0,0 };	
@@ -471,6 +504,13 @@ bool PathManager::calculate_neighbour(AEVec2 parent, AEVec2 goalPos)
 	return false;
 }
 
+/**
+ * \brief calculates the final path backwards from calculated results
+ * 
+ * \param cellData data of the current cell to start generating from
+ * \param goalPos position GO wishes to get to
+ * \return finalised path
+ */
 std::vector<AEVec2> PathManager::tracePath(std::map<std::string, cell> cellData, AEVec2 goalPos)
 {
 	AEVec2 temp = goalPos;
@@ -501,6 +541,13 @@ std::vector<AEVec2> PathManager::tracePath(std::map<std::string, cell> cellData,
 	return usablePath;
 }
 
+/**
+ * \brief calculate the path using weighted A*
+ * 
+ * \param startPos position GO is at currently
+ * \param goalPos position GO is wishes to get to
+ * \return vector of AEVec2 containing grid based waypoints
+ */
 std::vector<AEVec2> PathManager::GetPath(AEVec2 const& startPos, AEVec2 const& goalPos)
 {
 	if (!IsPositionValid(goalPos) || !IsPositionValid(startPos))
