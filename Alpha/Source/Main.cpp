@@ -41,7 +41,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	GSM_Initialize(GS_SPLASH);
 	// Using custom window procedure
 
-	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, true, NULL);
+	AESysInit(hInstance, nCmdShow, 1600, 900, 0, 60, true, NULL);
 	HICON hWindowIcon = NULL;
 	hWindowIcon = LoadIcon(hInstance, MAKEINTRESOURCE(101));  //101 is your new icon ID that you added into the reources. 
 	SendMessage(AESysGetWindowHandle(), WM_SETICON, ICON_SMALL, (LPARAM)hWindowIcon);
