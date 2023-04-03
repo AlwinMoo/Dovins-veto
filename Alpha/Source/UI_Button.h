@@ -9,9 +9,9 @@
 \brief		Alonzo (Primary 95%), Alvin (Secondary 5%)
 			This file contains the definition of button class
 			to be used with ui manager
-			Alonzo: everything
 			Alvin: Only added support for a different render for if a
 				   skill is bought in the skill tree
+			Alonzo: everything else
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the

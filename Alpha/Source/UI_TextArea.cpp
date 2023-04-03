@@ -96,15 +96,10 @@ namespace UI{
 		lines.push_back(UI_TextLineInfo{ str, m_scale});
 	}
 
-	UI_TextArea::UI_TextArea() : UI_TextArea(0,0)
-	{
-	}
-
 	UI_TextArea::UI_TextArea(f32 w, f32 h, UI::UI_Color color, f32 scale) : 
 		m_boxWidthN(w), m_boxHeightN(h), m_boxHeight(0.f), m_color(color), m_scale(scale)
 	{
 		m_boxWidth = AEGetWindowWidth() * m_boxWidthN; // Width is determined before splitting lines
-		//m_boxHeight = AEGetWindowHeight() * m_boxHeightN;
 	}
 
 
@@ -166,10 +161,4 @@ namespace UI{
 	{
 		return m_boxHeightN;
 	}
-
-	UI_TextArea::~UI_TextArea()
-	{
-		//std::cout << "DESTROYED" << std::endl;
-	}
-
 }

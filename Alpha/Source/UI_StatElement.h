@@ -4,7 +4,7 @@
 \authors 	Alonzo Nalpon(a.nalpon)
 \par    	email: a.nalpon@digipen.edu
 \date   	March 02, 2023
-\brief		This file contains the declaration of UI_StatInfo class.
+\brief		This file contains the definition of UI_StatInfo class.
 			These elements can render text and/or mesh
 
 Copyright (C) 2023 DigiPen Institute of Technology.

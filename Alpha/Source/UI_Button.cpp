@@ -5,7 +5,7 @@
 \par    	email: a.nalpon@digipen.edu
 \date   	January 28, 2023
 \brief		Alonzo (Primary 100%)
-			This file contains the definitions of button class
+			This file contains the definitions of button class member function
 			to be used with ui manager
 
 Copyright (C) 2023 DigiPen Institute of Technology.

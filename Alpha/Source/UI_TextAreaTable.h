@@ -48,17 +48,12 @@ namespace UI
 		UI::UI_TextArea gameConfirmText				= { .5f, 0.f, "ARE YOU SURE YOU WANT TO QUIT? PROGRESS WILL BE LOST!" };
 		UI::UI_TextArea yesButton					= { .2f, 0.f, "YES" };
 		UI::UI_TextArea noButton					= { .2f, 0.f, "NO" };
-		/*
-			start
-			how to play
-			credits
-			quit
-		*/
+
 
 		//For how to play
 		UI::UI_TextArea nextButton					= { .2f, 0.f, "NEXT" };
 
-		// For skill tree
+		// FOR SKILL TREE DESCRIPTIONS
 		UI::UI_TextArea Skill_Tree					= { .3f, 1.f, "Skill Tree" };
 		UI::UI_TextArea RangeBase					= { .3f, 1.f, "Enables shooting with the left mouse button. COSTS: 200" };
 		UI::UI_TextArea RangeTier1					= { .3f, 1.f, "Increases the damage of your bullets. COSTS: 250" };

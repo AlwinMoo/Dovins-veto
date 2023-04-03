@@ -25,6 +25,7 @@ namespace UI
 	const UI_Color DISABLED_RGBA{ 0.f, 0.f, 0.f, .8f };
 	//const float BUTTON_NORMAL_ALPHA{ 0.f };
 	/*________________________________________________*/
+
 	void UI_Manager::ConvertToWS(UI_Button* newButton)
 	{
 		newButton->posWS.x = newButton->pos.x - m_winDim.x * 0.5f;
@@ -61,6 +62,7 @@ namespace UI
 		// Button text position
 		newButton->CalculatePosN(m_winDim);
 
+		// Assign textures AND/OR custom attributes based on button type
 		switch (type) {
 		case BUILD_TOWER_BUTTON:
 			newButton->texID = TEX_TOWER;
@@ -188,15 +190,7 @@ namespace UI
 	{
 		for (UI_Button* curr : m_buttons) {
 			curr->bHovering = false;
-
-#ifdef DEBUG_UI
-			std::
-				<< "MOUSEPOS = " << mousePos.x << ", " << mousePos.y << '\n';
-			std::cout << "CURRMIN  = " << curr->min.x << ", " << curr->min.y << '\n';
-			std::cout << "CURRMAX  = " << curr->max.x << ", " << curr->max.y << '\n';
-			std::cout << std::endl;
-#endif
-
+			// If button is disabled or mouse not on button, skip
 			if (!curr->bEnable || 
 				mousePos.x > curr->max.x || mousePos.x < curr->min.x || 
 				mousePos.y > curr->max.y || mousePos.y < curr->min.y)
@@ -204,14 +198,13 @@ namespace UI
 			// CLICKING LOGIC
 			if (lClick)
 			{
-				// Set any bools?
-				if (curr->callback)
+				if (curr->callback) // Callback if any
 					curr->callback(curr);
 			}
 			// HOVER LOGIC
 			else
 			{
-				curr->bHovering = true;
+				curr->bHovering = true; // If not clicking, it's hovered on
 			}
 		}
 	}
@@ -278,6 +271,6 @@ namespace UI
 
 	UI_Manager::~UI_Manager()
 	{
-		Unload();
+		Unload(); // Automatically clears all the buttons/elements/panels
 	}
 }

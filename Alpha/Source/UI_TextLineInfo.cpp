@@ -21,10 +21,6 @@ namespace UI
 		AEGfxGetPrintSize(1, const_cast<s8*>(str.c_str()), scale, m_width, m_height);
 	}
 
-	UI_TextLineInfo::~UI_TextLineInfo()
-	{
-	}
-
 	f32 UI_TextLineInfo::Height()const
 	{
 		return m_height;

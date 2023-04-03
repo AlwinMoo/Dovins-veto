@@ -53,11 +53,13 @@ namespace UI
 
 	void UnloadUI()
 	{
+		// CLEAR ALL TEXTURES
 		for (AEGfxTexture* i : TextureList) {
 			if (!i)
 				continue;
 			AEGfxTextureUnload(i);
 		}
+		// CLEAR ALL MESHES
 		for (AEGfxVertexList* i : MeshList) {
 			if (!i)
 				continue;
@@ -65,8 +67,6 @@ namespace UI
 		}
 
 	}
-
-	
 
 	void AEGfxPrint(s8 const* pStr, AEVec2 const& screenPosN, f32 scale, UI_Color const& color)
 	{
@@ -86,6 +86,7 @@ namespace UI
 		AEGfxSetTransparency(1.f);
 		AEGfxTextureSet(TextureList[texID], 0, 0);
 
+		// Perform transformations
 		AEMtx33 scale = { 0 };
 		AEMtx33Scale(&scale, meshScale.x, meshScale.y);
 
@@ -105,10 +106,10 @@ namespace UI
 
 	void DrawMesh(AEVec2 const& pos, AEVec2 const& meshScale, UI_TEX texID, UI_Color const& color)
 	{
-		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE); // stop other settings from leaking in
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetBlendColor(color.r, color.g, color.b, color.a);
-		DrawMesh(pos, meshScale, texID);
-		AEGfxSetBlendColor(0.f, 0.f, 0.f, 0.f);
+		DrawMesh(pos, meshScale, texID);		// Draw mesh
+		AEGfxSetBlendColor(0.f, 0.f, 0.f, 0.f);	// Reset blend color
 	}
 }

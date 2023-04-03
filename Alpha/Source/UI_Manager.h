@@ -4,7 +4,7 @@
 \author 	Alonzo Nalpon (a.nalpon)
 \par    	email: a.nalpon@digipen.edu
 \date   	January 26, 2023
-\brief		This file contains declarations for the UI Manager
+\brief		This file contains definition for the UI Manager class
 
 Copyright (C) 2023 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
