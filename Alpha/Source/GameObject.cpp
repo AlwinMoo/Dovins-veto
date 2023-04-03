@@ -77,18 +77,18 @@ void GameObject::Render()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(alpha);
 
-	AEMtx33 scale = { 0 };
-	AEMtx33Scale(&scale, this->scale.x, this->scale.x);
+	AEMtx33 s = { 0 };
+	AEMtx33Scale(&s, this->scale.x, this->scale.x);
 
-	AEMtx33 rotate = { 0 };
-	AEMtx33Rot(&rotate, AEDegToRad(static_cast<float>(rotation) + 180.f));
+	AEMtx33 r = { 0 };
+	AEMtx33Rot(&r, AEDegToRad(static_cast<float>(rotation) + 180.f));
 
-	AEMtx33 translate = { 0 };
-	AEMtx33Trans(&translate, position.x - AEGetWindowWidth() / 2.f, -position.y + AEGetWindowHeight() / 2.f);
+	AEMtx33 t = { 0 };
+	AEMtx33Trans(&t, position.x - AEGetWindowWidth() / 2.f, -position.y + AEGetWindowHeight() / 2.f);
 
 	AEMtx33 transform = { 0 };
-	AEMtx33Concat(&transform, &rotate, &scale);
-	AEMtx33Concat(&transform, &translate, &transform);
+	AEMtx33Concat(&transform, &r, &s);
+	AEMtx33Concat(&transform, &t, &transform);
 
 	AEGfxSetTransform(transform.m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
@@ -115,9 +115,9 @@ GameObject::~GameObject()
 	if(mesh) AEGfxMeshFree(mesh);
 }
 
-void Color::Set(float r, float g, float b)
+void Color::Set(float red, float green, float blue)
 {
-	this->r = r;
-	this->g = g;
-	this->b = b;
+	this->r = red;
+	this->g = green;
+	this->b = blue;
 }

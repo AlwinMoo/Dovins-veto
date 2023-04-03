@@ -46,7 +46,7 @@ namespace UI{
 
 		std::string lineCpy(line);
 		std::string::const_reverse_iterator rIt{ line.rbegin() };
-		std::string::size_type index{line.size()};
+		
 		bool isWord{};
 		// Find suitable substring that fits width
 		// If word is longer than actual width limit, string is cut within word
@@ -68,8 +68,8 @@ namespace UI{
 				isWord = is_whitespace(*rIt) ? false : true;
 				++rIt;
 			}
-		if (int index = static_cast<int>(line.rend() - rIt))
-			return static_cast<u32>(index);
+		if (int id = static_cast<int>(line.rend() - rIt))
+			return static_cast<u32>(id);
 		//do 
 		//{
 		//	lineCpy.erase(lineCpy.end() - 1);		// erasing one
@@ -119,8 +119,6 @@ namespace UI{
 
 	void UI_TextArea::Draw(f32 screenX, f32 screenY, f32 r, f32 g, f32 b)const
 	{
-		f32 screenHeight{ static_cast<f32>(AEGetWindowHeight()) };
-		f32 screenWidth{ static_cast<f32>(AEGetWindowWidth()) };
 		f32 offsetY{lines.at(0).Height()};
 
 		// Automatically offset x based on screen bounds

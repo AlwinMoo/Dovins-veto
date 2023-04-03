@@ -1868,7 +1868,6 @@ namespace
 
 		UI::UI_Manager& gameUIManager{ *uiManagers[UI_TYPE_GAME] };
 		UI::UI_Manager& skillUIManager{ *uiManagers[UI_TYPE_SKILL] };
-		UI::UI_Manager& blankUIManager{ *uiManagers[UI_TYPE_BLANK] };
 		UI::UI_Manager& pauseUIManager{ *uiManagers[UI_TYPE_PAUSE] };
 		UI::UI_Manager& quitUIManager{ *uiManagers[UI_TYPE_QUIT] };
 
@@ -2110,7 +2109,6 @@ nullptr, MeleeSkillUpgrade_tier7, & textTable->MeleeTier7, false);
 	void InitializeUIElements()
 	{
 		AEVec2 healthBarPos{ -35.f, 0.f }, healthBarScale{ 50.f, 5.f };
-		UI::UI_Manager& skillUIManager{ *uiManagers[UI_TYPE_SKILL] };
 		goHealthBar = UI::UI_Manager::GenerateUIStat(healthBarPos, healthBarScale, nullptr);
 		goHealthBar->SetValue(1.f);
 		goHealthBar->SetColor(UI::UI_Color{ 1.f, 0.f, 0.f, 1.f });

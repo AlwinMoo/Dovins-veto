@@ -30,7 +30,7 @@ struct Color
 	float g;
 	float b;
 
-	void Set(float r, float g, float b);
+	void Set(float, float, float);
 };
 struct skill_necessity
 {
