@@ -52,7 +52,6 @@ namespace UI {
 		double GetValue()const;
 		void SetColor(UI_Color const& color);
 
-		void Update(double dt);
 		void Draw();
 	};
 }

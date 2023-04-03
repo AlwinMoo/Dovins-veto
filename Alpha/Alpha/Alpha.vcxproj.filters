@@ -25,7 +25,7 @@
     <ClCompile Include="..\Source\UI_Button.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Alwintest.cpp">
+    <ClCompile Include="..\Source\BadeaState.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Main.cpp">
@@ -90,7 +90,7 @@
     <ClInclude Include="..\Source\UI_Button.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Alwintest.h">
+    <ClInclude Include="..\Source\BadeaState.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\UI_TextLineInfo.h">

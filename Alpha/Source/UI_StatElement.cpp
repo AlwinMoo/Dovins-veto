@@ -60,11 +60,6 @@ void UI_StatElement::CalculatePositions()
 		data.posWS = pos;
 	}
 
-	void UI_StatElement::Update(double dt)
-	{
-		
-	}
-
 	void UI_StatElement::Draw()
 	{
 		// Render text if any
