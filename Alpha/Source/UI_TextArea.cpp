@@ -80,17 +80,6 @@ namespace UI{
 		return newStr;
 	}
 
-	//!< NOT BEING USED AT THE MOMENT>  INCOMPLETE
-	void UI_TextArea::SetString(std::string& str)
-	{
-		u32 index;
-		while (index = ProcessLine(str)) {
-
-			lines.push_back(UI_TextLineInfo{ SplitLine(str, index) , m_scale});
-		}
-		lines.push_back(UI_TextLineInfo{ str, m_scale});
-	}
-
 	UI_TextArea::UI_TextArea(f32 w, f32 h, UI::UI_Color color, f32 scale) : 
 		m_boxWidthN(w), m_boxHeightN(h), m_boxHeight(0.f), m_color(color), m_scale(scale)
 	{

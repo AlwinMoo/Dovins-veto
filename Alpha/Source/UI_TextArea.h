@@ -35,12 +35,23 @@ private:
 	f32 m_scale;
 	UI::UI_Color m_color;
 	// Helper functions
-	//!< Returns 0 if no break needed, otherwise returns size
-	void GetPrintSize(std::string const& str, f32& width, f32& height);
+	void GetPrintSize(std::string const& str, f32& width, f32& height); //!< Returns 0 if no break needed, otherwise returns size
+	
+	/// <summary>
+	/// Processes entire string into multiple lines to fit width
+	/// </summary>
+	/// <param name="line"></param>
+	/// <returns></returns>
 	u32 ProcessLine(std::string const& line);
-	//!< Trims line from the front to index and returns trimmed string
+
+	/// <summary>
+	/// Trims line from the front to index and returns trimmed string
+	/// </summary>
+	/// <param name="line">str to split</param>
+	/// <param name="end"></param>
+	/// <returns></returns>
 	std::string SplitLine(std::string& line, u32 end);
-	void SetString(std::string& str);
+
 	/// <summary>
 	/// Private ctor to set width, height, color and scale
 	/// while calculating the box width in world
